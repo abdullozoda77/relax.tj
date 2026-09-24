@@ -202,3 +202,20 @@ class PlaceSuggestionReviewSerializer(serializers.ModelSerializer):
         if value == "pending":
             raise serializers.ValidationError("Choose approved or rejected.")
         return value
+
+class SuggestionApproveSerializer(serializers.Serializer):
+    """For admins: optional fixes before a suggestion becomes a real place."""
+
+    region = serializers.PrimaryKeyRelatedField(queryset=Region.objects.all(), required=False)
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), required=False, allow_null=True)
+    admin_comment = serializers.CharField(required=False, allow_blank=True)
+
+
+class RejectSerializer(serializers.Serializer):
+    admin_comment = serializers.CharField()
+
+
+class TravelListAddPlaceSerializer(serializers.Serializer):
+    place = serializers.PrimaryKeyRelatedField(queryset=Place.objects.filter(is_active=True))
+    note = serializers.CharField(required=False, allow_blank=True, default="")
+    order = serializers.IntegerField(required=False, min_value=0)
