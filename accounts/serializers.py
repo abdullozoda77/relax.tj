@@ -45,3 +45,14 @@ class ChangePasswordSerializer(serializers.Serializer):
         user.set_password(self.validated_data["new_password"])
         user.save()
         return user
+class LogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+
+
+class AdminUserSerializer(serializers.ModelSerializer):
+    """For admins: see users and change their role or block them."""
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "first_name", "last_name", "phone_number", "avatar", "role", "is_active", "is_staff", "date_joined", "last_login"]
+        read_only_fields = ["id", "username", "email", "first_name", "last_name", "phone_number", "avatar", "is_staff", "date_joined", "last_login"]
