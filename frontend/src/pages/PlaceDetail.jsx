@@ -7,6 +7,7 @@ import PlaceGallery from "../components/place/PlaceGallery.jsx";
 import { DetailsAccordion, GearChecklist, GoodToKnow, LocationCard, MetricsBar } from "../components/place/PlaceInfoBlocks.jsx";
 import PlaceSidebar from "../components/place/PlaceSidebar.jsx";
 import Reviews from "../components/place/Reviews.jsx";
+import WeatherCard from "../components/place/WeatherCard.jsx";
 import Stars from "../components/Stars.jsx";
 import { SEASONS, formatRating, plural } from "../utils.js";
 
@@ -136,6 +137,7 @@ export default function PlaceDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           <div className="lg:col-span-8 flex flex-col gap-14 min-w-0">
             {place.latitude && place.longitude && <Terrain3DSection place={place} />}
+            <WeatherCard place={place} />
             <LocationCard place={place} />
             <DetailsAccordion place={place} />
             <GoodToKnow place={place} />
