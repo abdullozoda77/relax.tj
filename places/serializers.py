@@ -131,10 +131,11 @@ class PlaceWriteSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     author = UserShortSerializer(source="user", read_only=True)
+    place_name = serializers.CharField(source="place.name", read_only=True)
 
     class Meta:
         model = Review
-        fields = ["id", "user", "author", "place", "rating", "comment", "created_at", "updated_at"]
+        fields = ["id", "user", "author", "place", "place_name", "rating", "comment", "created_at", "updated_at"]
 
     def validate_place(self, value):
         if self.instance and self.instance.place != value:

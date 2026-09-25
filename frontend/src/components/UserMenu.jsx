@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import { useUi } from "../context/UiContext.jsx";
@@ -59,6 +60,9 @@ export default function UserMenu() {
               {user.email || (user.role === "admin" ? "Администратор" : "Путешественник")}
             </p>
           </div>
+          <Link className={itemClass} onClick={() => setOpen(false)} to="/profile">
+            <Icon name="account_circle" className="text-[18px]" /> Мой профиль
+          </Link>
           <button
             className={itemClass}
             onClick={() => {

@@ -6,6 +6,7 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 import { ToastProvider } from "./context/ToastContext.jsx";
 import { UiProvider } from "./context/UiContext.jsx";
 import Home from "./pages/Home.jsx";
+import Profile from "./pages/Profile.jsx";
 
 // Scrolls to #places, #lists... after navigation, or to the top when there is no hash.
 function ScrollToHash() {
@@ -32,6 +33,7 @@ export default function App() {
             <main className="w-full pt-20 bg-[#0b1117] min-h-screen">
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/profile" element={<Profile />} />
               </Routes>
             </main>
             <Footer />
