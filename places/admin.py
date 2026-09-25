@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     Region, Category, Place, PlaceImage, Activity, Favorite,
-    Review, ReviewImage, TravelList, TravelListPlace, PlaceSuggestion,
+    Review, ReviewImage, TravelList, TravelListPlace, PlaceSuggestion, Notification,
 )
 
 
@@ -91,3 +91,10 @@ class PlaceSuggestionAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "user", "region", "status", "created_at"]
     list_filter = ["status", "region"]
     search_fields = ["name", "user__username"]
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ["id", "user", "kind", "text", "is_read", "created_at"]
+    list_filter = ["kind", "is_read"]
+    search_fields = ["user__username", "text"]

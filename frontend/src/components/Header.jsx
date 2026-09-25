@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import Icon from "./Icon.jsx";
 import Logo from "./Logo.jsx";
+import NotificationBell from "./NotificationBell.jsx";
 import UserMenu from "./UserMenu.jsx";
 
 const NAV = [
@@ -57,6 +58,7 @@ export default function Header() {
               value={query}
             />
           </div>
+          <NotificationBell />
           <UserMenu />
         </div>
       </div>

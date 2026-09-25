@@ -13,6 +13,7 @@ router.register("favorites", views.FavoriteViewSet, basename="favorites")
 router.register("travel-lists", views.TravelListViewSet, basename="travel-lists")
 router.register("travel-list-places", views.TravelListPlaceViewSet, basename="travel-list-places")
 router.register("suggestions", views.PlaceSuggestionViewSet, basename="suggestions")
+router.register("notifications", views.NotificationViewSet, basename="notifications")
 
 urlpatterns = [
     path("stats/", views.StatsView.as_view(), name="stats"),

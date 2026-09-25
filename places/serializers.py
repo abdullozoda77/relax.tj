@@ -4,7 +4,7 @@ from accounts.serializers import UserShortSerializer
 from .validators import image_validators
 from .models import (
     Region, Category, Activity, Place, PlaceImage, Favorite,
-    Review, ReviewImage, TravelList, TravelListPlace, PlaceSuggestion,
+    Review, ReviewImage, TravelList, TravelListPlace, PlaceSuggestion, Notification,
 )
 
 class RegionSerializer(serializers.ModelSerializer):
@@ -235,3 +235,9 @@ class TravelListAddPlaceSerializer(serializers.Serializer):
     place = serializers.PrimaryKeyRelatedField(queryset=Place.objects.filter(is_active=True))
     note = serializers.CharField(required=False, allow_blank=True, default="")
     order = serializers.IntegerField(required=False, min_value=0)
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ["id", "kind", "text", "link", "is_read", "created_at"]
+        read_only_fields = fields

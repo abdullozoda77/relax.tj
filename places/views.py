@@ -12,12 +12,12 @@ from rest_framework.views import APIView
 from accounts.models import User
 from .filters import PlaceFilter, PlaceSuggestionFilter, ReviewFilter
 from .models import (
-    Activity, Category, Favorite, Place, PlaceImage, PlaceSuggestion,
+    Activity, Category, Favorite, Notification, Place, PlaceImage, PlaceSuggestion,
     Region, Review, TravelList, TravelListPlace,
 )
 from .permissions import IsAdmin, IsAdminOrReadOnly, IsOwner, IsOwnerOrAdminOrReadOnly, is_admin
 from .serializers import (
-    ActivitySerializer, CategorySerializer, FavoriteSerializer, PlaceDetailSerializer,
+    ActivitySerializer, CategorySerializer, FavoriteSerializer, NotificationSerializer, PlaceDetailSerializer,
     PlaceImageSerializer, PlaceListSerializer, PlaceSuggestionSerializer, PlaceWriteSerializer,
     RegionSerializer, RejectSerializer, ReviewSerializer, SuggestionApproveSerializer,
     TravelListAddPlaceSerializer, TravelListPlaceSerializer, TravelListSerializer,
@@ -487,6 +487,12 @@ class PlaceSuggestionViewSet(viewsets.ModelViewSet):
             suggestion.category = category
             suggestion.admin_comment = data.get("admin_comment", "")
             suggestion.save()
+            Notification.objects.create(
+                user=suggestion.user,
+                kind="suggestion",
+                text=f"Ваше предложение «{suggestion.name}» одобрено — место добавлено на сайт",
+                link=f"/places/{place.id}",
+            )
 
         place = places_queryset(request).get(pk=place.pk)
         return Response(
@@ -508,6 +514,12 @@ class PlaceSuggestionViewSet(viewsets.ModelViewSet):
         suggestion.status = "rejected"
         suggestion.admin_comment = serializer.validated_data["admin_comment"]
         suggestion.save(update_fields=["status", "admin_comment"])
+        Notification.objects.create(
+            user=suggestion.user,
+            kind="suggestion",
+            text=f"Ваше предложение «{suggestion.name}» отклонено: {suggestion.admin_comment}",
+            link="/profile",
+        )
         return Response(PlaceSuggestionSerializer(suggestion, context={"request": request}).data)
 
 class StatsView(APIView):
@@ -539,3 +551,33 @@ class StatsView(APIView):
                 for p in top_places
             ],
         })
+
+class NotificationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    """The user's own notifications, newest first."""
+
+    serializer_class = NotificationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filterset_fields = ["is_read", "kind"]
+
+    def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Notification.objects.none()
+        return Notification.objects.filter(user=self.request.user)
+
+    @action(detail=False, methods=["get"], url_path="unread-count")
+    def unread_count(self, request):
+        return Response({"count": self.get_queryset().filter(is_read=False).count()})
+
+    @swagger_auto_schema(request_body=no_body)
+    @action(detail=True, methods=["post"])
+    def read(self, request, pk=None):
+        updated = self.get_queryset().filter(pk=pk).update(is_read=True)
+        if not updated:
+            return Response({"detail": "Уведомление не найдено."}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"detail": "Прочитано."})
+
+    @swagger_auto_schema(request_body=no_body)
+    @action(detail=False, methods=["post"], url_path="read-all")
+    def read_all(self, request):
+        count = self.get_queryset().filter(is_read=False).update(is_read=True)
+        return Response({"detail": "Все уведомления прочитаны.", "count": count})
