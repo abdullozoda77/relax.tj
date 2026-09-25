@@ -64,6 +64,7 @@ class Place(models.Model):
     altitude = models.PositiveIntegerField(blank=True, null=True, help_text="Meters above sea level")
     best_season = models.CharField(max_length=20, choices=SEASONS, default="summer")
     entrance_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="In somoni, 0 = free")
+    views_count = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -75,7 +75,7 @@ class PlaceListSerializer(PlaceRatingMixin, serializers.ModelSerializer):
         model = Place
         fields = [
             "id", "name", "region", "category", "main_image", "best_season",
-            "entrance_fee", "average_rating", "reviews_count", "is_favorite",
+            "entrance_fee", "views_count", "average_rating", "reviews_count", "is_favorite",
         ]
 
     def get_main_image(self, obj):
@@ -98,7 +98,7 @@ class PlaceDetailSerializer(PlaceRatingMixin, serializers.ModelSerializer):
         fields = [
             "id", "name", "description", "region", "category", "activities", "images",
             "address", "how_to_get_there", "latitude", "longitude", "altitude",
-            "best_season", "entrance_fee", "average_rating", "reviews_count",
+            "best_season", "entrance_fee", "views_count", "average_rating", "reviews_count",
             "is_favorite", "is_active", "created_by", "created_at", "updated_at",
         ]
 

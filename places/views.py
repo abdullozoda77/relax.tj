@@ -1,7 +1,7 @@
 import math
 
 from django.db import transaction
-from django.db.models import Avg, Count, Exists, Max, OuterRef, ProtectedError, Q, Value, BooleanField
+from django.db.models import Avg, Count, Exists, F, Max, OuterRef, ProtectedError, Q, Value, BooleanField
 from drf_yasg import openapi
 from drf_yasg.utils import no_body, swagger_auto_schema
 from rest_framework import mixins, permissions, status, viewsets
@@ -101,7 +101,7 @@ class PlaceViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
     filterset_class = PlaceFilter
     search_fields = ["name", "description", "address", "region__name", "category__name", "activities__name"]
-    ordering_fields = ["name", "created_at", "entrance_fee", "altitude", "avg_rating", "reviews_total", "favorites_total"]
+    ordering_fields = ["name", "created_at", "entrance_fee", "altitude", "views_count", "avg_rating", "reviews_total", "favorites_total"]
     ordering = ["-created_at"]
 
     def get_queryset(self):
@@ -118,6 +118,12 @@ class PlaceViewSet(viewsets.ModelViewSet):
     def detail_response(self, place, status_code=status.HTTP_200_OK):
         place = places_queryset(self.request).get(pk=place.pk)
         return Response(PlaceDetailSerializer(place, context={"request": self.request}).data, status=status_code)
+
+    def retrieve(self, request, *args, **kwargs):
+        place = self.get_object()
+        Place.objects.filter(pk=place.pk).update(views_count=F("views_count") + 1)
+        place.views_count += 1
+        return Response(self.get_serializer(place).data)
 
     @swagger_auto_schema(request_body=PlaceWriteSerializer, responses={201: PlaceDetailSerializer})
     def create(self, request, *args, **kwargs):
@@ -187,6 +193,12 @@ class PlaceViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"], url_path="top-rated")
     def top_rated(self, request):
         qs = self.filter_queryset(self.get_queryset()).filter(reviews_total__gt=0).order_by("-avg_rating", "-reviews_total")
+        page = self.paginate_queryset(qs)
+        return self.get_paginated_response(PlaceListSerializer(page, many=True, context={"request": request}).data)
+
+    @action(detail=False, methods=["get"], url_path="most-viewed")
+    def most_viewed(self, request):
+        qs = self.filter_queryset(self.get_queryset()).order_by("-views_count")
         page = self.paginate_queryset(qs)
         return self.get_paginated_response(PlaceListSerializer(page, many=True, context={"request": request}).data)
 
