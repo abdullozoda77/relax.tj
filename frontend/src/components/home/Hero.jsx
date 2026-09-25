@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import Icon from "../Icon.jsx";
 
 function Stat({ value, title, text, amber }) {
@@ -17,18 +18,95 @@ function Stat({ value, title, text, amber }) {
   );
 }
 
+// Photos from Wikimedia Commons. The licenses require showing the author, so the credit is shown under the slide.
+const COMMONS = "https://upload.wikimedia.org/wikipedia/commons/thumb";
+const PHOTOS = [
+  {
+    src: `${COMMONS}/c/cb/-Rudaki_in_Park_Dushanbe_city.jpg/1920px--Rudaki_in_Park_Dushanbe_city.jpg`,
+    place: "Душанбе · Памятник Рудаки",
+    author: "Шухрат Саъдиев",
+    license: "CC BY-SA 4.0",
+    page: "https://commons.wikimedia.org/wiki/File:-Rudaki_in_Park_Dushanbe_city.jpg",
+  },
+  {
+    src: `${COMMONS}/e/eb/Panorama_with_Dousti_Square_and_Dushanbe_Flagpole.jpg/1920px-Panorama_with_Dousti_Square_and_Dushanbe_Flagpole.jpg`,
+    place: "Душанбе · Площадь Дусти и флагшток",
+    author: "Adam Harangozó",
+    license: "CC BY-SA 4.0",
+    page: "https://commons.wikimedia.org/wiki/File:Panorama_with_Dousti_Square_and_Dushanbe_Flagpole.jpg",
+  },
+  {
+    src: `${COMMONS}/6/60/Ustod_Rudaki_Park_and_Palace_of_the_Nation_in_Dushanbe_-_panoramio.jpg/1920px-Ustod_Rudaki_Park_and_Palace_of_the_Nation_in_Dushanbe_-_panoramio.jpg`,
+    place: "Душанбе · Парк Рудаки и Дворец нации",
+    author: "Maris Teteris",
+    license: "CC BY 3.0",
+    page: "https://commons.wikimedia.org/wiki/File:Ustod_Rudaki_Park_and_Palace_of_the_Nation_in_Dushanbe_-_panoramio.jpg",
+  },
+  {
+    src: `${COMMONS}/5/5c/Panorama_with_buildings%2C_Dushanbe.jpg/1920px-Panorama_with_buildings%2C_Dushanbe.jpg`,
+    place: "Душанбе · Современный центр",
+    author: "Adam Harangozó",
+    license: "CC BY-SA 4.0",
+    page: "https://commons.wikimedia.org/wiki/File:Panorama_with_buildings,_Dushanbe.jpg",
+  },
+  {
+    src: `${COMMONS}/4/46/Pamir_Mountains%2C_Lake_Yashikul_viewed_from_the_south_%28August_2017%29.jpg/1920px-Pamir_Mountains%2C_Lake_Yashikul_viewed_from_the_south_%28August_2017%29.jpg`,
+    place: "Памир · Озеро Яшилькуль",
+    author: "Kondephy",
+    license: "CC BY-SA 4.0",
+    page: "https://commons.wikimedia.org/wiki/File:Pamir_Mountains,_Lake_Yashikul_viewed_from_the_south_(August_2017).jpg",
+  },
+];
+const SLIDE_MS = 6000;
+
 export default function Hero({ stats = {}, onNearby }) {
+  const [slide, setSlide] = useState(0);
+
+  // Next photo every 6 seconds. Changing `slide` by a dot click restarts the timer.
+  useEffect(() => {
+    const timer = setTimeout(() => setSlide((s) => (s + 1) % PHOTOS.length), SLIDE_MS);
+    return () => clearTimeout(timer);
+  }, [slide]);
+
+  const photo = PHOTOS[slide];
+
   return (
     <section className="relative min-h-[860px] flex flex-col justify-between pt-12 pb-16 px-6 lg:px-12 overflow-hidden bg-[#070c11] text-white">
-      <svg className="absolute inset-x-0 bottom-0 w-full h-[70%] z-0 opacity-60" preserveAspectRatio="none" viewBox="0 0 1440 600">
-        <path d="M0 600V330l140-120 110 90 190-210 150 150 120-90 200 230 160-170 190 160 180-190v420Z" fill="#13221d" />
-        <path d="M0 600V420l200-130 140 90 210-160 170 150 150-80 180 140 190-120 200 110v180Z" fill="#0f1a17" />
-        <path d="M440 90l-38 42 18 4 20-22 16 26 22-6Z" fill="#cbd5e1" opacity=".5" />
-        <path d="M950 170l-30 34 16 2 14-14 14 20 16-4Z" fill="#cbd5e1" opacity=".4" />
-      </svg>
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0b1117] via-[#0b1117]/40 to-[#070c11]/70 z-0" />
+      {PHOTOS.map((p, i) => (
+        <div
+          key={p.src}
+          aria-hidden
+          className={`absolute inset-0 z-0 bg-cover bg-center transition-[opacity,transform] ease-out ${
+            i === slide ? "opacity-100 scale-105 duration-[1500ms,7000ms]" : "opacity-0 scale-100 duration-[1500ms,0ms]"
+          }`}
+          style={{ backgroundImage: `url("${p.src}")` }}
+        />
+      ))}
+      {/* Dark gradients keep the text readable on any photo */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#070c11]/85 via-[#070c11]/50 to-transparent" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#0b1117] via-[#0b1117]/20 to-[#070c11]/50" />
       <div className="absolute -top-32 -left-32 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/3 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="absolute right-6 lg:right-12 bottom-[250px] md:bottom-[170px] z-10 flex flex-col items-end gap-2 text-right">
+        <div className="flex items-center gap-1.5 bg-slate-950/60 backdrop-blur-md border border-slate-700/60 px-3 py-1.5 rounded-full text-label-sm font-label-sm text-slate-200">
+          <Icon name="location_on" className="text-[14px] text-emerald-400" />
+          {photo.place}
+        </div>
+        <a className="text-[10px] text-slate-400 hover:text-slate-200 transition-colors" href={photo.page} rel="noreferrer" target="_blank">
+          Фото: {photo.author}, {photo.license}, Wikimedia Commons
+        </a>
+        <div className="flex gap-1.5">
+          {PHOTOS.map((p, i) => (
+            <button
+              key={p.src}
+              aria-label={p.place}
+              className={`h-1.5 rounded-full transition-all ${i === slide ? "w-6 bg-emerald-400" : "w-1.5 bg-slate-500 hover:bg-slate-300"}`}
+              onClick={() => setSlide(i)}
+              type="button"
+            />
+          ))}
+        </div>
+      </div>
 
       <div className="max-w-7xl mx-auto w-full z-10 flex flex-col items-start my-auto py-16">
         <div className="inline-flex items-center gap-2 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-4 py-1.5 rounded-full text-label-md font-label-md mb-6 shadow-[0_0_16px_rgba(16,185,129,0.15)] backdrop-blur-md">

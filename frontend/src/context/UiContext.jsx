@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../api.js";
 import AuthModal from "../components/AuthModal.jsx";
-import PlaceModal from "../components/place/PlaceModal.jsx";
 import SuggestModal from "../components/SuggestModal.jsx";
 import { useAuth } from "./AuthContext.jsx";
 import { useToast } from "./ToastContext.jsx";
@@ -15,13 +15,13 @@ export function useUi() {
 
 const MODALS = {
   auth: AuthModal,
-  place: PlaceModal,
   suggest: SuggestModal,
 };
 
 export function UiProvider({ children }) {
   const { user } = useAuth();
   const toast = useToast();
+  const navigate = useNavigate();
   const [modal, setModal] = useState(null);
   // Favorite changes made on this page: { placeId: true/false }. Cards use them over the value from the API.
   const [favorites, setFavorites] = useState({});
@@ -32,7 +32,8 @@ export function UiProvider({ children }) {
 
   const closeModal = useCallback(() => setModal(null), []);
   const openAuth = useCallback((tab = "login") => setModal({ type: "auth", props: { tab } }), []);
-  const openPlace = useCallback((id) => setModal({ type: "place", props: { id } }), []);
+  // Places open as their own page: /places/5
+  const openPlace = useCallback((id) => navigate(`/places/${id}`), [navigate]);
 
   // Returns true if logged in, otherwise shows the login window.
   const requireLogin = useCallback(
