@@ -8,9 +8,9 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Travel API",
+        title="Relax.tj API",
         default_version='v1',
-        description="API documentation",
+        description="API для поиска мест отдыха в Таджикистане: регионы, места, отзывы, избранное и списки путешествий",
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
@@ -23,3 +23,7 @@ urlpatterns = [
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+admin.site.site_header = "Relax.tj"
+admin.site.site_title = "Relax.tj"
+admin.site.index_title = "Панель управления"
