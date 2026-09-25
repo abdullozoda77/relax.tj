@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../api.js";
+import { useAuth } from "../../context/AuthContext.jsx";
 import { SEASONS } from "../../utils.js";
 import Icon from "../Icon.jsx";
 import PlaceCard, { SkeletonCards } from "../PlaceCard.jsx";
@@ -25,14 +26,15 @@ function buildQuery(filters, page) {
   return params.toString();
 }
 
-export default function PlacesSection({ filters, setFilters, onReset, regions, categories, onOpenPlace }) {
+export default function PlacesSection({ filters, setFilters, onReset, regions, categories }) {
+  const { user } = useAuth();
   const [places, setPlaces] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Load the first page again whenever filters change.
+  // Load the first page again when filters change, or the user logs in/out (hearts depend on the user).
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -49,7 +51,7 @@ export default function PlacesSection({ filters, setFilters, onReset, regions, c
     return () => {
       cancelled = true;
     };
-  }, [filters]);
+  }, [filters, user?.id]);
 
   async function loadMore() {
     const data = await api(`/places/?${buildQuery(filters, page + 1)}`);
@@ -139,7 +141,7 @@ export default function PlacesSection({ filters, setFilters, onReset, regions, c
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {loading ? <SkeletonCards /> : places.map((p) => <PlaceCard key={p.id} onOpen={onOpenPlace} place={p} />)}
+          {loading ? <SkeletonCards /> : places.map((p) => <PlaceCard key={p.id} place={p} />)}
         </div>
         {error && <p className="text-center text-rose-300 py-16">{error}</p>}
         {!loading && !error && places.length === 0 && (

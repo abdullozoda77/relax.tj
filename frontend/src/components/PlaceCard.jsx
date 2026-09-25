@@ -1,15 +1,19 @@
+import { useUi } from "../context/UiContext.jsx";
 import { SEASONS, formatFee, formatRating } from "../utils.js";
+import FavoriteButton from "./FavoriteButton.jsx";
 import Icon from "./Icon.jsx";
 import PlaceBackground from "./PlaceBackground.jsx";
 
-export default function PlaceCard({ place, onOpen }) {
+export default function PlaceCard({ place }) {
+  const { openPlace } = useUi();
   return (
     <article
       className="group relative rounded-2xl overflow-hidden bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 shadow-xl transition-all duration-300 flex flex-col justify-end h-[420px] cursor-pointer"
-      onClick={() => onOpen?.(place.id)}
+      onClick={() => openPlace(place.id)}
     >
       <PlaceBackground place={place} />
       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
+      <FavoriteButton place={place} />
       {place.distance_km != null && (
         <span className="absolute top-4 left-4 z-20 bg-slate-950/70 backdrop-blur-md text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full text-label-sm font-label-sm flex items-center gap-1">
           <Icon name="near_me" className="text-[14px]" />
