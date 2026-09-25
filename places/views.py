@@ -1,5 +1,8 @@
+import math
+
 from django.db import transaction
 from django.db.models import Avg, Count, Exists, Max, OuterRef, ProtectedError, Q, Value, BooleanField
+from drf_yasg import openapi
 from drf_yasg.utils import no_body, swagger_auto_schema
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -20,6 +23,12 @@ from .serializers import (
     RegionSerializer, RejectSerializer, ReviewSerializer, SuggestionApproveSerializer,
     TravelListAddPlaceSerializer, TravelListPlaceSerializer, TravelListSerializer,
 )
+
+def distance_km(lat1, lng1, lat2, lng2):
+    """Distance between two points on Earth (haversine formula)."""
+    lat1, lng1, lat2, lng2 = map(math.radians, (lat1, lng1, lat2, lng2))
+    a = math.sin((lat2 - lat1) / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin((lng2 - lng1) / 2) ** 2
+    return 6371 * 2 * math.asin(math.sqrt(a))
 
 def places_queryset(request):
     """Places with rating, review count, favorite count and is_favorite calculated in one query."""
@@ -186,6 +195,38 @@ class PlaceViewSet(viewsets.ModelViewSet):
         qs = self.filter_queryset(self.get_queryset()).order_by("-favorites_total", "-reviews_total")
         page = self.paginate_queryset(qs)
         return self.get_paginated_response(PlaceListSerializer(page, many=True, context={"request": request}).data)
+
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter("lat", openapi.IN_QUERY, type=openapi.TYPE_NUMBER, required=True),
+        openapi.Parameter("lng", openapi.IN_QUERY, type=openapi.TYPE_NUMBER, required=True),
+        openapi.Parameter("radius", openapi.IN_QUERY, type=openapi.TYPE_NUMBER, description="В км, по умолчанию 50"),
+    ])
+    @action(detail=False, methods=["get"])
+    def nearby(self, request):
+        """Places within a radius (km) of the given point, closest first."""
+        try:
+            lat = float(request.query_params["lat"])
+            lng = float(request.query_params["lng"])
+            radius = float(request.query_params.get("radius", 50))
+        except (KeyError, ValueError):
+            raise ValidationError({"detail": "Укажите lat и lng числами, radius в км (необязательно)."})
+        if not (-90 <= lat <= 90 and -180 <= lng <= 180) or radius <= 0:
+            raise ValidationError({"detail": "Неверные координаты или радиус."})
+
+        qs = self.filter_queryset(self.get_queryset()).filter(latitude__isnull=False, longitude__isnull=False)
+        found = []
+        for place in qs:
+            distance = distance_km(lat, lng, float(place.latitude), float(place.longitude))
+            if distance <= radius:
+                found.append((distance, place))
+        found.sort(key=lambda pair: pair[0])
+
+        page = self.paginate_queryset([place for _, place in found])
+        data = PlaceListSerializer(page, many=True, context={"request": request}).data
+        distances = {place.pk: round(d, 1) for d, place in found}
+        for item in data:
+            item["distance_km"] = distances[item["id"]]
+        return self.get_paginated_response(data)
 
 class PlaceImageViewSet(viewsets.ModelViewSet):
     queryset = PlaceImage.objects.select_related("place")
