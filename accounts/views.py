@@ -1,9 +1,11 @@
 from rest_framework import generics, permissions, status, viewsets, mixins
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 from drf_yasg.utils import swagger_auto_schema
 from places.permissions import IsAdmin
 from .models import User
@@ -19,6 +21,8 @@ def tokens_for(user):
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -28,6 +32,10 @@ class RegisterView(generics.CreateAPIView):
             {"user": UserSerializer(user, context={"request": request}).data, "tokens": tokens_for(user)},
             status=status.HTTP_201_CREATED,
         )
+
+class LoginView(TokenObtainPairView):
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
 
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
