@@ -6,6 +6,7 @@ import SettingsCard, { SuggestionsCard } from "../components/profile/SettingsCar
 import Icon from "../components/Icon.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useUi } from "../context/UiContext.jsx";
+import { t } from "../i18n.js";
 
 export default function Profile() {
   const { user, ready, reloadUser } = useAuth();
@@ -19,14 +20,14 @@ export default function Profile() {
     return (
       <div className="max-w-xl mx-auto px-6 py-32 text-center">
         <Icon name="lock" className="text-primary text-[48px]" />
-        <h1 className="font-headline-md text-headline-md text-on-surface mt-4 mb-2">Профиль доступен после входа</h1>
-        <p className="text-body-md text-on-surface-variant mb-6">Войдите, чтобы увидеть свои маршруты, избранное и отзывы.</p>
+        <h1 className="font-headline-md text-headline-md text-on-surface mt-4 mb-2">{t("Профиль доступен после входа")}</h1>
+        <p className="text-body-md text-on-surface-variant mb-6">{t("Войдите, чтобы увидеть свои маршруты, избранное и отзывы.")}</p>
         <button
           className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-6 py-3 rounded-xl text-label-md font-label-md"
           onClick={() => openAuth("login")}
           type="button"
         >
-          Войти
+          {t("Войти")}
         </button>
       </div>
     );

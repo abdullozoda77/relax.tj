@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
 import Icon from "../Icon.jsx";
 import { Empty, input } from "./ui.jsx";
+import { locale, t } from "../../i18n.js";
 
 export default function UsersTab() {
   const { user: me } = useAuth();
@@ -36,9 +37,9 @@ export default function UsersTab() {
 
   return (
     <div className="flex flex-col gap-4">
-      <input className={`${input} sm:max-w-xs`} onChange={(e) => setSearch(e.target.value)} placeholder="Поиск: имя, email, телефон..." value={search} />
+      <input className={`${input} sm:max-w-xs`} onChange={(e) => setSearch(e.target.value)} placeholder={t("Поиск: имя, email, телефон...")} value={search} />
       {users === null && <div className="h-64 rounded-xl bg-surface-container animate-pulse" />}
-      {users?.length === 0 && <Empty>Никого не найдено.</Empty>}
+      {users?.length === 0 && <Empty>{t("Никого не найдено.")}</Empty>}
       <div className="flex flex-col gap-2">
         {users?.map((u) => (
           <div key={u.id} className={`bg-surface-container rounded-xl p-4 flex flex-wrap items-center gap-4 ${u.is_active ? "" : "opacity-60"}`}>
@@ -50,32 +51,32 @@ export default function UsersTab() {
             <div className="flex-1 min-w-[180px]">
               <div className="flex items-center gap-2">
                 <span className="font-title-md text-title-md text-on-surface">{u.username}</span>
-                {u.id === me.id && <span className="text-[10px] text-primary">(это вы)</span>}
-                {!u.is_active && <span className="text-[10px] font-bold text-rose-300 bg-rose-500/15 px-1.5 py-0.5 rounded">ЗАБЛОКИРОВАН</span>}
+                {u.id === me.id && <span className="text-[10px] text-primary">{t("(это вы)")}</span>}
+                {!u.is_active && <span className="text-[10px] font-bold text-rose-300 bg-rose-500/15 px-1.5 py-0.5 rounded">{t("ЗАБЛОКИРОВАН")}</span>}
               </div>
               <span className="text-label-sm font-label-sm text-on-surface-variant">
-                {[u.email, u.phone_number, `с ${new Date(u.date_joined).toLocaleDateString("ru-RU")}`].filter(Boolean).join(" · ")}
+                {[u.email, u.phone_number, t("с {0}", new Date(u.date_joined).toLocaleDateString(locale()))].filter(Boolean).join(" · ")}
               </span>
             </div>
             <select
               className={`${input} w-auto`}
               disabled={u.id === me.id}
-              onChange={(e) => update(u, { role: e.target.value }, `Роль ${u.username} изменена`)}
+              onChange={(e) => update(u, { role: e.target.value }, t("Роль {0} изменена", u.username))}
               value={u.role}
             >
-              <option value="user">Пользователь</option>
-              <option value="admin">Администратор</option>
+              <option value="user">{t("Пользователь")}</option>
+              <option value="admin">{t("Администратор")}</option>
             </select>
             <button
               className={`text-body-sm px-3 py-2 rounded-lg flex items-center gap-1.5 disabled:opacity-40 ${
                 u.is_active ? "bg-rose-500/15 text-rose-300 hover:bg-rose-500/25" : "bg-primary/15 text-primary hover:bg-primary/25"
               }`}
               disabled={u.id === me.id}
-              onClick={() => update(u, { is_active: !u.is_active }, u.is_active ? `${u.username} заблокирован` : `${u.username} разблокирован`)}
+              onClick={() => update(u, { is_active: !u.is_active }, u.is_active ? t("{0} заблокирован", u.username) : t("{0} разблокирован", u.username))}
               type="button"
             >
               <Icon name={u.is_active ? "block" : "lock_open"} className="text-[18px]" />
-              {u.is_active ? "Заблокировать" : "Разблокировать"}
+              {u.is_active ? t("Заблокировать") : t("Разблокировать")}
             </button>
           </div>
         ))}

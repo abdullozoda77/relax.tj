@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 import Icon from "../Icon.jsx";
+import { locale, t } from "../../i18n.js";
 
 // WMO weather codes used by Open-Meteo -> text and Material icon.
 const CODES = [
-  [[0], "Ясно", "sunny"],
-  [[1, 2], "Переменная облачность", "partly_cloudy_day"],
-  [[3], "Пасмурно", "cloud"],
-  [[45, 48], "Туман", "foggy"],
-  [[51, 53, 55, 56, 57], "Морось", "rainy_light"],
-  [[61, 63, 65, 66, 67, 80, 81, 82], "Дождь", "rainy"],
-  [[71, 73, 75, 77, 85, 86], "Снег", "weather_snowy"],
-  [[95, 96, 99], "Гроза", "thunderstorm"],
+  [[0], t("Ясно"), "sunny"],
+  [[1, 2], t("Переменная облачность"), "partly_cloudy_day"],
+  [[3], t("Пасмурно"), "cloud"],
+  [[45, 48], t("Туман"), "foggy"],
+  [[51, 53, 55, 56, 57], t("Морось"), "rainy_light"],
+  [[61, 63, 65, 66, 67, 80, 81, 82], t("Дождь"), "rainy"],
+  [[71, 73, 75, 77, 85, 86], t("Снег"), "weather_snowy"],
+  [[95, 96, 99], t("Гроза"), "thunderstorm"],
 ];
 
 function describe(code) {
@@ -18,8 +19,8 @@ function describe(code) {
   return found ? { text: found[1], icon: found[2] } : { text: "—", icon: "help" };
 }
 
-const DAY = new Intl.DateTimeFormat("ru-RU", { weekday: "short" });
-const DATE = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short" });
+const DAY = new Intl.DateTimeFormat(locale(), { weekday: "short" });
+const DATE = new Intl.DateTimeFormat(locale(), { day: "numeric", month: "short" });
 
 // Free forecast from open-meteo.com (no API key). Temperature is for the real height of the place.
 export default function WeatherCard({ place }) {
@@ -52,10 +53,10 @@ export default function WeatherCard({ place }) {
     <section className="bg-surface-container-low/70 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <span className="text-label-sm font-label-sm text-primary uppercase tracking-wider">Прогноз</span>
-          <h2 className="text-headline-md font-headline-md text-on-surface">Погода на месте</h2>
+          <span className="text-label-sm font-label-sm text-primary uppercase tracking-wider">{t("Прогноз")}</span>
+          <h2 className="text-headline-md font-headline-md text-on-surface">{t("Погода на месте")}</h2>
         </div>
-        <span className="text-label-sm font-label-sm text-outline">Open-Meteo · обновляется каждый час</span>
+        <span className="text-label-sm font-label-sm text-outline">{t("Open-Meteo · обновляется каждый час")}</span>
       </div>
 
       {!weather ? (
@@ -72,9 +73,9 @@ export default function WeatherCard({ place }) {
             </div>
             <div className="grid grid-cols-3 gap-4 flex-1 min-w-[240px]">
               {[
-                ["thermostat", "Ощущается", `${Math.round(now.apparent_temperature)}°`],
-                ["water_drop", "Влажность", `${now.relative_humidity_2m}%`],
-                ["air", "Ветер", `${Math.round(now.wind_speed_10m)} м/с`],
+                ["thermostat", t("Ощущается"), `${Math.round(now.apparent_temperature)}°`],
+                ["water_drop", t("Влажность"), `${now.relative_humidity_2m}%`],
+                ["air", t("Ветер"), t("{0} м/с", Math.round(now.wind_speed_10m))],
               ].map(([icon, label, value]) => (
                 <div key={label} className="flex flex-col gap-1">
                   <span className="text-label-sm font-label-sm text-outline flex items-center gap-1">
@@ -92,7 +93,7 @@ export default function WeatherCard({ place }) {
               const date = new Date(`${day}T12:00:00`);
               return (
                 <div key={day} className={`rounded-xl p-3 flex flex-col items-center gap-1 text-center ${i === 0 ? "bg-primary/10" : "bg-surface-container-lowest/60"}`}>
-                  <span className="text-label-sm font-label-sm text-on-surface capitalize">{i === 0 ? "Сегодня" : DAY.format(date)}</span>
+                  <span className="text-label-sm font-label-sm text-on-surface capitalize">{i === 0 ? t("Сегодня") : DAY.format(date)}</span>
                   <span className="text-[10px] text-outline">{DATE.format(date)}</span>
                   <Icon name={d.icon} filled className="text-secondary text-[26px]" />
                   <span className="text-body-sm text-on-surface font-semibold">

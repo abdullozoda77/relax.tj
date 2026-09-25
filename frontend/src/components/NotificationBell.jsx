@@ -3,17 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import Icon from "./Icon.jsx";
+import { locale, t } from "../i18n.js";
 
 const ICONS = { suggestion: "add_location_alt", review: "rate_review", system: "info" };
 const POLL_MS = 60000;
 
 function timeAgo(value) {
   const minutes = Math.round((Date.now() - new Date(value)) / 60000);
-  if (minutes < 1) return "только что";
-  if (minutes < 60) return `${minutes} мин назад`;
+  if (minutes < 1) return t("только что");
+  if (minutes < 60) return t("{0} мин назад", minutes);
   const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours} ч назад`;
-  return new Date(value).toLocaleDateString("ru-RU");
+  if (hours < 24) return t("{0} ч назад", hours);
+  return new Date(value).toLocaleDateString(locale());
 }
 
 export default function NotificationBell() {
@@ -77,7 +78,7 @@ export default function NotificationBell() {
 
   return (
     <div className="relative" ref={box}>
-      <button className="relative w-9 h-9 rounded-full hover:bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center transition-colors" onClick={toggle} title="Уведомления" type="button">
+      <button className="relative w-9 h-9 rounded-full hover:bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center transition-colors" onClick={toggle} title={t("Уведомления")} type="button">
         <Icon filled={count > 0} name="notifications" className="text-[22px]" />
         {count > 0 && (
           <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">
@@ -88,16 +89,16 @@ export default function NotificationBell() {
       {open && (
         <div className="absolute right-0 top-12 w-80 max-w-[90vw] bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
-            <span className="text-body-sm text-white font-semibold">Уведомления</span>
+            <span className="text-body-sm text-white font-semibold">{t("Уведомления")}</span>
             {count > 0 && (
               <button className="text-label-sm font-label-sm text-emerald-400 hover:text-emerald-300" onClick={readAll} type="button">
-                Прочитать все
+                {t("Прочитать все")}
               </button>
             )}
           </div>
           <div className="max-h-96 overflow-y-auto">
-            {items === null && <p className="px-4 py-6 text-body-sm text-slate-400">Загрузка...</p>}
-            {items?.length === 0 && <p className="px-4 py-6 text-body-sm text-slate-400 text-center">Пока нет уведомлений</p>}
+            {items === null && <p className="px-4 py-6 text-body-sm text-slate-400">{t("Загрузка...")}</p>}
+            {items?.length === 0 && <p className="px-4 py-6 text-body-sm text-slate-400 text-center">{t("Пока нет уведомлений")}</p>}
             {items?.map((n) => (
               <button
                 key={n.id}

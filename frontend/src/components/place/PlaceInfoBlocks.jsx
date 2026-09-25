@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { SEASONS, formatFee } from "../../utils.js";
 import Icon from "../Icon.jsx";
+import { t } from "../../i18n.js";
 
 const card = "bg-surface-container-low/70 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-xl";
 const DUSHANBE_ALTITUDE = 800;
@@ -20,12 +21,12 @@ function SectionTitle({ label, title, accent = "text-primary", children }) {
 
 export function MetricsBar({ place }) {
   const metrics = [
-    { icon: "wb_sunny", label: "Сезон", value: SEASONS[place.best_season] },
-    { icon: "altitude", label: "Высота", value: place.altitude ? `${place.altitude} м` : "—", accent: true },
-    { icon: "payments", label: "Вход", value: formatFee(place.entrance_fee) },
-    { icon: "location_on", label: "Регион", value: place.region.name },
-    { icon: "category", label: "Категория", value: place.category?.name || "—", accent: true },
-    { icon: "visibility", label: "Просмотры", value: place.views_count },
+    { icon: "wb_sunny", label: t("Сезон"), value: SEASONS[place.best_season] },
+    { icon: "altitude", label: t("Высота"), value: place.altitude ? t("{0} м", place.altitude) : "—", accent: true },
+    { icon: "payments", label: t("Вход"), value: formatFee(place.entrance_fee) },
+    { icon: "location_on", label: t("Регион"), value: t(place.region.name) },
+    { icon: "category", label: t("Категория"), value: place.category ? t(place.category.name) : "—", accent: true },
+    { icon: "visibility", label: t("Просмотры"), value: place.views_count },
   ];
   return (
     <section className="max-w-7xl mx-auto px-6 lg:px-12 w-full my-4">
@@ -63,7 +64,7 @@ export function LocationCard({ place }) {
 
   return (
     <section className={`${card} flex flex-col gap-6`}>
-      <SectionTitle label="Расположение и высота" title="Где находится">
+      <SectionTitle label={t("Расположение и высота")} title={t("Где находится")}>
         {hasMap && (
           <span className="font-label-sm text-label-sm text-on-surface-variant">
             {lat.toFixed(4)}, {lng.toFixed(4)}
@@ -75,10 +76,10 @@ export function LocationCard({ place }) {
           className="w-full h-64 rounded-xl border-0 bg-surface-container-lowest"
           loading="lazy"
           src={mapUrl}
-          title={`Карта: ${place.name}`}
+          title={t("Карта: {0}", place.name)}
         />
       ) : (
-        <p className="text-body-md text-on-surface-variant">Координаты этого места пока не указаны.</p>
+        <p className="text-body-md text-on-surface-variant">{t("Координаты этого места пока не указаны.")}</p>
       )}
       {place.altitude && (
         <div className="bg-surface-container-lowest/80 rounded-xl p-4 flex flex-col gap-3">
@@ -88,11 +89,11 @@ export function LocationCard({ place }) {
             <span className="absolute -top-0.5 w-4 h-4 rounded-full bg-primary/70 border-2 border-surface" style={{ left: `calc(${percent(DUSHANBE_ALTITUDE)}% - 8px)` }} />
           </div>
           <div className="flex items-center justify-between text-label-sm font-label-sm text-outline">
-            <span>Душанбе ({DUSHANBE_ALTITUDE} м)</span>
+            <span>{t("Душанбе (")}{DUSHANBE_ALTITUDE} {t("м)")}</span>
             <span className="text-secondary font-semibold">
-              {place.name} ({place.altitude} м)
+              {place.name} ({place.altitude} {t("м)")}
             </span>
-            <span>Пик Исмоила Сомони ({SOMONI_PEAK} м)</span>
+            <span>{t("Пик Исмоила Сомони (")}{SOMONI_PEAK} {t("м)")}</span>
           </div>
         </div>
       )}
@@ -122,23 +123,23 @@ function AccordionItem({ item, open, onToggle }) {
 
 export function DetailsAccordion({ place }) {
   const items = [
-    { icon: "description", badge: "О месте", title: "Описание", content: place.description },
-    { icon: "directions_car", badge: "Дорога", title: "Как добраться", content: place.how_to_get_there },
+    { icon: "description", badge: t("О месте"), title: t("Описание"), content: place.description },
+    { icon: "directions_car", badge: t("Дорога"), title: t("Как добраться"), content: place.how_to_get_there },
     {
       icon: "hiking",
-      badge: `${place.activities.length} активностей`,
-      title: "Чем заняться",
+      badge: t("{0} активностей", place.activities.length),
+      title: t("Чем заняться"),
       content: place.activities.length ? (
         <div className="flex flex-wrap gap-2">
           {place.activities.map((a) => (
             <span key={a.id} className="bg-primary/10 text-primary px-3 py-1 rounded-full text-label-sm font-label-sm">
-              {a.name}
+              {t(a.name)}
             </span>
           ))}
         </div>
       ) : null,
     },
-    { icon: "home_pin", badge: "Адрес", title: "Точное место", content: place.address },
+    { icon: "home_pin", badge: t("Адрес"), title: t("Точное место"), content: place.address },
   ].filter((item) => item.content);
 
   const [openSet, setOpenSet] = useState(() => new Set([0]));
@@ -155,15 +156,15 @@ export function DetailsAccordion({ place }) {
     <section className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <span className="text-label-sm font-label-sm text-primary uppercase tracking-wider">Подробности</span>
-          <h2 className="text-3xl md:text-headline-lg font-headline-lg text-on-surface">Всё о месте</h2>
+          <span className="text-label-sm font-label-sm text-primary uppercase tracking-wider">{t("Подробности")}</span>
+          <h2 className="text-3xl md:text-headline-lg font-headline-lg text-on-surface">{t("Всё о месте")}</h2>
         </div>
         <button
           className="text-label-sm font-label-sm text-primary hover:text-tertiary transition-colors flex items-center gap-1"
           onClick={() => setOpenSet(allOpen ? new Set() : new Set(items.map((_, i) => i)))}
           type="button"
         >
-          <span>{allOpen ? "Свернуть всё" : "Развернуть всё"}</span>
+          <span>{allOpen ? t("Свернуть всё") : t("Развернуть всё")}</span>
           <Icon name={allOpen ? "unfold_less" : "unfold_more"} className="text-[16px]" />
         </button>
       </div>
@@ -180,16 +181,16 @@ export function DetailsAccordion({ place }) {
 export function GoodToKnow({ place }) {
   const fee = Number(place.entrance_fee);
   const good = [
-    ...place.activities.map((a) => `Можно заняться: ${a.name.toLowerCase()}`),
-    fee === 0 && "Вход бесплатный",
-    place.best_season === "all_year" && "Можно приезжать в любое время года",
-    place.latitude && "Точка отмечена на карте — легко найти",
+    ...place.activities.map((a) => t("Можно заняться: {0}", t(a.name).toLowerCase())),
+    fee === 0 && t("Вход бесплатный"),
+    place.best_season === "all_year" && t("Можно приезжать в любое время года"),
+    place.latitude && t("Точка отмечена на карте — легко найти"),
   ].filter(Boolean);
   const warnings = [
-    fee > 0 && `Вход платный: ${formatFee(fee)}`,
-    place.altitude > 2500 && `Высота ${place.altitude} м — поднимайтесь постепенно, возможна горная болезнь`,
-    place.altitude > 1500 && "В горах погода меняется быстро — возьмите тёплую одежду",
-    place.best_season !== "all_year" && `Лучшее время для поездки — ${SEASONS[place.best_season].toLowerCase()}`,
+    fee > 0 && t("Вход платный: {0}", formatFee(fee)),
+    place.altitude > 2500 && t("Высота {0} м — поднимайтесь постепенно, возможна горная болезнь", place.altitude),
+    place.altitude > 1500 && t("В горах погода меняется быстро — возьмите тёплую одежду"),
+    place.best_season !== "all_year" && t("Лучшее время для поездки — {0}", SEASONS[place.best_season].toLowerCase()),
   ].filter(Boolean);
 
   const List = ({ items, icon, color }) => (
@@ -205,19 +206,19 @@ export function GoodToKnow({ place }) {
 
   return (
     <section className={card}>
-      <SectionTitle label="Коротко" title="Что важно знать" />
+      <SectionTitle label={t("Коротко")} title={t("Что важно знать")} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="flex flex-col gap-4 bg-surface-container-lowest/60 p-6 rounded-xl">
           <div className="flex items-center gap-2 text-primary font-semibold text-title-md">
-            <Icon name="check_circle" className="text-[22px]" /> Что здесь есть
+            <Icon name="check_circle" className="text-[22px]" /> {t("Что здесь есть")}
           </div>
-          {good.length ? <List color="text-primary" icon="check" items={good} /> : <p className="text-body-md text-on-surface-variant">Информация скоро появится.</p>}
+          {good.length ? <List color="text-primary" icon="check" items={good} /> : <p className="text-body-md text-on-surface-variant">{t("Информация скоро появится.")}</p>}
         </div>
         <div className="flex flex-col gap-4 bg-surface-container-lowest/60 p-6 rounded-xl">
           <div className="flex items-center gap-2 text-secondary font-semibold text-title-md">
-            <Icon name="info" className="text-[22px]" /> Учтите
+            <Icon name="info" className="text-[22px]" /> {t("Учтите")}
           </div>
-          {warnings.length ? <List color="text-outline" icon="priority_high" items={warnings} /> : <p className="text-body-md text-on-surface-variant">Особых ограничений нет.</p>}
+          {warnings.length ? <List color="text-outline" icon="priority_high" items={warnings} /> : <p className="text-body-md text-on-surface-variant">{t("Особых ограничений нет.")}</p>}
         </div>
       </div>
     </section>
@@ -225,22 +226,22 @@ export function GoodToKnow({ place }) {
 }
 
 const GEAR = {
-  clothes: { winter: ["Тёплая куртка и шапка", "Термобельё", "Непромокаемая обувь"], other: ["Лёгкая одежда и головной убор", "Ветровка на вечер", "Удобная обувь"] },
-  health: ["Солнцезащитный крем SPF 50", "Аптечка и личные лекарства", "Вода и перекус"],
-  gear: ["Заряженный телефон и powerbank", "Наличные сомони", "Фонарик"],
+  clothes: { winter: [t("Тёплая куртка и шапка"), t("Термобельё"), t("Непромокаемая обувь")], other: [t("Лёгкая одежда и головной убор"), t("Ветровка на вечер"), t("Удобная обувь")] },
+  health: [t("Солнцезащитный крем SPF 50"), t("Аптечка и личные лекарства"), t("Вода и перекус")],
+  gear: [t("Заряженный телефон и powerbank"), t("Наличные сомони"), t("Фонарик")],
 };
 
 export function GearChecklist({ place }) {
   const cold = place.best_season === "winter" || place.altitude > 2500;
   const groups = [
-    { icon: "checkroom", title: "Одежда", text: "text-primary", dot: "bg-primary", items: cold ? GEAR.clothes.winter : GEAR.clothes.other },
-    { icon: "medical_services", title: "Здоровье", text: "text-secondary", dot: "bg-secondary", items: GEAR.health },
-    { icon: "backpack", title: "В рюкзак", text: "text-primary", dot: "bg-primary", items: GEAR.gear },
+    { icon: "checkroom", title: t("Одежда"), text: "text-primary", dot: "bg-primary", items: cold ? GEAR.clothes.winter : GEAR.clothes.other },
+    { icon: "medical_services", title: t("Здоровье"), text: "text-secondary", dot: "bg-secondary", items: GEAR.health },
+    { icon: "backpack", title: t("В рюкзак"), text: "text-primary", dot: "bg-primary", items: GEAR.gear },
   ];
   return (
     <section className={card}>
-      <SectionTitle accent="text-secondary" label="Подготовка" title="Что взять с собой">
-        <span className="text-label-sm font-label-sm text-outline">{cold ? "Для холодной погоды" : "Для тёплого сезона"}</span>
+      <SectionTitle accent="text-secondary" label={t("Подготовка")} title={t("Что взять с собой")}>
+        <span className="text-label-sm font-label-sm text-outline">{cold ? t("Для холодной погоды") : t("Для тёплого сезона")}</span>
       </SectionTitle>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {groups.map((g) => (

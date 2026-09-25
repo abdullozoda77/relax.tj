@@ -3,6 +3,7 @@ import { SEASONS, formatFee, formatRating } from "../utils.js";
 import FavoriteButton from "./FavoriteButton.jsx";
 import Icon from "./Icon.jsx";
 import PlaceBackground from "./PlaceBackground.jsx";
+import { t } from "../i18n.js";
 
 export default function PlaceCard({ place }) {
   const { openPlace } = useUi();
@@ -17,12 +18,12 @@ export default function PlaceCard({ place }) {
       {place.distance_km != null && (
         <span className="absolute top-4 left-4 z-20 bg-slate-950/70 backdrop-blur-md text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full text-label-sm font-label-sm flex items-center gap-1">
           <Icon name="near_me" className="text-[14px]" />
-          {place.distance_km} км
+          {place.distance_km} {t("км")}
         </span>
       )}
       <div className="relative z-10 p-8 flex flex-col justify-end h-full">
         <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 backdrop-blur-md self-start px-3 py-1 rounded-full text-label-sm font-label-sm mb-3">
-          {place.category || "Без категории"}
+          {place.category ? t(place.category) : t("Без категории")}
         </span>
         <h3 className="text-headline-md font-headline-md text-white mb-2">{place.name}</h3>
         <p className="text-body-sm text-slate-300 mb-4">
@@ -31,7 +32,7 @@ export default function PlaceCard({ place }) {
         <div className="flex items-center justify-between gap-2 text-label-sm font-label-sm">
           <span className="flex items-center gap-2 text-emerald-400 min-w-0">
             <Icon name="location_on" className="text-[16px]" />
-            <span className="truncate">{place.region}</span>
+            <span className="truncate">{t(place.region)}</span>
           </span>
           <span className="flex items-center gap-3 text-slate-300 shrink-0">
             <span className="flex items-center gap-1">

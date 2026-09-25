@@ -1,5 +1,6 @@
 import { Suspense, lazy, useState } from "react";
 import Icon from "../Icon.jsx";
+import { t } from "../../i18n.js";
 
 // The 3D library is big: it is loaded only after the visitor presses the button.
 const PlacesMap3D = lazy(() => import("./PlacesMap3D.jsx"));
@@ -12,11 +13,11 @@ export default function MapSection() {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
           <div>
-            <span className="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">Карта</span>
-            <h2 className="text-3xl md:text-headline-lg font-headline-lg text-white">Все места на 3D-карте</h2>
+            <span className="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">{t("Карта")}</span>
+            <h2 className="text-3xl md:text-headline-lg font-headline-lg text-white">{t("Все места на 3D-карте")}</h2>
           </div>
           <p className="text-body-md text-slate-400 max-w-md">
-            Реальный рельеф и спутниковые снимки. Нажмите на метку — камера перелетит к месту.
+            {t("Реальный рельеф и спутниковые снимки. Нажмите на метку — камера перелетит к месту.")}
           </p>
         </div>
         {open ? (
@@ -35,8 +36,8 @@ export default function MapSection() {
               <span className="w-16 h-16 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center shadow-lg shadow-emerald-950 group-hover:scale-110 transition-transform">
                 <Icon name="3d_rotation" className="text-[32px]" />
               </span>
-              <span className="text-headline-md font-headline-md text-white">Открыть 3D-карту Таджикистана</span>
-              <span className="text-body-sm text-slate-300">Горы, озёра и все места Relax.tj на одной карте</span>
+              <span className="text-headline-md font-headline-md text-white">{t("Открыть 3D-карту Таджикистана")}</span>
+              <span className="text-body-sm text-slate-300">{t("Горы, озёра и все места Relax.tj на одной карте")}</span>
             </div>
           </button>
         )}

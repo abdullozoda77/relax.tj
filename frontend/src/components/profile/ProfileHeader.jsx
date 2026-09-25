@@ -1,5 +1,6 @@
 import { formatDate, plural } from "../../utils.js";
 import Icon from "../Icon.jsx";
+import { t } from "../../i18n.js";
 
 function InfoTile({ label, icon, value, note, live, accent = "primary" }) {
   const color = accent === "primary" ? "text-primary" : "text-secondary";
@@ -46,29 +47,29 @@ export default function ProfileHeader({ user }) {
             <Avatar user={user} />
             <div className="absolute -bottom-1 -right-1 bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md">
               <Icon name="workspace_premium" filled className="text-[13px]" />
-              <span>{isAdmin ? "АДМИН" : `УРОВЕНЬ ${Math.min(1 + Math.floor((stats.reviews || 0) / 3), 5)}`}</span>
+              <span>{isAdmin ? t("АДМИН") : t("УРОВЕНЬ {0}", Math.min(1 + Math.floor((stats.reviews || 0) / 3), 5))}</span>
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="font-headline-lg text-3xl md:text-headline-lg text-on-surface">{fullName || user.username}</h1>
               <span className="bg-primary/15 text-primary font-label-sm text-label-sm px-3 py-1 rounded-full uppercase tracking-wider">
-                {isAdmin ? "Администратор" : "Путешественник"}
+                {isAdmin ? t("Администратор") : t("Путешественник")}
               </span>
             </div>
             <p className="font-body-md text-body-md text-on-surface-variant flex flex-wrap items-center gap-2">
               <Icon name="verified_user" className="text-[16px] text-primary" />
-              На сайте с {formatDate(user.date_joined)} <span className="text-outline">/</span> @{user.username}
+              {t("На сайте с")} {formatDate(user.date_joined)} <span className="text-outline">/</span> @{user.username}
             </p>
             <div className="flex items-center gap-4 mt-1 font-label-md text-label-md">
               <div className="flex items-center gap-1.5 text-on-surface">
                 <span className="font-headline-sm text-headline-sm text-primary">{stats.travel_lists ?? 0}</span>
-                <span className="text-on-surface-variant text-body-sm">Маршрутов</span>
+                <span className="text-on-surface-variant text-body-sm">{t("Маршрутов")}</span>
               </div>
               <div className="w-1.5 h-1.5 rounded-full bg-outline-variant" />
               <div className="flex items-center gap-1.5 text-on-surface">
                 <span className="font-headline-sm text-headline-sm text-secondary">{stats.reviews ?? 0}</span>
-                <span className="text-on-surface-variant text-body-sm">Отзывов</span>
+                <span className="text-on-surface-variant text-body-sm">{t("Отзывов")}</span>
               </div>
             </div>
           </div>
@@ -76,19 +77,19 @@ export default function ProfileHeader({ user }) {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 self-stretch lg:self-auto lg:w-[520px]">
           <InfoTile
             icon="favorite"
-            label="ИЗБРАННОЕ"
+            label={t("ИЗБРАННОЕ")}
             live
-            note="Сохранённые места"
-            value={plural(stats.favorites ?? 0, ["место", "места", "мест"])}
+            note={t("Сохранённые места")}
+            value={plural(stats.favorites ?? 0, [t("место"), t("места"), t("мест")])}
           />
           <InfoTile
             accent="secondary"
             icon="add_location_alt"
-            label="ПРЕДЛОЖЕНИЯ"
-            note="Новые места от вас"
-            value={`${stats.suggestions ?? 0} отправлено`}
+            label={t("ПРЕДЛОЖЕНИЯ")}
+            note={t("Новые места от вас")}
+            value={t("{0} отправлено", stats.suggestions ?? 0)}
           />
-          <InfoTile icon="contact_mail" label="КОНТАКТЫ" note={user.phone_number || "Телефон не указан"} value={user.email || "Email не указан"} />
+          <InfoTile icon="contact_mail" label={t("КОНТАКТЫ")} note={user.phone_number || t("Телефон не указан")} value={user.email || t("Email не указан")} />
         </div>
       </div>
     </div>

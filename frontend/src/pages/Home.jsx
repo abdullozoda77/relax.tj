@@ -9,6 +9,7 @@ import MapSection from "../components/home/MapSection.jsx";
 import PlacesSection from "../components/home/PlacesSection.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import { useUi } from "../context/UiContext.jsx";
+import { t } from "../i18n.js";
 
 const EMPTY_FILTERS = { region: "", category: "", best_season: "", ordering: "-created_at", is_free: false };
 const DUSHANBE = { lat: 38.5598, lng: 68.787 };
@@ -58,7 +59,7 @@ export default function Home() {
   }
 
   async function showNearby({ lat, lng }, fallback) {
-    const title = `Места рядом ${fallback ? "с Душанбе" : "с вами"} (до ${NEARBY_RADIUS_KM} км)`;
+    const title = t("Места рядом {0} (до {1} км)", fallback ? t("с Душанбе") : t("с вами"), NEARBY_RADIUS_KM);
     setNearby({ title, places: null });
     document.getElementById("places")?.scrollIntoView();
     try {
@@ -72,7 +73,7 @@ export default function Home() {
 
   function findNearby() {
     const useDushanbe = () => {
-      toast("Не удалось определить местоположение — показываем места рядом с Душанбе", "error");
+      toast(t("Не удалось определить местоположение — показываем места рядом с Душанбе"), "error");
       showNearby(DUSHANBE, true);
     };
     if (!navigator.geolocation) return useDushanbe();
@@ -84,10 +85,10 @@ export default function Home() {
   }
 
   async function copyList(list) {
-    if (!requireLogin("Войдите, чтобы копировать маршруты")) return;
+    if (!requireLogin(t("Войдите, чтобы копировать маршруты"))) return;
     try {
       const copy = await api(`/travel-lists/${list.id}/copy/`, { method: "POST" });
-      toast(`Маршрут «${copy.title}» добавлен в ваши списки`);
+      toast(t("Маршрут «{0}» добавлен в ваши списки", copy.title));
     } catch (err) {
       toast(err.message, "error");
     }

@@ -10,6 +10,7 @@ import {
 } from "cesium";
 import { createViewer, pin } from "../cesium.js";
 import Icon from "../Icon.jsx";
+import { t } from "../../i18n.js";
 
 const DEGREES_PER_SECOND = 5;
 
@@ -34,7 +35,7 @@ export default function Terrain3D({ place }) {
     try {
       viewer = createViewer(container.current);
     } catch {
-      setError("Ваш браузер не поддерживает 3D (WebGL).");
+      setError(t("Ваш браузер не поддерживает 3D (WebGL)."));
       return;
     }
     viewerRef.current = viewer;
@@ -129,19 +130,19 @@ export default function Terrain3D({ place }) {
       <div className="w-full h-full" ref={container} />
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center gap-2 text-on-surface-variant text-body-sm pointer-events-none bg-surface-container-lowest/40">
-          <Icon name="progress_activity" className="animate-spin text-primary" /> Загружаем рельеф и спутниковые снимки...
+          <Icon name="progress_activity" className="animate-spin text-primary" /> {t("Загружаем рельеф и спутниковые снимки...")}
         </div>
       )}
       <div className="absolute left-3 top-3 flex gap-2">
         <button className={button} onClick={toggleSpin} type="button">
           <Icon name={isSpinning ? "pause" : "360"} className="text-[16px] text-primary" />
-          {isSpinning ? "Пауза" : "Облёт"}
+          {isSpinning ? t("Пауза") : t("Облёт")}
         </button>
         <button className={button} onClick={resetView} type="button">
-          <Icon name="restart_alt" className="text-[16px] text-primary" /> Сбросить вид
+          <Icon name="restart_alt" className="text-[16px] text-primary" /> {t("Сбросить вид")}
         </button>
       </div>
-      <button className={`${button} absolute right-3 top-3`} onClick={fullscreen} title="Во весь экран" type="button">
+      <button className={`${button} absolute right-3 top-3`} onClick={fullscreen} title={t("Во весь экран")} type="button">
         <Icon name="fullscreen" className="text-[18px] text-primary" />
       </button>
     </div>

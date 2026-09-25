@@ -5,6 +5,7 @@ import { useToast } from "../../context/ToastContext.jsx";
 import { useUi } from "../../context/UiContext.jsx";
 import Icon from "../Icon.jsx";
 import Stars from "../Stars.jsx";
+import { locale, t } from "../../i18n.js";
 
 const MAX_PHOTOS = 5;
 
@@ -26,14 +27,14 @@ function ReviewForm({ placeId, onSaved }) {
 
   function pickFiles(e) {
     const chosen = [...files, ...e.target.files].slice(0, MAX_PHOTOS);
-    if (files.length + e.target.files.length > MAX_PHOTOS) toast(`Можно прикрепить не больше ${MAX_PHOTOS} фото`, "error");
+    if (files.length + e.target.files.length > MAX_PHOTOS) toast(t("Можно прикрепить не больше {0} фото", MAX_PHOTOS), "error");
     setFiles(chosen);
     e.target.value = "";
   }
 
   async function submit(e) {
     e.preventDefault();
-    if (!rating) return toast("Поставьте оценку от 1 до 5 звёзд", "error");
+    if (!rating) return toast(t("Поставьте оценку от 1 до 5 звёзд"), "error");
     setBusy(true);
     const body = new FormData();
     body.append("place", placeId);
@@ -42,7 +43,7 @@ function ReviewForm({ placeId, onSaved }) {
     files.forEach((f) => body.append("uploaded_images", f));
     try {
       await api("/reviews/", { method: "POST", body });
-      toast("Спасибо за отзыв!");
+      toast(t("Спасибо за отзыв!"));
       onSaved();
     } catch (err) {
       toast(err.message, "error");
@@ -58,12 +59,12 @@ function ReviewForm({ placeId, onSaved }) {
             <Icon filled={n <= (hover || rating)} name="star" className={n <= (hover || rating) ? "text-amber-400" : "text-slate-600"} size={28} />
           </button>
         ))}
-        <span className="text-body-sm text-slate-400 ml-2">Ваша оценка</span>
+        <span className="text-body-sm text-slate-400 ml-2">{t("Ваша оценка")}</span>
       </div>
       <textarea
         className="w-full px-4 py-2.5 rounded-lg bg-slate-900 border border-slate-700/80 text-body-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400"
         onChange={(e) => setComment(e.target.value)}
-        placeholder="Расскажите, как вам это место"
+        placeholder={t("Расскажите, как вам это место")}
         rows={3}
         value={comment}
       />
@@ -74,7 +75,7 @@ function ReviewForm({ placeId, onSaved }) {
             <button
               className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-slate-950/80 text-slate-200 flex items-center justify-center"
               onClick={() => setFiles(files.filter((_, j) => j !== i))}
-              title="Убрать фото"
+              title={t("Убрать фото")}
               type="button"
             >
               <Icon name="close" className="text-[14px]" />
@@ -84,18 +85,18 @@ function ReviewForm({ placeId, onSaved }) {
         {files.length < MAX_PHOTOS && (
           <label className="w-16 h-16 rounded-lg border border-dashed border-slate-600 hover:border-emerald-400 text-slate-400 hover:text-emerald-300 flex flex-col items-center justify-center cursor-pointer text-[10px] gap-0.5">
             <Icon name="add_a_photo" className="text-[20px]" />
-            Фото
+            {t("Фото")}
             <input accept=".jpg,.jpeg,.png,.webp" className="hidden" multiple onChange={pickFiles} type="file" />
           </label>
         )}
-        <span className="text-label-sm font-label-sm text-slate-500">до {MAX_PHOTOS} фото, jpg/png/webp до 5 МБ</span>
+        <span className="text-label-sm font-label-sm text-slate-500">{t("до")} {MAX_PHOTOS} {t("фото, jpg/png/webp до 5 МБ")}</span>
       </div>
       <button
         className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-5 py-2 rounded-lg text-label-md font-label-md disabled:opacity-60"
         disabled={busy}
         type="submit"
       >
-        Отправить отзыв
+        {t("Отправить отзыв")}
       </button>
     </form>
   );
@@ -120,17 +121,17 @@ export default function Reviews({ placeId, onSummary }) {
   useEffect(load, [load]);
 
   async function remove(id) {
-    if (!confirm("Удалить ваш отзыв?")) return;
+    if (!confirm(t("Удалить ваш отзыв?"))) return;
     try {
       await api(`/reviews/${id}/`, { method: "DELETE" });
-      toast("Отзыв удалён");
+      toast(t("Отзыв удалён"));
       load();
     } catch (err) {
       toast(err.message, "error");
     }
   }
 
-  if (!data) return <p className="text-slate-400">Загрузка отзывов...</p>;
+  if (!data) return <p className="text-slate-400">{t("Загрузка отзывов...")}</p>;
 
   const summary = data.rating_summary;
   const myReview = user && data.results.find((r) => r.author.id === user.id);
@@ -139,7 +140,7 @@ export default function Reviews({ placeId, onSummary }) {
 
   return (
     <div>
-      <h3 className="text-headline-sm font-headline-sm text-white mb-6">Отзывы</h3>
+      <h3 className="text-headline-sm font-headline-sm text-white mb-6">{t("Отзывы")}</h3>
       <div className="grid md:grid-cols-[180px_1fr] gap-6 mb-6">
         <div className="space-y-1.5">
           {bars.map(([star, count]) => (
@@ -155,13 +156,13 @@ export default function Reviews({ placeId, onSummary }) {
         <div>
           {!user ? (
             <div className="h-full flex flex-col items-start justify-center gap-3 bg-slate-950/60 border border-slate-800 rounded-xl p-5">
-              <p className="text-body-sm text-slate-300">Были здесь? Войдите, чтобы оставить отзыв.</p>
+              <p className="text-body-sm text-slate-300">{t("Были здесь? Войдите, чтобы оставить отзыв.")}</p>
               <button
                 className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-4 py-2 rounded-lg text-label-md font-label-md"
                 onClick={() => openAuth("login")}
                 type="button"
               >
-                Войти
+                {t("Войти")}
               </button>
             </div>
           ) : (
@@ -170,7 +171,7 @@ export default function Reviews({ placeId, onSummary }) {
         </div>
       </div>
       <div className="space-y-3">
-        {data.results.length === 0 && <p className="text-body-sm text-slate-400">Пока нет отзывов. Будьте первым!</p>}
+        {data.results.length === 0 && <p className="text-body-sm text-slate-400">{t("Пока нет отзывов. Будьте первым!")}</p>}
         {data.results.map((r) => (
           <div key={r.id} className="bg-slate-950/60 border border-slate-800 rounded-xl p-4">
             <div className="flex items-center justify-between gap-3 mb-2">
@@ -180,13 +181,13 @@ export default function Reviews({ placeId, onSummary }) {
                 </span>
                 <div>
                   <p className="text-body-sm text-white font-semibold">{r.author.username}</p>
-                  <p className="text-label-sm font-label-sm text-slate-500">{new Date(r.created_at).toLocaleDateString("ru-RU")}</p>
+                  <p className="text-label-sm font-label-sm text-slate-500">{new Date(r.created_at).toLocaleDateString(locale())}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Stars rating={r.rating} size={14} />
                 {myReview?.id === r.id && (
-                  <button className="text-slate-500 hover:text-rose-400" onClick={() => remove(r.id)} title="Удалить отзыв" type="button">
+                  <button className="text-slate-500 hover:text-rose-400" onClick={() => remove(r.id)} title={t("Удалить отзыв")} type="button">
                     <Icon name="delete" className="text-[18px]" />
                   </button>
                 )}

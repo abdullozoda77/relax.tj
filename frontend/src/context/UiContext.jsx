@@ -5,6 +5,7 @@ import AuthModal from "../components/AuthModal.jsx";
 import SuggestModal from "../components/SuggestModal.jsx";
 import { useAuth } from "./AuthContext.jsx";
 import { useToast } from "./ToastContext.jsx";
+import { t } from "../i18n.js";
 
 const UiContext = createContext(null);
 
@@ -37,7 +38,7 @@ export function UiProvider({ children }) {
 
   // Returns true if logged in, otherwise shows the login window.
   const requireLogin = useCallback(
-    (message = "Войдите, чтобы продолжить") => {
+    (message = t("Войдите, чтобы продолжить")) => {
       if (user) return true;
       toast(message, "error");
       openAuth("login");
@@ -48,7 +49,7 @@ export function UiProvider({ children }) {
 
   const openSuggest = useCallback(
     (name = "") => {
-      if (requireLogin("Войдите, чтобы предложить место")) setModal({ type: "suggest", props: { name } });
+      if (requireLogin(t("Войдите, чтобы предложить место"))) setModal({ type: "suggest", props: { name } });
     },
     [requireLogin]
   );
@@ -57,7 +58,7 @@ export function UiProvider({ children }) {
 
   const toggleFavorite = useCallback(
     async (placeId, current) => {
-      if (!requireLogin("Войдите, чтобы добавлять места в избранное")) return;
+      if (!requireLogin(t("Войдите, чтобы добавлять места в избранное"))) return;
       try {
         await api(`/places/${placeId}/favorite/`, { method: current ? "DELETE" : "POST" });
       } catch (err) {
@@ -65,7 +66,7 @@ export function UiProvider({ children }) {
       }
       setFavorites((prev) => ({ ...prev, [placeId]: !current }));
       setFavoritesVersion((v) => v + 1);
-      toast(current ? "Удалено из избранного" : "Добавлено в избранное");
+      toast(current ? t("Удалено из избранного") : t("Добавлено в избранное"));
     },
     [requireLogin, toast]
   );

@@ -1,17 +1,18 @@
 import Icon from "../Icon.jsx";
+import { t } from "../../i18n.js";
 
 const TIPS = [
   {
     icon: "event",
-    title: "Когда ехать",
-    text: "С мая по октябрь — лучшее время для походов, озёр и перевалов. Зимой — лыжи в Сафеддаре.",
-    footer: "Май – октябрь",
+    title: t("Когда ехать"),
+    text: t("С мая по октябрь — лучшее время для походов, озёр и перевалов. Зимой — лыжи в Сафеддаре."),
+    footer: t("Май – октябрь"),
   },
   {
     icon: "directions_car",
-    title: "Транспорт",
-    text: "На горных дорогах нужен внедорожник 4x4 и опытный местный водитель.",
-    footer: "Безопасные 4x4",
+    title: t("Транспорт"),
+    text: t("На горных дорогах нужен внедорожник 4x4 и опытный местный водитель."),
+    footer: t("Безопасные 4x4"),
   },
 ];
 
@@ -20,22 +21,22 @@ export default function InfoSection({ onSuggest }) {
     <section className="py-24 px-6 lg:px-12 bg-surface scroll-mt-20" id="info">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
         <div className="lg:col-span-1">
-          <span className="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">Полезно знать</span>
-          <h2 className="text-3xl md:text-headline-lg font-headline-lg text-white mb-6">Советы путешественнику</h2>
+          <span className="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">{t("Полезно знать")}</span>
+          <h2 className="text-3xl md:text-headline-lg font-headline-lg text-white mb-6">{t("Советы путешественнику")}</h2>
           <p className="text-body-md text-slate-400 mb-8 leading-relaxed">
-            Планируйте поездку спокойно: когда лучше ехать и как добраться до гор.
+            {t("Планируйте поездку спокойно: когда лучше ехать и как добраться до гор.")}
           </p>
           <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-900 to-surface-accent border border-emerald-900/50 text-white shadow-xl">
-            <h4 className="text-headline-sm font-headline-sm mb-2 text-emerald-300">Знаете красивое место?</h4>
+            <h4 className="text-headline-sm font-headline-sm mb-2 text-emerald-300">{t("Знаете красивое место?")}</h4>
             <p className="text-body-sm text-slate-300 mb-4 leading-relaxed">
-              Предложите его — после проверки администратором оно появится на сайте.
+              {t("Предложите его — после проверки администратором оно появится на сайте.")}
             </p>
             <button
               className="bg-amber-500 text-slate-950 font-semibold hover:bg-amber-400 transition-colors px-5 py-2.5 rounded-lg text-label-md font-label-md shadow-md"
               onClick={onSuggest}
               type="button"
             >
-              Предложить место
+              {t("Предложить место")}
             </button>
           </div>
         </div>

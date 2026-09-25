@@ -1,3 +1,4 @@
+import { t } from "./i18n.js";
 // API calls to Django with JWT tokens. Tokens are stored in localStorage.
 
 const API = "/api";
@@ -71,7 +72,7 @@ export async function api(path, { method = "GET", body } = {}) {
 
   const data = res.status === 204 ? null : await res.json().catch(() => null);
   if (!res.ok) {
-    const error = new Error(errorText(data) || `Ошибка ${res.status}`);
+    const error = new Error(errorText(data) || t("Ошибка {0}", res.status));
     error.status = res.status;
     error.data = data;
     throw error;

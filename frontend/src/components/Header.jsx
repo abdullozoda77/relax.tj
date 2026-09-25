@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import Icon from "./Icon.jsx";
+import LanguageSwitcher from "./LanguageSwitcher.jsx";
 import Logo from "./Logo.jsx";
 import NotificationBell from "./NotificationBell.jsx";
 import ThemeToggle from "./ThemeToggle.jsx";
 import UserMenu from "./UserMenu.jsx";
+import { t } from "../i18n.js";
 
 const NAV = [
-  { to: "/#top", label: "Главная" },
-  { to: "/#places", label: "Места" },
-  { to: "/#map", label: "Карта" },
-  { to: "/#categories", label: "Категории" },
-  { to: "/#lists", label: "Маршруты" },
-  { to: "/#info", label: "Советы" },
+  { to: "/#top", label: t("Главная") },
+  { to: "/#places", label: t("Места") },
+  { to: "/#map", label: t("Карта") },
+  { to: "/#categories", label: t("Категории") },
+  { to: "/#lists", label: t("Маршруты") },
+  { to: "/#info", label: t("Советы") },
 ];
 
 export default function Header() {
@@ -55,11 +57,12 @@ export default function Header() {
               className="pl-9 pr-4 py-1.5 rounded-full bg-slate-900 border border-slate-700/80 text-body-sm text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400 w-48 focus:w-64 transition-all"
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && document.getElementById("places")?.scrollIntoView()}
-              placeholder="Поиск мест..."
+              placeholder={t("Поиск мест...")}
               type="search"
               value={query}
             />
           </div>
+          <LanguageSwitcher />
           <ThemeToggle />
           <NotificationBell />
           <UserMenu />

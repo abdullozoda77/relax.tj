@@ -3,6 +3,7 @@ import { api } from "../api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import Modal from "./Modal.jsx";
+import { t } from "../i18n.js";
 
 export const inputClass =
   "w-full px-4 py-2.5 rounded-lg bg-slate-950 border border-slate-700/80 text-body-md text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400";
@@ -39,8 +40,8 @@ function ForgotPassword({ onBack }) {
 
   return (
     <div className="p-8">
-      <h2 className="text-headline-md font-headline-md text-white mb-1">Восстановление пароля</h2>
-      <p className="text-body-sm text-slate-400 mb-6">Введите email, указанный при регистрации — мы пришлём ссылку для нового пароля.</p>
+      <h2 className="text-headline-md font-headline-md text-white mb-1">{t("Восстановление пароля")}</h2>
+      <p className="text-body-sm text-slate-400 mb-6">{t("Введите email, указанный при регистрации — мы пришлём ссылку для нового пароля.")}</p>
       {sent ? (
         <p className="text-body-sm text-emerald-200 bg-emerald-950/60 border border-emerald-800 rounded-lg px-4 py-3">{sent}</p>
       ) : (
@@ -52,12 +53,12 @@ function ForgotPassword({ onBack }) {
             disabled={busy}
             type="submit"
           >
-            {busy ? "Отправляем..." : "Отправить ссылку"}
+            {busy ? t("Отправляем...") : t("Отправить ссылку")}
           </button>
         </form>
       )}
       <button className="mt-4 w-full text-body-sm text-slate-400 hover:text-emerald-300" onClick={onBack} type="button">
-        ← Назад ко входу
+        {t("← Назад ко входу")}
       </button>
     </div>
   );
@@ -80,10 +81,10 @@ export default function AuthModal({ tab: initialTab = "login", onClose }) {
     setError("");
     try {
       const user = isLogin ? await login(form.username, form.password) : await register(form);
-      toast(isLogin ? `Добро пожаловать, ${user.username}!` : "Аккаунт создан. Добро пожаловать!");
+      toast(isLogin ? t("Добро пожаловать, {0}!", user.username) : t("Аккаунт создан. Добро пожаловать!"));
       onClose();
     } catch (err) {
-      setError(err.status === 401 ? "Неверное имя пользователя или пароль." : err.message);
+      setError(err.status === 401 ? t("Неверное имя пользователя или пароль.") : err.message);
       setBusy(false);
     }
   }
@@ -102,14 +103,14 @@ export default function AuthModal({ tab: initialTab = "login", onClose }) {
   return (
     <Modal onClose={onClose}>
       <div className="p-8">
-        <h2 className="text-headline-md font-headline-md text-white mb-1">{isLogin ? "С возвращением!" : "Создать аккаунт"}</h2>
+        <h2 className="text-headline-md font-headline-md text-white mb-1">{isLogin ? t("С возвращением!") : t("Создать аккаунт")}</h2>
         <p className="text-body-sm text-slate-400 mb-6">
-          {isLogin ? "Войдите, чтобы добавлять места в избранное и писать отзывы." : "Регистрация займёт меньше минуты."}
+          {isLogin ? t("Войдите, чтобы добавлять места в избранное и писать отзывы.") : t("Регистрация займёт меньше минуты.")}
         </p>
         <div className="flex gap-2 mb-6 bg-slate-950 p-1 rounded-xl">
           {[
-            ["login", "Вход"],
-            ["register", "Регистрация"],
+            ["login", t("Вход")],
+            ["register", t("Регистрация")],
           ].map(([value, label]) => (
             <button
               key={value}
@@ -125,11 +126,11 @@ export default function AuthModal({ tab: initialTab = "login", onClose }) {
           ))}
         </div>
         <form className="space-y-4" onSubmit={submit}>
-          <Field autoComplete="username" autoFocus label="Имя пользователя" name="username" onChange={change} required value={form.username} />
+          <Field autoComplete="username" autoFocus label={t("Имя пользователя")} name="username" onChange={change} required value={form.username} />
           {!isLogin && <Field autoComplete="email" label="Email" name="email" onChange={change} type="email" value={form.email} />}
           <Field
             autoComplete={isLogin ? "current-password" : "new-password"}
-            label="Пароль"
+            label={t("Пароль")}
             name="password"
             onChange={change}
             required
@@ -137,7 +138,7 @@ export default function AuthModal({ tab: initialTab = "login", onClose }) {
             value={form.password}
           />
           {!isLogin && (
-            <Field autoComplete="new-password" label="Повторите пароль" name="password2" onChange={change} required type="password" value={form.password2} />
+            <Field autoComplete="new-password" label={t("Повторите пароль")} name="password2" onChange={change} required type="password" value={form.password2} />
           )}
           {error && <p className="text-body-sm text-red-300 bg-red-950/60 border border-red-900 rounded-lg px-4 py-2.5">{error}</p>}
           <button
@@ -145,11 +146,11 @@ export default function AuthModal({ tab: initialTab = "login", onClose }) {
             disabled={busy}
             type="submit"
           >
-            {busy ? "Подождите..." : isLogin ? "Войти" : "Зарегистрироваться"}
+            {busy ? t("Подождите...") : isLogin ? t("Войти") : t("Зарегистрироваться")}
           </button>
           {isLogin && (
             <button className="w-full text-body-sm text-slate-400 hover:text-emerald-300" onClick={() => setTab("forgot")} type="button">
-              Забыли пароль?
+              {t("Забыли пароль?")}
             </button>
           )}
         </form>

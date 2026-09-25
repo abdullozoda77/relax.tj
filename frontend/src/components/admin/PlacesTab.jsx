@@ -7,6 +7,7 @@ import Icon from "../Icon.jsx";
 import Modal from "../Modal.jsx";
 import PlaceBackground from "../PlaceBackground.jsx";
 import { btnPrimary, btnSecondary, Empty, input, Label } from "./ui.jsx";
+import { t } from "../../i18n.js";
 
 const EMPTY_PLACE = {
   name: "",
@@ -68,18 +69,18 @@ function PhotosManager({ placeId }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <span className="font-label-sm text-label-sm text-on-surface-variant">ФОТО ({images.length})</span>
+      <span className="font-label-sm text-label-sm text-on-surface-variant">{t("ФОТО (")}{images.length})</span>
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
         {images.map((img) => (
           <div key={img.id} className={`relative rounded-lg overflow-hidden border-2 ${img.is_main ? "border-secondary" : "border-transparent"}`}>
             <img alt="" className="w-full h-24 object-cover" src={img.image} />
-            {img.is_main && <span className="absolute top-1 left-1 bg-secondary text-on-secondary-container text-[10px] font-bold px-1.5 rounded">ГЛАВНОЕ</span>}
+            {img.is_main && <span className="absolute top-1 left-1 bg-secondary text-on-secondary-container text-[10px] font-bold px-1.5 rounded">{t("ГЛАВНОЕ")}</span>}
             <div className="absolute bottom-1 right-1 flex gap-1">
               {!img.is_main && (
                 <button
                   className="w-7 h-7 rounded-full bg-slate-950/80 text-secondary flex items-center justify-center"
-                  onClick={() => action(() => api(`/place-images/${img.id}/set-main/`, { method: "POST" }), "Главное фото изменено")}
-                  title="Сделать главным"
+                  onClick={() => action(() => api(`/place-images/${img.id}/set-main/`, { method: "POST" }), t("Главное фото изменено"))}
+                  title={t("Сделать главным")}
                   type="button"
                 >
                   <Icon name="star" className="text-[16px]" />
@@ -87,8 +88,8 @@ function PhotosManager({ placeId }) {
               )}
               <button
                 className="w-7 h-7 rounded-full bg-slate-950/80 text-rose-300 flex items-center justify-center"
-                onClick={() => confirm("Удалить фото?") && action(() => api(`/place-images/${img.id}/`, { method: "DELETE" }), "Фото удалено")}
-                title="Удалить"
+                onClick={() => confirm(t("Удалить фото?")) && action(() => api(`/place-images/${img.id}/`, { method: "DELETE" }), t("Фото удалено"))}
+                title={t("Удалить")}
                 type="button"
               >
                 <Icon name="delete" className="text-[16px]" />
@@ -98,7 +99,7 @@ function PhotosManager({ placeId }) {
         ))}
         <label className="h-24 rounded-lg border-2 border-dashed border-outline-variant hover:border-primary text-on-surface-variant hover:text-primary flex flex-col items-center justify-center cursor-pointer text-label-sm font-label-sm gap-1">
           <Icon name={busy ? "progress_activity" : "add_a_photo"} className={`text-[22px] ${busy ? "animate-spin" : ""}`} />
-          {busy ? "Загрузка..." : "Добавить"}
+          {busy ? t("Загрузка...") : t("Добавить")}
           <input accept=".jpg,.jpeg,.png,.webp" className="hidden" disabled={busy} multiple onChange={upload} type="file" />
         </label>
       </div>
@@ -143,7 +144,7 @@ function PlaceEditor({ placeId, regions, categories, activities, onClose, onSave
     };
     try {
       const saved = await api(id ? `/places/${id}/` : "/places/", { method: id ? "PATCH" : "POST", body });
-      toast(id ? "Место сохранено" : "Место создано — теперь можно добавить фото");
+      toast(id ? t("Место сохранено") : t("Место создано — теперь можно добавить фото"));
       setId(saved.id);
       onSaved();
     } catch (err) {
@@ -156,17 +157,17 @@ function PlaceEditor({ placeId, regions, categories, activities, onClose, onSave
   return (
     <Modal onClose={onClose} wide>
       <div className="p-6 sm:p-8">
-        <h2 className="text-headline-md font-headline-md text-white mb-6">{id ? "Редактирование места" : "Новое место"}</h2>
+        <h2 className="text-headline-md font-headline-md text-white mb-6">{id ? t("Редактирование места") : t("Новое место")}</h2>
         {!form ? (
           <div className="h-64 rounded-xl bg-surface-container-lowest animate-pulse" />
         ) : (
           <form className="grid grid-cols-1 sm:grid-cols-2 gap-4" onSubmit={save}>
-            <Label className="sm:col-span-2" text="НАЗВАНИЕ *">
+            <Label className="sm:col-span-2" text={t("НАЗВАНИЕ *")}>
               <input className={input} onChange={set("name")} required value={form.name} />
             </Label>
-            <Label text="РЕГИОН *">
+            <Label text={t("РЕГИОН *")}>
               <select className={input} onChange={set("region")} required value={form.region}>
-                <option value="">— выберите —</option>
+                <option value="">{t("— выберите —")}</option>
                 {regions.map((r) => (
                   <option key={r.id} value={r.id}>
                     {r.name}
@@ -174,9 +175,9 @@ function PlaceEditor({ placeId, regions, categories, activities, onClose, onSave
                 ))}
               </select>
             </Label>
-            <Label text="КАТЕГОРИЯ">
+            <Label text={t("КАТЕГОРИЯ")}>
               <select className={input} onChange={set("category")} value={form.category}>
-                <option value="">— без категории —</option>
+                <option value="">{t("— без категории —")}</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -184,28 +185,28 @@ function PlaceEditor({ placeId, regions, categories, activities, onClose, onSave
                 ))}
               </select>
             </Label>
-            <Label className="sm:col-span-2" text="ОПИСАНИЕ">
+            <Label className="sm:col-span-2" text={t("ОПИСАНИЕ")}>
               <textarea className={input} onChange={set("description")} rows={4} value={form.description} />
             </Label>
-            <Label className="sm:col-span-2" text="КАК ДОБРАТЬСЯ">
+            <Label className="sm:col-span-2" text={t("КАК ДОБРАТЬСЯ")}>
               <textarea className={input} onChange={set("how_to_get_there")} rows={2} value={form.how_to_get_there} />
             </Label>
-            <Label className="sm:col-span-2" text="АДРЕС">
+            <Label className="sm:col-span-2" text={t("АДРЕС")}>
               <input className={input} onChange={set("address")} value={form.address} />
             </Label>
-            <Label text="ШИРОТА">
+            <Label text={t("ШИРОТА")}>
               <input className={input} onChange={set("latitude")} placeholder="38.5767" step="any" type="number" value={form.latitude} />
             </Label>
-            <Label text="ДОЛГОТА">
+            <Label text={t("ДОЛГОТА")}>
               <input className={input} onChange={set("longitude")} placeholder="68.7806" step="any" type="number" value={form.longitude} />
             </Label>
-            <Label text="ВЫСОТА, М">
+            <Label text={t("ВЫСОТА, М")}>
               <input className={input} min="0" onChange={set("altitude")} type="number" value={form.altitude} />
             </Label>
-            <Label text="ВХОД, СОМОНИ (0 = БЕСПЛАТНО)">
+            <Label text={t("ВХОД, СОМОНИ (0 = БЕСПЛАТНО)")}>
               <input className={input} min="0" onChange={set("entrance_fee")} step="0.01" type="number" value={form.entrance_fee} />
             </Label>
-            <Label text="ЛУЧШИЙ СЕЗОН">
+            <Label text={t("ЛУЧШИЙ СЕЗОН")}>
               <select className={input} onChange={set("best_season")} value={form.best_season}>
                 {Object.entries(SEASONS).map(([value, label]) => (
                   <option key={value} value={value}>
@@ -216,10 +217,10 @@ function PlaceEditor({ placeId, regions, categories, activities, onClose, onSave
             </Label>
             <label className="flex items-center gap-2 text-body-sm text-on-surface self-end pb-2">
               <input checked={form.is_active} className="rounded bg-surface-container-lowest border-outline-variant text-primary" onChange={set("is_active")} type="checkbox" />
-              Показывать на сайте
+              {t("Показывать на сайте")}
             </label>
             <div className="sm:col-span-2">
-              <span className="block font-label-sm text-label-sm text-on-surface-variant mb-2">АКТИВНОСТИ</span>
+              <span className="block font-label-sm text-label-sm text-on-surface-variant mb-2">{t("АКТИВНОСТИ")}</span>
               <div className="flex flex-wrap gap-2">
                 {activities.map((a) => (
                   <button
@@ -237,10 +238,10 @@ function PlaceEditor({ placeId, regions, categories, activities, onClose, onSave
             </div>
             <div className="sm:col-span-2 flex gap-2">
               <button className={btnPrimary} disabled={busy} type="submit">
-                <Icon name="save" className="text-[18px]" /> {id ? "Сохранить" : "Создать место"}
+                <Icon name="save" className="text-[18px]" /> {id ? t("Сохранить") : t("Создать место")}
               </button>
               <button className={btnSecondary} onClick={onClose} type="button">
-                Закрыть
+                {t("Закрыть")}
               </button>
             </div>
           </form>
@@ -287,7 +288,7 @@ export default function PlacesTab() {
   async function toggleActive(p) {
     try {
       await api(`/places/${p.id}/`, { method: "PATCH", body: { is_active: !p.is_active } });
-      toast(p.is_active ? `«${p.name}» скрыто с сайта` : `«${p.name}» снова на сайте`);
+      toast(p.is_active ? t("«{0}» скрыто с сайта", p.name) : t("«{0}» снова на сайте", p.name));
       load();
     } catch (err) {
       toast(err.message, "error");
@@ -295,10 +296,10 @@ export default function PlacesTab() {
   }
 
   async function remove(p) {
-    if (!confirm(`Удалить место «${p.name}» навсегда? Вместе с ним удалятся фото и отзывы.`)) return;
+    if (!confirm(t("Удалить место «{0}» навсегда? Вместе с ним удалятся фото и отзывы.", p.name))) return;
     try {
       await api(`/places/${p.id}/`, { method: "DELETE" });
-      toast("Место удалено");
+      toast(t("Место удалено"));
       load();
     } catch (err) {
       toast(err.message, "error");
@@ -308,13 +309,13 @@ export default function PlacesTab() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col sm:flex-row gap-3 justify-between">
-        <input className={`${input} sm:max-w-xs`} onChange={(e) => setSearch(e.target.value)} placeholder="Поиск по названию..." value={search} />
+        <input className={`${input} sm:max-w-xs`} onChange={(e) => setSearch(e.target.value)} placeholder={t("Поиск по названию...")} value={search} />
         <button className={btnPrimary} onClick={() => setEditing(null)} type="button">
-          <Icon name="add_location_alt" className="text-[18px]" /> Новое место
+          <Icon name="add_location_alt" className="text-[18px]" /> {t("Новое место")}
         </button>
       </div>
       {places === null && <div className="h-64 rounded-xl bg-surface-container animate-pulse" />}
-      {places?.length === 0 && <Empty>Ничего не найдено.</Empty>}
+      {places?.length === 0 && <Empty>{t("Ничего не найдено.")}</Empty>}
       <div className="flex flex-col gap-2">
         {places?.map((p) => (
           <div key={p.id} className={`bg-surface-container rounded-xl p-3 flex items-center gap-4 ${p.is_active ? "" : "opacity-60"}`}>
@@ -324,28 +325,28 @@ export default function PlacesTab() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <span className="font-title-md text-title-md text-on-surface truncate">{p.name}</span>
-                {!p.is_active && <span className="text-[10px] font-bold text-rose-300 bg-rose-500/15 px-1.5 py-0.5 rounded">СКРЫТО</span>}
+                {!p.is_active && <span className="text-[10px] font-bold text-rose-300 bg-rose-500/15 px-1.5 py-0.5 rounded">{t("СКРЫТО")}</span>}
               </div>
               <span className="text-label-sm font-label-sm text-on-surface-variant">
-                {p.region} · {p.category || "без категории"} · {formatFee(p.entrance_fee)} · ★ {formatRating(p.average_rating)} · 👁 {p.views_count}
+                {p.region} · {p.category || t("без категории")} · {formatFee(p.entrance_fee)} · ★ {formatRating(p.average_rating)} · 👁 {p.views_count}
               </span>
             </div>
             <div className="flex gap-1 shrink-0">
-              <button className="p-2 text-on-surface-variant hover:text-primary" onClick={() => openPlace(p.id)} title="Открыть на сайте" type="button">
+              <button className="p-2 text-on-surface-variant hover:text-primary" onClick={() => openPlace(p.id)} title={t("Открыть на сайте")} type="button">
                 <Icon name="open_in_new" className="text-[20px]" />
               </button>
-              <button className="p-2 text-on-surface-variant hover:text-primary" onClick={() => setEditing(p.id)} title="Редактировать" type="button">
+              <button className="p-2 text-on-surface-variant hover:text-primary" onClick={() => setEditing(p.id)} title={t("Редактировать")} type="button">
                 <Icon name="edit" className="text-[20px]" />
               </button>
               <button
                 className="p-2 text-on-surface-variant hover:text-secondary"
                 onClick={() => toggleActive(p)}
-                title={p.is_active ? "Скрыть с сайта" : "Показать на сайте"}
+                title={p.is_active ? t("Скрыть с сайта") : t("Показать на сайте")}
                 type="button"
               >
                 <Icon name={p.is_active ? "visibility_off" : "visibility"} className="text-[20px]" />
               </button>
-              <button className="p-2 text-on-surface-variant hover:text-rose-400" onClick={() => remove(p)} title="Удалить" type="button">
+              <button className="p-2 text-on-surface-variant hover:text-rose-400" onClick={() => remove(p)} title={t("Удалить")} type="button">
                 <Icon name="delete" className="text-[20px]" />
               </button>
             </div>

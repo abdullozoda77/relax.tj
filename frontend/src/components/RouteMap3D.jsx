@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArcType, BoundingSphere, Cartesian3, Color, HeadingPitchRange, Math as CesiumMath, PolylineDashMaterialProperty } from "cesium";
 import { createViewer, pin } from "./cesium.js";
 import Icon from "./Icon.jsx";
+import { t } from "../i18n.js";
 
 // 3D map of a route: numbered pins for every stop and a dashed line between them.
 // points: [{ id, name, lat, lng, visited }]
@@ -16,7 +17,7 @@ export default function RouteMap3D({ points, onSelect }) {
     try {
       viewer = createViewer(container.current);
     } catch {
-      setError("Ваш браузер не поддерживает 3D (WebGL).");
+      setError(t("Ваш браузер не поддерживает 3D (WebGL)."));
       return;
     }
     viewerRef.current = viewer;
@@ -80,10 +81,10 @@ export default function RouteMap3D({ points, onSelect }) {
           onClick={() => viewerRef.current && showAll(viewerRef.current, points.map((p) => Cartesian3.fromDegrees(p.lng, p.lat)))}
           type="button"
         >
-          <Icon name="zoom_out_map" className="text-[16px] text-primary" /> Весь маршрут
+          <Icon name="zoom_out_map" className="text-[16px] text-primary" /> {t("Весь маршрут")}
         </button>
       </div>
-      <button className={`${button} absolute right-3 top-3`} onClick={fullscreen} title="Во весь экран" type="button">
+      <button className={`${button} absolute right-3 top-3`} onClick={fullscreen} title={t("Во весь экран")} type="button">
         <Icon name="fullscreen" className="text-[18px] text-primary" />
       </button>
     </div>

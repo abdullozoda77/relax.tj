@@ -18,6 +18,7 @@ import { formatRating } from "../../utils.js";
 import { createViewer, pin } from "../cesium.js";
 import Icon from "../Icon.jsx";
 import PlaceBackground from "../PlaceBackground.jsx";
+import { t } from "../../i18n.js";
 
 const CATEGORY_COLORS = {
   "Озёра": "#06b6d4",
@@ -50,7 +51,7 @@ export default function PlacesMap3D() {
     try {
       viewer = createViewer(container.current);
     } catch {
-      setError("Ваш браузер не поддерживает 3D (WebGL).");
+      setError(t("Ваш браузер не поддерживает 3D (WebGL)."));
       return;
     }
     viewerRef.current = viewer;
@@ -125,10 +126,10 @@ export default function PlacesMap3D() {
       <div className="w-full h-full" ref={container} />
       <div className="absolute left-3 top-3 flex flex-wrap gap-2">
         <button className={button} onClick={showAll} type="button">
-          <Icon name="public" className="text-[16px] text-emerald-400" /> Весь Таджикистан
+          <Icon name="public" className="text-[16px] text-emerald-400" /> {t("Весь Таджикистан")}
         </button>
       </div>
-      <button className={`${button} absolute right-3 top-3`} onClick={fullscreen} title="Во весь экран" type="button">
+      <button className={`${button} absolute right-3 top-3`} onClick={fullscreen} title={t("Во весь экран")} type="button">
         <Icon name="fullscreen" className="text-[18px] text-emerald-400" />
       </button>
 
@@ -149,18 +150,18 @@ export default function PlacesMap3D() {
             </button>
           </div>
           <div className="p-4 flex flex-col gap-1">
-            <span className="text-label-sm font-label-sm text-amber-300">{selected.category || "Место"}</span>
+            <span className="text-label-sm font-label-sm text-amber-300">{selected.category || t("Место")}</span>
             <span className="font-headline-sm text-headline-sm text-white leading-tight">{selected.name}</span>
             <span className="text-body-sm text-slate-400">
               {selected.region} · ★ {formatRating(selected.average_rating)}
-              {selected.altitude ? ` · ${selected.altitude} м` : ""}
+              {selected.altitude ? t(" · {0} м", selected.altitude) : ""}
             </span>
             <button
               className="mt-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold py-2 rounded-lg text-label-md font-label-md"
               onClick={() => openPlace(selected.id)}
               type="button"
             >
-              Подробнее
+              {t("Подробнее")}
             </button>
           </div>
         </div>

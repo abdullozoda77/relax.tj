@@ -1,41 +1,42 @@
+import { lang, locale, t } from "./i18n.js";
 export const SEASONS = {
-  spring: "Весна",
-  summer: "Лето",
-  autumn: "Осень",
-  winter: "Зима",
-  all_year: "Круглый год",
+  spring: t("Весна"),
+  summer: t("Лето"),
+  autumn: t("Осень"),
+  winter: t("Зима"),
+  all_year: t("Круглый год"),
 };
 
 const CATEGORY_STYLES = {
   "Озёра": {
     icon: "water",
     gradient: "from-cyan-700 via-teal-900 to-slate-950",
-    text: "Бирюзовые горные озёра Фанских гор и Памира — тишина, чистый воздух и отдых у воды.",
+    text: t("Бирюзовые горные озёра Фанских гор и Памира — тишина, чистый воздух и отдых у воды."),
   },
   "Горы": {
     icon: "landscape",
     gradient: "from-slate-500 via-slate-800 to-slate-950",
-    text: "Вершины, перевалы и горнолыжные склоны для тех, кто любит высоту.",
+    text: t("Вершины, перевалы и горнолыжные склоны для тех, кто любит высоту."),
   },
   "Ущелья": {
     icon: "terrain",
     gradient: "from-amber-700 via-stone-800 to-slate-950",
-    text: "Прохладные ущелья с реками и водопадами — лучшее место летом.",
+    text: t("Прохладные ущелья с реками и водопадами — лучшее место летом."),
   },
   "Курорты и санатории": {
     icon: "hot_tub",
     gradient: "from-emerald-600 via-teal-900 to-slate-950",
-    text: "Горячие источники и санатории с минеральной водой для здоровья и восстановления.",
+    text: t("Горячие источники и санатории с минеральной водой для здоровья и восстановления."),
   },
   "Исторические места": {
     icon: "fort",
     gradient: "from-orange-700 via-stone-800 to-slate-950",
-    text: "Древние крепости и памятники Великого шёлкового пути.",
+    text: t("Древние крепости и памятники Великого шёлкового пути."),
   },
   "Парки": {
     icon: "park",
     gradient: "from-green-600 via-emerald-900 to-slate-950",
-    text: "Парки и заповедники для прогулок, семейного отдыха и фотографий.",
+    text: t("Парки и заповедники для прогулок, семейного отдыха и фотографий."),
   },
 };
 
@@ -44,14 +45,14 @@ export function categoryStyle(name) {
     CATEGORY_STYLES[name] || {
       icon: "explore",
       gradient: "from-slate-700 via-slate-800 to-slate-950",
-      text: "Интересные места для отдыха по всему Таджикистану.",
+      text: t("Интересные места для отдыха по всему Таджикистану."),
     }
   );
 }
 
 export function formatFee(fee) {
   const amount = Number(fee);
-  return amount > 0 ? `${amount.toLocaleString("ru-RU")} сомони` : "Бесплатно";
+  return amount > 0 ? t("{0} сомони", amount.toLocaleString(locale())) : t("Бесплатно");
 }
 
 export function formatRating(rating) {
@@ -59,11 +60,14 @@ export function formatRating(rating) {
 }
 
 export function formatDate(value) {
-  return new Date(value).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" });
+  return new Date(value).toLocaleDateString(locale(), { day: "numeric", month: "long", year: "numeric" });
 }
 
-// plural(5, ["отзыв", "отзыва", "отзывов"]) -> "5 отзывов"
+// plural(5, ["отзыв", "отзыва", "отзывов"]) -> "5 отзывов". Words come translated through t().
+// Russian has three forms, English two (1 review / 5 reviews), Tajik keeps the noun singular after numbers.
 export function plural(n, [one, few, many]) {
+  if (lang === "tg") return `${n} ${one}`;
+  if (lang === "en") return `${n} ${n === 1 ? one : many}`;
   const mod10 = n % 10;
   const mod100 = n % 100;
   const word =

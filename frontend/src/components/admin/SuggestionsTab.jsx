@@ -4,11 +4,12 @@ import { useToast } from "../../context/ToastContext.jsx";
 import Icon from "../Icon.jsx";
 import { StatusBadge } from "../SuggestModal.jsx";
 import { btnDanger, btnPrimary, card, Empty, input, Label } from "./ui.jsx";
+import { locale, t } from "../../i18n.js";
 
 const FILTERS = [
-  ["pending", "На проверке"],
-  ["approved", "Одобренные"],
-  ["rejected", "Отклонённые"],
+  ["pending", t("На проверке")],
+  ["approved", t("Одобренные")],
+  ["rejected", t("Отклонённые")],
 ];
 
 function SuggestionCard({ s, regions, categories, onDone }) {
@@ -21,7 +22,7 @@ function SuggestionCard({ s, regions, categories, onDone }) {
   const categoryName = categories.find((c) => c.id === s.category)?.name;
 
   async function decide(action) {
-    if (action === "reject" && !comment.trim()) return toast("Напишите причину отказа", "error");
+    if (action === "reject" && !comment.trim()) return toast(t("Напишите причину отказа"), "error");
     setBusy(true);
     try {
       const body =
@@ -29,7 +30,7 @@ function SuggestionCard({ s, regions, categories, onDone }) {
           ? { region: region || undefined, category: category || null, admin_comment: comment }
           : { admin_comment: comment };
       await api(`/suggestions/${s.id}/${action}/`, { method: "POST", body });
-      toast(action === "approve" ? `«${s.name}» добавлено на сайт` : `Предложение «${s.name}» отклонено`);
+      toast(action === "approve" ? t("«{0}» добавлено на сайт", s.name) : t("Предложение «{0}» отклонено", s.name));
       onDone();
     } catch (err) {
       toast(err.message, "error");
@@ -54,19 +55,19 @@ function SuggestionCard({ s, regions, categories, onDone }) {
           <StatusBadge status={s.status} />
         </div>
         <p className="text-label-sm font-label-sm text-on-surface-variant">
-          от @{s.user.username} · {new Date(s.created_at).toLocaleDateString("ru-RU")}
+          {t("от @")}{s.user.username} · {new Date(s.created_at).toLocaleDateString(locale())}
           {regionName && ` · ${regionName}`}
           {categoryName && ` · ${categoryName}`}
         </p>
         {s.address && <p className="text-body-sm text-on-surface-variant">📍 {s.address}</p>}
         {s.description && <p className="text-body-sm text-on-surface whitespace-pre-line">{s.description}</p>}
-        {s.admin_comment && <p className="text-body-sm text-secondary">Комментарий: {s.admin_comment}</p>}
+        {s.admin_comment && <p className="text-body-sm text-secondary">{t("Комментарий:")} {s.admin_comment}</p>}
 
         {s.status === "pending" && (
           <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-            <Label text="РЕГИОН">
+            <Label text={t("РЕГИОН")}>
               <select className={input} onChange={(e) => setRegion(e.target.value)} value={region}>
-                <option value="">— выберите —</option>
+                <option value="">{t("— выберите —")}</option>
                 {regions.map((r) => (
                   <option key={r.id} value={r.id}>
                     {r.name}
@@ -74,9 +75,9 @@ function SuggestionCard({ s, regions, categories, onDone }) {
                 ))}
               </select>
             </Label>
-            <Label text="КАТЕГОРИЯ">
+            <Label text={t("КАТЕГОРИЯ")}>
               <select className={input} onChange={(e) => setCategory(e.target.value)} value={category}>
-                <option value="">— без категории —</option>
+                <option value="">{t("— без категории —")}</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -84,15 +85,15 @@ function SuggestionCard({ s, regions, categories, onDone }) {
                 ))}
               </select>
             </Label>
-            <Label text="КОММЕНТАРИЙ (для отказа — обязательно)">
+            <Label text={t("КОММЕНТАРИЙ (для отказа — обязательно)")}>
               <input className={input} onChange={(e) => setComment(e.target.value)} value={comment} />
             </Label>
             <div className="sm:col-span-3 flex gap-2">
               <button className={btnPrimary} disabled={busy || !region} onClick={() => decide("approve")} type="button">
-                <Icon name="check" className="text-[18px]" /> Одобрить и создать место
+                <Icon name="check" className="text-[18px]" /> {t("Одобрить и создать место")}
               </button>
               <button className={btnDanger} disabled={busy} onClick={() => decide("reject")} type="button">
-                <Icon name="close" className="text-[18px]" /> Отклонить
+                <Icon name="close" className="text-[18px]" /> {t("Отклонить")}
               </button>
             </div>
           </div>
@@ -139,7 +140,7 @@ export default function SuggestionsTab() {
         ))}
       </div>
       {items === null && <div className="h-40 rounded-xl bg-surface-container animate-pulse" />}
-      {items?.length === 0 && <Empty>Здесь пока пусто.</Empty>}
+      {items?.length === 0 && <Empty>{t("Здесь пока пусто.")}</Empty>}
       {items?.map((s) => (
         <SuggestionCard key={s.id} categories={categories} onDone={load} regions={regions} s={s} />
       ))}

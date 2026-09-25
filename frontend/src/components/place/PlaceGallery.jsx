@@ -2,6 +2,7 @@ import { useUi } from "../../context/UiContext.jsx";
 import { formatRating } from "../../utils.js";
 import Icon from "../Icon.jsx";
 import PlaceBackground from "../PlaceBackground.jsx";
+import { t } from "../../i18n.js";
 
 // Big photo on the left and three smaller tiles on the right.
 // Tiles show more photos of the place; if there are not enough, similar places fill them.
@@ -23,8 +24,8 @@ export default function PlaceGallery({ place, similar }) {
           <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between gap-3">
             <div className="flex flex-col gap-1">
               <span className="self-start inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high/90 text-primary font-label-sm text-label-sm backdrop-blur-md">
-                <Icon name="landscape" className="text-[16px]" /> {place.region.name}
-                {place.altitude ? ` · ${place.altitude} м` : ""}
+                <Icon name="landscape" className="text-[16px]" /> {t(place.region.name)}
+                {place.altitude ? t(" · {0} м", place.altitude) : ""}
               </span>
               <span className="text-title-md font-title-md text-on-surface">{place.name}</span>
             </div>
@@ -34,7 +35,7 @@ export default function PlaceGallery({ place, similar }) {
                 href={place.images[0].image}
                 rel="noreferrer"
                 target="_blank"
-                title="Открыть фото"
+                title={t("Открыть фото")}
               >
                 <Icon name="fullscreen" className="text-[20px]" />
               </a>
@@ -55,7 +56,7 @@ export default function PlaceGallery({ place, similar }) {
               <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/85 via-transparent to-transparent pointer-events-none" />
               <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2">
                 <span className="text-label-sm font-label-sm text-on-surface font-medium truncate">
-                  {tile.similar ? `Похожее: ${tile.title}` : tile.title}
+                  {tile.similar ? t("Похожее: {0}", tile.title) : tile.title}
                 </span>
                 {tile.similar && (
                   <span className="inline-flex items-center gap-1 text-label-sm font-label-sm text-secondary shrink-0">
@@ -67,7 +68,7 @@ export default function PlaceGallery({ place, similar }) {
           ))}
           {tiles.length === 0 && (
             <div className="col-span-2 rounded-2xl bg-surface-container-low flex items-center justify-center text-body-sm text-on-surface-variant p-6 text-center">
-              Фотографии появятся после загрузки администратором.
+              {t("Фотографии появятся после загрузки администратором.")}
             </div>
           )}
         </div>

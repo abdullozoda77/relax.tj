@@ -1,5 +1,6 @@
 import { useUi } from "../context/UiContext.jsx";
 import Icon from "./Icon.jsx";
+import { t } from "../i18n.js";
 
 // Heart on a card (round) or a big button in the place window (large).
 export default function FavoriteButton({ place, large = false }) {
@@ -21,7 +22,7 @@ export default function FavoriteButton({ place, large = false }) {
         type="button"
       >
         <Icon filled={fav} name="favorite" className="text-[18px]" />
-        {fav ? "В избранном" : "В избранное"}
+        {fav ? t("В избранном") : t("В избранное")}
       </button>
     );
   }
@@ -32,7 +33,7 @@ export default function FavoriteButton({ place, large = false }) {
         fav ? "text-rose-400" : "text-slate-300"
       }`}
       onClick={onClick}
-      title="Избранное"
+      title={t("Избранное")}
       type="button"
     >
       <Icon filled={fav} name="favorite" className="text-[20px]" />

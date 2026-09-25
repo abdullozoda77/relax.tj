@@ -5,6 +5,7 @@ import { useToast } from "../context/ToastContext.jsx";
 import { useUi } from "../context/UiContext.jsx";
 import { isAdmin } from "../pages/AdminPanel.jsx";
 import Icon from "./Icon.jsx";
+import { t } from "../i18n.js";
 
 const itemClass = "w-full text-left px-4 py-2 text-body-sm text-slate-300 hover:bg-slate-800 hover:text-emerald-300 flex items-center gap-2";
 
@@ -29,7 +30,7 @@ export default function UserMenu() {
         onClick={() => openAuth("login")}
         type="button"
       >
-        <Icon name="person" className="text-[18px]" /> Войти
+        <Icon name="person" className="text-[18px]" /> {t("Войти")}
       </button>
     );
   }
@@ -37,7 +38,7 @@ export default function UserMenu() {
   async function handleLogout() {
     setOpen(false);
     await logout();
-    toast("Вы вышли из аккаунта");
+    toast(t("Вы вышли из аккаунта"));
   }
 
   return (
@@ -58,11 +59,11 @@ export default function UserMenu() {
           <div className="px-4 py-2 border-b border-slate-800 mb-1">
             <p className="text-body-sm text-white font-semibold truncate">{user.username}</p>
             <p className="text-label-sm font-label-sm text-slate-400 truncate">
-              {user.email || (user.role === "admin" ? "Администратор" : "Путешественник")}
+              {user.email || (user.role === "admin" ? t("Администратор") : t("Путешественник"))}
             </p>
           </div>
           <Link className={itemClass} onClick={() => setOpen(false)} to="/profile">
-            <Icon name="account_circle" className="text-[18px]" /> Мой профиль
+            <Icon name="account_circle" className="text-[18px]" /> {t("Мой профиль")}
           </Link>
           <button
             className={itemClass}
@@ -72,15 +73,15 @@ export default function UserMenu() {
             }}
             type="button"
           >
-            <Icon name="add_location_alt" className="text-[18px]" /> Предложить место
+            <Icon name="add_location_alt" className="text-[18px]" /> {t("Предложить место")}
           </button>
           {isAdmin(user) && (
             <Link className={itemClass} onClick={() => setOpen(false)} to="/admin-panel">
-              <Icon name="admin_panel_settings" className="text-[18px]" /> Панель управления
+              <Icon name="admin_panel_settings" className="text-[18px]" /> {t("Панель управления")}
             </Link>
           )}
           <button className={`${itemClass} !text-rose-300 border-t border-slate-800 mt-1`} onClick={handleLogout} type="button">
-            <Icon name="logout" className="text-[18px]" /> Выйти
+            <Icon name="logout" className="text-[18px]" /> {t("Выйти")}
           </button>
         </div>
       )}

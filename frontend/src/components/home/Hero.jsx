@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Icon from "../Icon.jsx";
+import { t } from "../../i18n.js";
 
 function Stat({ value, title, text, amber }) {
   const color = amber
@@ -23,35 +24,35 @@ function Stat({ value, title, text, amber }) {
 const PHOTOS = [
   {
     src: "/hero/rudaki.jpg",
-    place: "Душанбе · Памятник Рудаки",
-    author: "Шухрат Саъдиев",
+    place: t("Душанбе · Памятник Рудаки"),
+    author: t("Шухрат Саъдиев"),
     license: "CC BY-SA 4.0",
     page: "https://commons.wikimedia.org/wiki/File:-Rudaki_in_Park_Dushanbe_city.jpg",
   },
   {
     src: "/hero/flagpole.jpg",
-    place: "Душанбе · Площадь Дусти и флагшток",
+    place: t("Душанбе · Площадь Дусти и флагшток"),
     author: "Adam Harangozó",
     license: "CC BY-SA 4.0",
     page: "https://commons.wikimedia.org/wiki/File:Panorama_with_Dousti_Square_and_Dushanbe_Flagpole.jpg",
   },
   {
     src: "/hero/palace.jpg",
-    place: "Душанбе · Парк Рудаки и Дворец нации",
+    place: t("Душанбе · Парк Рудаки и Дворец нации"),
     author: "Maris Teteris",
     license: "CC BY 3.0",
     page: "https://commons.wikimedia.org/wiki/File:Ustod_Rudaki_Park_and_Palace_of_the_Nation_in_Dushanbe_-_panoramio.jpg",
   },
   {
     src: "/hero/city.jpg",
-    place: "Душанбе · Современный центр",
+    place: t("Душанбе · Современный центр"),
     author: "Adam Harangozó",
     license: "CC BY-SA 4.0",
     page: "https://commons.wikimedia.org/wiki/File:Panorama_with_buildings,_Dushanbe.jpg",
   },
   {
     src: "/hero/yashikul.jpg",
-    place: "Памир · Озеро Яшилькуль",
+    place: t("Памир · Озеро Яшилькуль"),
     author: "Kondephy",
     license: "CC BY-SA 4.0",
     page: "https://commons.wikimedia.org/wiki/File:Pamir_Mountains,_Lake_Yashikul_viewed_from_the_south_(August_2017).jpg",
@@ -93,7 +94,7 @@ export default function Hero({ stats = {}, onNearby }) {
           {photo.place}
         </div>
         <a className="text-[10px] text-slate-400 hover:text-slate-200 transition-colors" href={photo.page} rel="noreferrer" target="_blank">
-          Фото: {photo.author}, {photo.license}, Wikimedia Commons
+          {t("Фото:")} {photo.author}, {photo.license}, Wikimedia Commons
         </a>
         <div className="flex gap-1.5">
           {PHOTOS.map((p, i) => (
@@ -111,21 +112,20 @@ export default function Hero({ stats = {}, onNearby }) {
       <div className="max-w-7xl mx-auto w-full z-10 flex flex-col items-start my-auto py-16">
         <div className="inline-flex items-center gap-2 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-4 py-1.5 rounded-full text-label-md font-label-md mb-6 shadow-[0_0_16px_rgba(16,185,129,0.15)] backdrop-blur-md">
           <Icon name="landscape" filled className="text-[18px] text-emerald-400" />
-          <span>Крыша мира</span>
+          <span>{t("Крыша мира")}</span>
         </div>
         <h1 className="text-4xl md:text-headline-xl font-headline-xl max-w-4xl tracking-tight mb-6 text-white drop-shadow-sm">
-          Лучшие места для отдыха в Таджикистане
+          {t("Лучшие места для отдыха в Таджикистане")}
         </h1>
         <p className="text-body-lg text-slate-300 max-w-2xl mb-10 leading-relaxed">
-          Горные озёра Фанских гор, Памир, ущелья Варзоба, горячие источники и древние крепости — находите места, читайте
-          отзывы и собирайте свои маршруты.
+          {t("Горные озёра Фанских гор, Памир, ущелья Варзоба, горячие источники и древние крепости — находите места, читайте отзывы и собирайте свои маршруты.")}
         </p>
         <div className="flex flex-wrap gap-4 items-center">
           <a
             className="bg-amber-500 text-slate-950 font-semibold hover:bg-amber-400 transition-all px-8 py-4 rounded-xl text-label-md font-label-md shadow-lg shadow-amber-950/40 flex items-center gap-2"
             href="#places"
           >
-            <span>Смотреть места</span>
+            <span>{t("Смотреть места")}</span>
             <Icon name="arrow_forward" className="text-[18px]" />
           </a>
           {onNearby && (
@@ -135,16 +135,16 @@ export default function Hero({ stats = {}, onNearby }) {
               type="button"
             >
               <Icon name="near_me" className="text-[18px] text-emerald-400" />
-              <span>Места рядом со мной</span>
+              <span>{t("Места рядом со мной")}</span>
             </button>
           )}
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto w-full z-10 grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-900/70 backdrop-blur-xl p-8 rounded-2xl border border-slate-700/60 shadow-2xl">
-        <Stat amber value={stats.places} title="Мест для отдыха" text="Озёра, горы, ущелья и санатории" />
-        <Stat value={stats.regions} title="Регионов" text="От Худжанда до Памира" />
-        <Stat amber value={stats.activities} title="Видов активностей" text="Походы, рыбалка, лыжи и купание" />
+        <Stat amber value={stats.places} title={t("Мест для отдыха")} text={t("Озёра, горы, ущелья и санатории")} />
+        <Stat value={stats.regions} title={t("Регионов")} text={t("От Худжанда до Памира")} />
+        <Stat amber value={stats.activities} title={t("Видов активностей")} text={t("Походы, рыбалка, лыжи и купание")} />
       </div>
     </section>
   );

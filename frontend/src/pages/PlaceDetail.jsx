@@ -10,6 +10,7 @@ import Reviews from "../components/place/Reviews.jsx";
 import WeatherCard from "../components/place/WeatherCard.jsx";
 import Stars from "../components/Stars.jsx";
 import { SEASONS, formatRating, plural } from "../utils.js";
+import { t } from "../i18n.js";
 
 // The 3D map library is big, so it is loaded only when a place page opens.
 const Terrain3D = lazy(() => import("../components/place/Terrain3D.jsx"));
@@ -19,11 +20,11 @@ function Terrain3DSection({ place }) {
     <section className="bg-surface-container-low/70 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <span className="text-label-sm font-label-sm text-primary uppercase tracking-wider">Как в жизни</span>
-          <h2 className="text-headline-md font-headline-md text-on-surface">3D-вид местности</h2>
+          <span className="text-label-sm font-label-sm text-primary uppercase tracking-wider">{t("Как в жизни")}</span>
+          <h2 className="text-headline-md font-headline-md text-on-surface">{t("3D-вид местности")}</h2>
         </div>
         <span className="text-label-sm font-label-sm text-outline flex items-center gap-1.5">
-          <Icon name="3d_rotation" className="text-[16px]" /> Тяните мышью, чтобы вращать · правой кнопкой — наклон
+          <Icon name="3d_rotation" className="text-[16px]" /> {t("Тяните мышью, чтобы вращать · правой кнопкой — наклон")}
         </span>
       </div>
       <Suspense fallback={<div className="h-[420px] rounded-xl bg-surface-container-lowest animate-pulse" />}>
@@ -46,7 +47,7 @@ export default function PlaceDetail() {
     setError("");
     api(`/places/${id}/`)
       .then(setPlace)
-      .catch((err) => setError(err.status === 404 ? "Такое место не найдено." : err.message));
+      .catch((err) => setError(err.status === 404 ? t("Такое место не найдено.") : err.message));
     api(`/places/${id}/similar/`).then(setSimilar).catch(() => setSimilar([]));
   }, [id]);
 
@@ -58,7 +59,7 @@ export default function PlaceDetail() {
         <Icon name="wrong_location" className="text-secondary text-[48px]" />
         <h1 className="font-headline-md text-headline-md text-on-surface mt-4 mb-6">{error}</h1>
         <Link className="text-primary hover:underline" to="/#places">
-          ← Ко всем местам
+          {t("← Ко всем местам")}
         </Link>
       </div>
     );
@@ -86,15 +87,15 @@ export default function PlaceDetail() {
           <div className="flex flex-wrap items-center gap-3 text-label-sm font-label-sm text-outline mb-4">
             <Link className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5" to="/#places">
               <Icon name="arrow_back" className="text-[16px]" />
-              <span>Места</span>
+              <span>{t("Места")}</span>
             </Link>
             <span className="text-outline-variant">/</span>
-            <span className="text-on-surface-variant">{place.region.name}</span>
+            <span className="text-on-surface-variant">{t(place.region.name)}</span>
             <span className="text-outline-variant">/</span>
             <span className="text-primary font-medium tracking-wide">{place.name}</span>
             <span className="ml-auto inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary/10 text-secondary border border-secondary/20">
               <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
-              Лучший сезон: {SEASONS[place.best_season].toLowerCase()}
+              {t("Лучший сезон:")} {SEASONS[place.best_season].toLowerCase()}
             </span>
           </div>
 
@@ -102,11 +103,11 @@ export default function PlaceDetail() {
             <div className="lg:col-span-8 flex flex-col gap-3">
               <div className="flex flex-wrap items-center gap-3">
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm">
-                  <Icon name="terrain" className="text-[15px]" /> {place.category?.name || "Без категории"}
+                  <Icon name="terrain" className="text-[15px]" /> {place.category ? t(place.category.name) : t("Без категории")}
                 </span>
                 {place.altitude && (
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">
-                    <Icon name="altitude" className="text-[15px]" /> {place.altitude} м над уровнем моря
+                    <Icon name="altitude" className="text-[15px]" /> {place.altitude} {t("м над уровнем моря")}
                   </span>
                 )}
               </div>
@@ -116,13 +117,13 @@ export default function PlaceDetail() {
             <div className="lg:col-span-4 flex lg:justify-end">
               <div className="bg-surface-container-low/90 backdrop-blur-md p-5 rounded-2xl flex flex-col gap-2 w-full sm:w-auto shadow-xl">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-label-sm font-label-sm text-outline uppercase tracking-wider">Рейтинг</span>
+                  <span className="text-label-sm font-label-sm text-outline uppercase tracking-wider">{t("Рейтинг")}</span>
                   <span className="text-headline-lg font-headline-lg text-primary">{formatRating(rating)}</span>
-                  <span className="text-label-sm font-label-sm text-on-surface-variant">из 5</span>
+                  <span className="text-label-sm font-label-sm text-on-surface-variant">{t("из 5")}</span>
                 </div>
                 <div className="flex items-center gap-3 text-label-sm font-label-sm text-on-surface-variant">
                   <Stars rating={rating || 0} size={17} />
-                  <span>({plural(reviewsCount, ["отзыв", "отзыва", "отзывов"])})</span>
+                  <span>({plural(reviewsCount, [t("отзыв"), t("отзыва"), t("отзывов")])})</span>
                 </div>
               </div>
             </div>
@@ -153,8 +154,8 @@ export default function PlaceDetail() {
 
         {similar.length > 0 && (
           <section className="mt-16">
-            <span className="text-label-sm font-label-sm text-primary uppercase tracking-wider">Ещё места</span>
-            <h2 className="text-3xl md:text-headline-lg font-headline-lg text-on-surface mb-8">Похожие места</h2>
+            <span className="text-label-sm font-label-sm text-primary uppercase tracking-wider">{t("Ещё места")}</span>
+            <h2 className="text-3xl md:text-headline-lg font-headline-lg text-on-surface mb-8">{t("Похожие места")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {similar.slice(0, 3).map((p) => (
                 <PlaceCard key={p.id} place={p} />

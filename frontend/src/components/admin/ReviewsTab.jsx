@@ -5,6 +5,7 @@ import { useUi } from "../../context/UiContext.jsx";
 import Icon from "../Icon.jsx";
 import Stars from "../Stars.jsx";
 import { Empty, input } from "./ui.jsx";
+import { locale, t } from "../../i18n.js";
 
 export default function ReviewsTab() {
   const toast = useToast();
@@ -23,10 +24,10 @@ export default function ReviewsTab() {
   useEffect(load, [load]);
 
   async function remove(r) {
-    if (!confirm(`Удалить отзыв @${r.author.username} о «${r.place_name}»?`)) return;
+    if (!confirm(t("Удалить отзыв @{0} о «{1}»?", r.author.username, r.place_name))) return;
     try {
       await api(`/reviews/${r.id}/`, { method: "DELETE" });
-      toast("Отзыв удалён");
+      toast(t("Отзыв удалён"));
       load();
     } catch (err) {
       toast(err.message, "error");
@@ -36,7 +37,7 @@ export default function ReviewsTab() {
   return (
     <div className="flex flex-col gap-4">
       <select className={`${input} sm:max-w-xs`} onChange={(e) => setRating(e.target.value)} value={rating}>
-        <option value="">Все оценки</option>
+        <option value="">{t("Все оценки")}</option>
         {[5, 4, 3, 2, 1].map((n) => (
           <option key={n} value={n}>
             {"★".repeat(n)} ({n})
@@ -44,7 +45,7 @@ export default function ReviewsTab() {
         ))}
       </select>
       {reviews === null && <div className="h-64 rounded-xl bg-surface-container animate-pulse" />}
-      {reviews?.length === 0 && <Empty>Отзывов нет.</Empty>}
+      {reviews?.length === 0 && <Empty>{t("Отзывов нет.")}</Empty>}
       {reviews?.map((r) => (
         <div key={r.id} className="bg-surface-container rounded-xl p-4 flex gap-4">
           <div className="flex-1 min-w-0">
@@ -55,7 +56,7 @@ export default function ReviewsTab() {
               <Stars rating={r.rating} size={14} />
             </div>
             <p className="text-label-sm font-label-sm text-on-surface-variant mb-2">
-              @{r.author.username} · {new Date(r.created_at).toLocaleString("ru-RU")}
+              @{r.author.username} · {new Date(r.created_at).toLocaleString(locale())}
             </p>
             {r.comment && <p className="text-body-sm text-on-surface">{r.comment}</p>}
             {r.images?.length > 0 && (
@@ -68,7 +69,7 @@ export default function ReviewsTab() {
               </div>
             )}
           </div>
-          <button className="self-start p-2 text-on-surface-variant hover:text-rose-400" onClick={() => remove(r)} title="Удалить отзыв" type="button">
+          <button className="self-start p-2 text-on-surface-variant hover:text-rose-400" onClick={() => remove(r)} title={t("Удалить отзыв")} type="button">
             <Icon name="delete" className="text-[20px]" />
           </button>
         </div>

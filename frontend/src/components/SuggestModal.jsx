@@ -3,11 +3,12 @@ import { api } from "../api.js";
 import { useToast } from "../context/ToastContext.jsx";
 import { inputClass } from "./AuthModal.jsx";
 import Modal from "./Modal.jsx";
+import { t } from "../i18n.js";
 
 export const SUGGESTION_STATUSES = {
-  pending: ["На проверке", "text-amber-300 bg-amber-500/15 border-amber-500/30"],
-  approved: ["Одобрено", "text-emerald-300 bg-emerald-500/15 border-emerald-500/30"],
-  rejected: ["Отклонено", "text-rose-300 bg-rose-500/15 border-rose-500/30"],
+  pending: [t("На проверке"), "text-amber-300 bg-amber-500/15 border-amber-500/30"],
+  approved: [t("Одобрено"), "text-emerald-300 bg-emerald-500/15 border-emerald-500/30"],
+  rejected: [t("Отклонено"), "text-rose-300 bg-rose-500/15 border-rose-500/30"],
 };
 
 export function StatusBadge({ status }) {
@@ -44,7 +45,7 @@ export default function SuggestModal({ name = "", onClose }) {
     setBusy(true);
     try {
       await api("/suggestions/", { method: "POST", body: data });
-      toast("Спасибо! Ваше предложение отправлено на проверку.");
+      toast(t("Спасибо! Ваше предложение отправлено на проверку."));
       onClose();
     } catch (err) {
       toast(err.message, "error");
@@ -55,14 +56,14 @@ export default function SuggestModal({ name = "", onClose }) {
   return (
     <Modal onClose={onClose}>
       <div className="p-8">
-        <h2 className="text-headline-md font-headline-md text-white mb-1">Предложить место</h2>
-        <p className="text-body-sm text-slate-400 mb-6">После проверки администратором место появится на сайте.</p>
+        <h2 className="text-headline-md font-headline-md text-white mb-1">{t("Предложить место")}</h2>
+        <p className="text-body-sm text-slate-400 mb-6">{t("После проверки администратором место появится на сайте.")}</p>
         <form className="space-y-4" onSubmit={submit}>
-          <Label text="Название *">
+          <Label text={t("Название *")}>
             <input className={inputClass} defaultValue={name} name="name" required />
           </Label>
           <div className="grid grid-cols-2 gap-3">
-            <Label text="Регион">
+            <Label text={t("Регион")}>
               <select className={inputClass} name="region">
                 <option value="">—</option>
                 {regions.map((r) => (
@@ -72,7 +73,7 @@ export default function SuggestModal({ name = "", onClose }) {
                 ))}
               </select>
             </Label>
-            <Label text="Категория">
+            <Label text={t("Категория")}>
               <select className={inputClass} name="category">
                 <option value="">—</option>
                 {categories.map((c) => (
@@ -83,13 +84,13 @@ export default function SuggestModal({ name = "", onClose }) {
               </select>
             </Label>
           </div>
-          <Label text="Адрес">
-            <input className={inputClass} name="address" placeholder="Район, село или ориентир" />
+          <Label text={t("Адрес")}>
+            <input className={inputClass} name="address" placeholder={t("Район, село или ориентир")} />
           </Label>
-          <Label text="Описание">
-            <textarea className={inputClass} name="description" placeholder="Чем интересно это место?" rows={3} />
+          <Label text={t("Описание")}>
+            <textarea className={inputClass} name="description" placeholder={t("Чем интересно это место?")} rows={3} />
           </Label>
-          <Label text="Фото (jpg, png, webp, до 5 МБ)">
+          <Label text={t("Фото (jpg, png, webp, до 5 МБ)")}>
             <input
               accept=".jpg,.jpeg,.png,.webp"
               className="block w-full text-body-sm text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-slate-800 file:text-emerald-300 hover:file:bg-slate-700"
@@ -102,12 +103,12 @@ export default function SuggestModal({ name = "", onClose }) {
             disabled={busy}
             type="submit"
           >
-            Отправить
+            {t("Отправить")}
           </button>
         </form>
         {mine.length > 0 && (
           <div className="border-t border-slate-800 mt-8 pt-6">
-            <h3 className="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-3">Мои предложения</h3>
+            <h3 className="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-3">{t("Мои предложения")}</h3>
             <div className="space-y-2">
               {mine.map((s) => (
                 <div key={s.id} className="flex items-center justify-between gap-3 text-body-sm">

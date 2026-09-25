@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 import { api } from "../../api.js";
 import Icon from "../Icon.jsx";
 import { card } from "./ui.jsx";
+import { t } from "../../i18n.js";
 
 const COUNTERS = [
-  ["users", "Пользователи", "group"],
-  ["places", "Все места", "location_on"],
-  ["active_places", "Активные места", "visibility"],
-  ["reviews", "Отзывы", "rate_review"],
-  ["favorites", "В избранном", "favorite"],
-  ["travel_lists", "Маршруты", "route"],
+  ["users", t("Пользователи"), "group"],
+  ["places", t("Все места"), "location_on"],
+  ["active_places", t("Активные места"), "visibility"],
+  ["reviews", t("Отзывы"), "rate_review"],
+  ["favorites", t("В избранном"), "favorite"],
+  ["travel_lists", t("Маршруты"), "route"],
 ];
 
 export default function StatsTab({ onOpenSuggestions }) {
@@ -20,7 +21,7 @@ export default function StatsTab({ onOpenSuggestions }) {
   }, []);
 
   if (stats === null) return <div className="h-64 rounded-xl bg-surface-container animate-pulse" />;
-  if (stats === false) return <p className="text-on-surface-variant">Не удалось загрузить статистику.</p>;
+  if (stats === false) return <p className="text-on-surface-variant">{t("Не удалось загрузить статистику.")}</p>;
 
   const maxPlaces = Math.max(1, ...stats.places_by_region.map((r) => r.places_total));
 
@@ -38,11 +39,11 @@ export default function StatsTab({ onOpenSuggestions }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className={card}>
-          <h3 className="font-title-md text-title-md text-on-surface mb-4">Предложения мест</h3>
+          <h3 className="font-title-md text-title-md text-on-surface mb-4">{t("Предложения мест")}</h3>
           {[
-            ["pending", "На проверке", "text-amber-300"],
-            ["approved", "Одобрено", "text-emerald-300"],
-            ["rejected", "Отклонено", "text-rose-300"],
+            ["pending", t("На проверке"), "text-amber-300"],
+            ["approved", t("Одобрено"), "text-emerald-300"],
+            ["rejected", t("Отклонено"), "text-rose-300"],
           ].map(([key, label, color]) => (
             <div key={key} className="flex items-center justify-between py-2 border-b border-outline-variant/40 last:border-0">
               <span className="text-body-sm text-on-surface-variant">{label}</span>
@@ -51,13 +52,13 @@ export default function StatsTab({ onOpenSuggestions }) {
           ))}
           {stats.suggestions.pending > 0 && (
             <button className="mt-4 text-label-md font-label-md text-primary hover:underline" onClick={onOpenSuggestions} type="button">
-              Проверить предложения →
+              {t("Проверить предложения →")}
             </button>
           )}
         </div>
 
         <div className={card}>
-          <h3 className="font-title-md text-title-md text-on-surface mb-4">Места по регионам</h3>
+          <h3 className="font-title-md text-title-md text-on-surface mb-4">{t("Места по регионам")}</h3>
           <div className="flex flex-col gap-3">
             {stats.places_by_region.map((r) => (
               <div key={r.id}>
@@ -74,8 +75,8 @@ export default function StatsTab({ onOpenSuggestions }) {
         </div>
 
         <div className={card}>
-          <h3 className="font-title-md text-title-md text-on-surface mb-4">Лучшие по рейтингу</h3>
-          {stats.top_places.length === 0 && <p className="text-body-sm text-on-surface-variant">Пока нет отзывов.</p>}
+          <h3 className="font-title-md text-title-md text-on-surface mb-4">{t("Лучшие по рейтингу")}</h3>
+          {stats.top_places.length === 0 && <p className="text-body-sm text-on-surface-variant">{t("Пока нет отзывов.")}</p>}
           {stats.top_places.map((p, i) => (
             <div key={p.id} className="flex items-center gap-3 py-2 border-b border-outline-variant/40 last:border-0">
               <span className="w-6 text-secondary font-semibold">{i + 1}</span>

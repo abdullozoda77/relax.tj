@@ -4,13 +4,14 @@ import { useAuth } from "../../context/AuthContext.jsx";
 import { SEASONS } from "../../utils.js";
 import Icon from "../Icon.jsx";
 import PlaceCard, { SkeletonCards } from "../PlaceCard.jsx";
+import { t } from "../../i18n.js";
 
 const ORDERING = [
-  ["-created_at", "Сначала новые"],
-  ["-avg_rating", "По рейтингу"],
-  ["-favorites_total", "Популярные"],
-  ["-views_count", "Самые просматриваемые"],
-  ["entrance_fee", "Сначала дешёвые"],
+  ["-created_at", t("Сначала новые")],
+  ["-avg_rating", t("По рейтингу")],
+  ["-favorites_total", t("Популярные")],
+  ["-views_count", t("Самые просматриваемые")],
+  ["entrance_fee", t("Сначала дешёвые")],
 ];
 
 const select =
@@ -87,27 +88,27 @@ export default function PlacesSection({ filters, setFilters, onReset, regions, c
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
           <div>
-            <span className="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">Куда поехать</span>
+            <span className="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">{t("Куда поехать")}</span>
             <h2 className="text-3xl md:text-headline-lg font-headline-lg text-white">
-              {nearby ? nearby.title : filters.search ? `Результаты поиска: «${filters.search}»` : "Лучшие места для отдыха"}
+              {nearby ? nearby.title : filters.search ? t("Результаты поиска: «{0}»", filters.search) : t("Лучшие места для отдыха")}
             </h2>
           </div>
           <p className="text-body-md text-slate-400 max-w-md">
-            Выбирайте по региону, категории и сезону. Нажмите на карточку, чтобы увидеть подробности и отзывы.
+            {t("Выбирайте по региону, категории и сезону. Нажмите на карточку, чтобы увидеть подробности и отзывы.")}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-3 items-center mb-6">
           <select className={select} onChange={(e) => update({ region: e.target.value })} value={filters.region}>
-            <option value="">Все регионы</option>
+            <option value="">{t("Все регионы")}</option>
             {regions.map((r) => (
               <option key={r.id} value={r.id}>
-                {r.name}
+                {t(r.name)}
               </option>
             ))}
           </select>
           <select className={select} onChange={(e) => update({ best_season: e.target.value })} value={filters.best_season}>
-            <option value="">Любой сезон</option>
+            <option value="">{t("Любой сезон")}</option>
             {Object.entries(SEASONS).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
@@ -128,17 +129,17 @@ export default function PlacesSection({ filters, setFilters, onReset, regions, c
               onChange={(e) => update({ is_free: e.target.checked })}
               type="checkbox"
             />
-            Только бесплатные
+            {t("Только бесплатные")}
           </label>
           {active && (
             <button className="flex text-body-sm text-amber-400 hover:text-amber-300 items-center gap-1" onClick={onReset} type="button">
-              <Icon name="close" className="text-[18px]" /> Сбросить
+              <Icon name="close" className="text-[18px]" /> {t("Сбросить")}
             </button>
           )}
         </div>
         <div className="flex flex-wrap gap-2 mb-10">
-          {chip("", "Все")}
-          {categories.map((c) => chip(c.id, c.name))}
+          {chip("", t("Все"))}
+          {categories.map((c) => chip(c.id, t(c.name)))}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -148,7 +149,7 @@ export default function PlacesSection({ filters, setFilters, onReset, regions, c
         </div>
         {error && <p className="text-center text-rose-300 py-16">{error}</p>}
         {!loading && !error && (nearby ? nearby.places?.length === 0 : places.length === 0) && (
-          <p className="text-center text-slate-400 py-16">Ничего не найдено. Попробуйте изменить фильтры.</p>
+          <p className="text-center text-slate-400 py-16">{t("Ничего не найдено. Попробуйте изменить фильтры.")}</p>
         )}
         {hasMore && !loading && !nearby && (
           <div className="flex justify-center mt-12">
@@ -157,7 +158,7 @@ export default function PlacesSection({ filters, setFilters, onReset, regions, c
               onClick={loadMore}
               type="button"
             >
-              Показать ещё
+              {t("Показать ещё")}
             </button>
           </div>
         )}

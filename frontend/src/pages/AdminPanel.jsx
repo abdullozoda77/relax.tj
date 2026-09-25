@@ -7,13 +7,14 @@ import UsersTab from "../components/admin/UsersTab.jsx";
 import Icon from "../components/Icon.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useUi } from "../context/UiContext.jsx";
+import { t } from "../i18n.js";
 
 const TABS = [
-  ["stats", "Обзор", "monitoring"],
-  ["suggestions", "Предложения", "add_location_alt"],
-  ["places", "Места", "location_on"],
-  ["users", "Пользователи", "group"],
-  ["reviews", "Отзывы", "rate_review"],
+  ["stats", t("Обзор"), "monitoring"],
+  ["suggestions", t("Предложения"), "add_location_alt"],
+  ["places", t("Места"), "location_on"],
+  ["users", t("Пользователи"), "group"],
+  ["reviews", t("Отзывы"), "rate_review"],
 ];
 
 export function isAdmin(user) {
@@ -34,13 +35,13 @@ export default function AdminPanel() {
     return (
       <div className="max-w-xl mx-auto px-6 py-32 text-center">
         <Icon name="admin_panel_settings" className="text-secondary text-[48px]" />
-        <h1 className="font-headline-md text-headline-md text-on-surface mt-4 mb-2">Только для администраторов</h1>
+        <h1 className="font-headline-md text-headline-md text-on-surface mt-4 mb-2">{t("Только для администраторов")}</h1>
         <p className="text-body-md text-on-surface-variant mb-6">
-          {user ? "У вашего аккаунта нет прав администратора." : "Войдите под аккаунтом администратора."}
+          {user ? t("У вашего аккаунта нет прав администратора.") : t("Войдите под аккаунтом администратора.")}
         </p>
         {!user && (
           <button className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-6 py-3 rounded-xl text-label-md font-label-md" onClick={() => openAuth("login")} type="button">
-            Войти
+            {t("Войти")}
           </button>
         )}
       </div>
@@ -54,7 +55,7 @@ export default function AdminPanel() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Relax.tj</span>
-          <h1 className="font-headline-lg text-3xl md:text-headline-lg text-on-surface">Панель управления</h1>
+          <h1 className="font-headline-lg text-3xl md:text-headline-lg text-on-surface">{t("Панель управления")}</h1>
         </div>
         <a className="text-label-md font-label-md text-on-surface-variant hover:text-primary flex items-center gap-1" href="http://127.0.0.1:8000/admin/" rel="noreferrer" target="_blank">
           Django admin <Icon name="open_in_new" className="text-[16px]" />

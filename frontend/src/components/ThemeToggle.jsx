@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Icon from "./Icon.jsx";
+import { t } from "../i18n.js";
 
 // Light / dark theme switch. The choice is saved in localStorage; index.html applies it before React starts.
 export default function ThemeToggle() {
@@ -19,7 +20,7 @@ export default function ThemeToggle() {
     <button
       className="w-9 h-9 rounded-full hover:bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center transition-colors"
       onClick={() => setTheme(light ? "dark" : "light")}
-      title={light ? "Тёмная тема" : "Светлая тема"}
+      title={light ? t("Тёмная тема") : t("Светлая тема")}
       type="button"
     >
       <Icon filled name={light ? "dark_mode" : "light_mode"} className={`text-[21px] ${light ? "" : "text-amber-400"}`} />

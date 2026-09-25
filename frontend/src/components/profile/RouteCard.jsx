@@ -6,6 +6,7 @@ import { useUi } from "../../context/UiContext.jsx";
 import { formatDate, plural } from "../../utils.js";
 import Icon from "../Icon.jsx";
 import PlaceBackground from "../PlaceBackground.jsx";
+import { t } from "../../i18n.js";
 
 const input =
   "px-3 py-2 rounded-lg bg-surface-container-lowest border border-outline-variant text-body-sm text-on-surface placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary";
@@ -21,7 +22,7 @@ function NewListForm({ onCreated }) {
     e.preventDefault();
     try {
       const list = await api("/travel-lists/", { method: "POST", body: { title, description, is_public: false } });
-      toast(`Маршрут «${list.title}» создан`);
+      toast(t("Маршрут «{0}» создан", list.title));
       setTitle("");
       setDescription("");
       onCreated(list.id);
@@ -32,10 +33,10 @@ function NewListForm({ onCreated }) {
 
   return (
     <form className="flex flex-col sm:flex-row gap-2" onSubmit={submit}>
-      <input className={`${input} flex-1`} onChange={(e) => setTitle(e.target.value)} placeholder="Название маршрута" required value={title} />
-      <input className={`${input} flex-1`} onChange={(e) => setDescription(e.target.value)} placeholder="Описание (необязательно)" value={description} />
+      <input className={`${input} flex-1`} onChange={(e) => setTitle(e.target.value)} placeholder={t("Название маршрута")} required value={title} />
+      <input className={`${input} flex-1`} onChange={(e) => setDescription(e.target.value)} placeholder={t("Описание (необязательно)")} value={description} />
       <button className="bg-primary hover:bg-tertiary-container text-on-primary font-title-md text-body-md px-4 py-2 rounded-lg flex items-center gap-1.5" type="submit">
-        <Icon name="add" className="text-[18px]" /> Создать
+        <Icon name="add" className="text-[18px]" /> {t("Создать")}
       </button>
     </form>
   );
@@ -107,9 +108,9 @@ export default function RouteCard({ onChanged }) {
 
       {!list ? (
         <div className="flex flex-col gap-4">
-          <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">МОЙ МАРШРУТ</span>
-          <h2 className="font-headline-md text-headline-md text-on-surface">У вас пока нет маршрутов</h2>
-          <p className="text-body-md text-on-surface-variant">Создайте список мест, которые хотите посетить, и отмечайте, где уже были.</p>
+          <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">{t("МОЙ МАРШРУТ")}</span>
+          <h2 className="font-headline-md text-headline-md text-on-surface">{t("У вас пока нет маршрутов")}</h2>
+          <p className="text-body-md text-on-surface-variant">{t("Создайте список мест, которые хотите посетить, и отмечайте, где уже были.")}</p>
           <NewListForm onCreated={(id) => run(() => load(id))} />
         </div>
       ) : (
@@ -117,7 +118,7 @@ export default function RouteCard({ onChanged }) {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6">
             <div>
               <div className="flex items-center gap-2">
-                <span className="bg-secondary-container/20 text-secondary font-label-sm text-label-sm px-2.5 py-0.5 rounded-full">МОЙ МАРШРУТ</span>
+                <span className="bg-secondary-container/20 text-secondary font-label-sm text-label-sm px-2.5 py-0.5 rounded-full">{t("МОЙ МАРШРУТ")}</span>
                 <span className="font-label-sm text-label-sm text-on-surface-variant tracking-wider">REF: #LIST-{list.id}</span>
               </div>
               <h2 className="font-headline-lg text-3xl md:text-headline-lg text-on-surface mt-1.5">{list.title}</h2>
@@ -126,9 +127,9 @@ export default function RouteCard({ onChanged }) {
             <div className="bg-surface-container-lowest px-4 py-3 rounded-lg flex items-center gap-3 shrink-0">
               <Icon name="flag" className="text-secondary text-[26px]" />
               <div>
-                <div className="font-label-sm text-label-sm text-on-surface-variant">ПОСЕЩЕНО</div>
+                <div className="font-label-sm text-label-sm text-on-surface-variant">{t("ПОСЕЩЕНО")}</div>
                 <div className="font-label-md text-label-md text-on-surface font-semibold">
-                  {visited} / {plural(items.length, ["места", "мест", "мест"])}
+                  {visited} / {plural(items.length, [t("места"), t("мест"), t("мест")])}
                 </div>
               </div>
             </div>
@@ -140,13 +141,13 @@ export default function RouteCard({ onChanged }) {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <Icon name="calendar_today" className="text-primary text-[20px]" />
-                  <span className="font-label-md text-label-md text-on-surface font-semibold">Создан {formatDate(list.created_at)}</span>
+                  <span className="font-label-md text-label-md text-on-surface font-semibold">{t("Создан")} {formatDate(list.created_at)}</span>
                   <span className="text-outline">·</span>
-                  <span className="font-label-sm text-label-sm text-on-surface-variant">{plural(items.length, ["место", "места", "мест"])}</span>
+                  <span className="font-label-sm text-label-sm text-on-surface-variant">{plural(items.length, [t("место"), t("места"), t("мест")])}</span>
                 </div>
                 <div className="flex items-center gap-2 bg-surface-container-high/90 backdrop-blur-md px-3 py-1 rounded-full">
                   <Icon name={list.is_public ? "public" : "lock"} className="text-secondary text-[16px]" />
-                  <span className="font-label-sm text-label-sm text-on-surface">{list.is_public ? "Открыт для всех" : "Виден только вам"}</span>
+                  <span className="font-label-sm text-label-sm text-on-surface">{list.is_public ? t("Открыт для всех") : t("Виден только вам")}</span>
                 </div>
               </div>
             </div>
@@ -163,10 +164,10 @@ export default function RouteCard({ onChanged }) {
                 {next ? <PlaceBackground place={next.place_detail} /> : <Icon name="celebration" className="absolute inset-0 m-auto h-fit w-fit text-primary text-[28px]" />}
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="font-label-sm text-label-sm text-primary">СЛЕДУЮЩЕЕ МЕСТО</span>
-                <div className="font-title-md text-title-md text-on-surface truncate">{next ? next.place_detail.name : "Все места посещены!"}</div>
+                <span className="font-label-sm text-label-sm text-primary">{t("СЛЕДУЮЩЕЕ МЕСТО")}</span>
+                <div className="font-title-md text-title-md text-on-surface truncate">{next ? next.place_detail.name : t("Все места посещены!")}</div>
                 <p className="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">
-                  {next ? `${next.place_detail.region} · ${next.place_detail.category || "Без категории"}` : "Отличная поездка"}
+                  {next ? `${next.place_detail.region} · ${next.place_detail.category || t("Без категории")}` : t("Отличная поездка")}
                 </p>
               </div>
             </button>
@@ -175,10 +176,10 @@ export default function RouteCard({ onChanged }) {
                 <Icon name="add_location" className="text-[28px]" />
               </div>
               <div className="flex flex-col min-w-0 flex-1 gap-1.5">
-                <span className="font-label-sm text-label-sm text-secondary">ДОБАВИТЬ МЕСТО</span>
+                <span className="font-label-sm text-label-sm text-secondary">{t("ДОБАВИТЬ МЕСТО")}</span>
                 <div className="flex gap-2">
                   <select className={`${input} flex-1 min-w-0 py-1.5`} onChange={(e) => setPlaceToAdd(e.target.value)} value={placeToAdd}>
-                    <option value="">Выберите место</option>
+                    <option value="">{t("Выберите место")}</option>
                     {available.map((p) => (
                       <option key={p.id} value={p.id}>
                         {p.name}
@@ -189,7 +190,7 @@ export default function RouteCard({ onChanged }) {
                     className="bg-secondary text-on-secondary-container px-3 rounded-lg disabled:opacity-40"
                     disabled={!placeToAdd}
                     onClick={() =>
-                      run(() => api(`/travel-lists/${list.id}/add-place/`, { method: "POST", body: { place: Number(placeToAdd) } }), "Место добавлено").then(() =>
+                      run(() => api(`/travel-lists/${list.id}/add-place/`, { method: "POST", body: { place: Number(placeToAdd) } }), t("Место добавлено")).then(() =>
                         setPlaceToAdd("")
                       )
                     }
@@ -206,15 +207,15 @@ export default function RouteCard({ onChanged }) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Icon name="checklist" className="text-primary text-[20px]" />
-                <span className="font-title-md text-title-md text-on-surface">Прогресс маршрута</span>
+                <span className="font-title-md text-title-md text-on-surface">{t("Прогресс маршрута")}</span>
               </div>
-              <span className="font-label-md text-label-md text-primary font-semibold">{percent}% пройдено</span>
+              <span className="font-label-md text-label-md text-primary font-semibold">{percent}{t("% пройдено")}</span>
             </div>
             <div className="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
               <div className="bg-primary h-full rounded-full transition-all duration-500" style={{ width: `${percent}%` }} />
             </div>
             <div className="flex flex-wrap gap-2 text-body-sm font-body-sm">
-              {items.length === 0 && <span className="text-on-surface-variant">Добавьте места в маршрут.</span>}
+              {items.length === 0 && <span className="text-on-surface-variant">{t("Добавьте места в маршрут.")}</span>}
               {items.map((item) => (
                 <span
                   key={item.id}
@@ -225,7 +226,7 @@ export default function RouteCard({ onChanged }) {
                   <button
                     className="inline-flex items-center gap-1"
                     onClick={() => run(() => api(`/travel-list-places/${item.id}/toggle-visited/`, { method: "POST" }))}
-                    title={item.is_visited ? "Отметить как не посещённое" : "Отметить как посещённое"}
+                    title={item.is_visited ? t("Отметить как не посещённое") : t("Отметить как посещённое")}
                     type="button"
                   >
                     <Icon name={item.is_visited ? "check_circle" : "pending"} className={`text-[14px] ${item.is_visited ? "text-primary" : ""}`} />
@@ -233,8 +234,8 @@ export default function RouteCard({ onChanged }) {
                   </button>
                   <button
                     className="text-outline hover:text-rose-400 ml-1"
-                    onClick={() => run(() => api(`/travel-lists/${list.id}/remove-place/${item.place}/`, { method: "DELETE" }), "Место убрано из маршрута")}
-                    title="Убрать из маршрута"
+                    onClick={() => run(() => api(`/travel-lists/${list.id}/remove-place/${item.place}/`, { method: "DELETE" }), t("Место убрано из маршрута"))}
+                    title={t("Убрать из маршрута")}
                     type="button"
                   >
                     <Icon name="close" className="text-[14px]" />
@@ -250,30 +251,30 @@ export default function RouteCard({ onChanged }) {
               onClick={() =>
                 run(
                   () => api(`/travel-lists/${list.id}/`, { method: "PATCH", body: { is_public: !list.is_public } }),
-                  list.is_public ? "Маршрут теперь виден только вам" : "Маршрут открыт для всех"
+                  list.is_public ? t("Маршрут теперь виден только вам") : t("Маршрут открыт для всех")
                 )
               }
               type="button"
             >
               <Icon name={list.is_public ? "lock" : "public"} className="text-[20px]" />
-              <span>{list.is_public ? "Сделать личным" : "Сделать публичным"}</span>
+              <span>{list.is_public ? t("Сделать личным") : t("Сделать публичным")}</span>
             </button>
             <Link className={secondaryBtn} to={`/lists/${list.id}`}>
               <Icon name="map" className="text-[20px]" />
-              <span>Страница маршрута</span>
+              <span>{t("Страница маршрута")}</span>
             </Link>
             <button
               className={secondaryBtn}
-              onClick={() => confirm(`Удалить маршрут «${list.title}»?`) && run(() => api(`/travel-lists/${list.id}/`, { method: "DELETE" }), "Маршрут удалён")}
+              onClick={() => confirm(t("Удалить маршрут «{0}»?", list.title)) && run(() => api(`/travel-lists/${list.id}/`, { method: "DELETE" }), t("Маршрут удалён"))}
               type="button"
             >
               <Icon name="delete" className="text-[20px]" />
-              <span>Удалить маршрут</span>
+              <span>{t("Удалить маршрут")}</span>
             </button>
           </div>
 
           <div className="mt-6 pt-6 border-t border-outline-variant/50">
-            <span className="block font-label-sm text-label-sm text-on-surface-variant mb-2">НОВЫЙ МАРШРУТ</span>
+            <span className="block font-label-sm text-label-sm text-on-surface-variant mb-2">{t("НОВЫЙ МАРШРУТ")}</span>
             <NewListForm onCreated={(id) => run(() => load(id))} />
           </div>
         </>
