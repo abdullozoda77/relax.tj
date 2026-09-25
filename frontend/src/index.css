@@ -2,6 +2,128 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Dark theme (default). Values are RGB channels so Tailwind can add opacity: bg-slate-900/80 */
+:root {
+  --c-white: 255 255 255;
+  --c-slate-50: 248 250 252;
+  --c-slate-100: 241 245 249;
+  --c-slate-200: 226 232 240;
+  --c-slate-300: 203 213 225;
+  --c-slate-400: 148 163 184;
+  --c-slate-500: 100 116 139;
+  --c-slate-600: 71 85 105;
+  --c-slate-700: 51 65 85;
+  --c-slate-800: 30 41 59;
+  --c-slate-900: 15 23 42;
+  --c-slate-950: 2 6 23;
+  --c-emerald-200: 167 243 208;
+  --c-emerald-300: 110 231 183;
+  --c-emerald-400: 52 211 153;
+  --c-emerald-500: 16 185 129;
+  --c-emerald-600: 5 150 105;
+  --c-emerald-700: 4 120 87;
+  --c-emerald-800: 6 95 70;
+  --c-emerald-950: 2 44 34;
+  --c-amber-200: 253 230 138;
+  --c-amber-300: 252 211 77;
+  --c-amber-400: 251 191 36;
+  --c-amber-500: 245 158 11;
+  --c-amber-600: 217 119 6;
+  --c-amber-700: 180 83 9;
+  --c-rose-300: 253 164 175;
+  --c-rose-400: 251 113 133;
+  --c-rose-500: 244 63 94;
+  --c-rose-600: 225 29 72;
+  --c-rose-700: 190 18 60;
+  --c-red-200: 254 202 202;
+  --c-red-300: 252 165 165;
+  --c-red-800: 153 27 27;
+  --c-red-900: 127 29 29;
+  --c-red-950: 69 10 10;
+  --c-background: 11 17 23;
+  --c-surface: 11 17 23;
+  --c-surface-accent: 19 34 29;
+  --c-surface-container-lowest: 7 11 14;
+  --c-surface-container-low: 14 22 32;
+  --c-surface-container: 22 32 44;
+  --c-surface-container-high: 28 40 54;
+  --c-surface-container-highest: 36 50 66;
+  --c-surface-bright: 30 41 59;
+  --c-on-surface: 248 250 252;
+  --c-on-surface-variant: 148 163 184;
+  --c-outline: 100 116 139;
+  --c-outline-variant: 51 65 85;
+  --c-primary: 16 185 129;
+  --c-on-primary: 0 56 36;
+  --c-secondary: 245 158 11;
+  --c-secondary-container: 245 158 11;
+  --c-on-secondary-container: 28 16 0;
+  --c-tertiary: 16 185 129;
+  --c-tertiary-container: 5 150 105;
+  --c-tertiary-fixed: 133 248 196;
+}
+
+/* Light theme: turned on by the ☀ button in the header (class "light" on <html>) */
+html.light {
+  --c-white: 15 23 42;
+  --c-slate-50: 2 6 23;
+  --c-slate-100: 15 23 42;
+  --c-slate-200: 30 41 59;
+  --c-slate-300: 51 65 85;
+  --c-slate-400: 71 85 105;
+  --c-slate-500: 100 116 139;
+  --c-slate-600: 148 163 184;
+  --c-slate-700: 203 213 225;
+  --c-slate-800: 226 232 240;
+  --c-slate-900: 248 250 252;
+  --c-slate-950: 255 255 255;
+  --c-emerald-200: 6 95 70;
+  --c-emerald-300: 4 120 87;
+  --c-emerald-400: 5 150 105;
+  --c-emerald-500: 16 185 129;
+  --c-emerald-600: 5 150 105;
+  --c-emerald-700: 4 120 87;
+  --c-emerald-800: 6 95 70;
+  --c-emerald-950: 236 253 245;
+  --c-amber-200: 146 64 14;
+  --c-amber-300: 180 83 9;
+  --c-amber-400: 217 119 6;
+  --c-amber-500: 245 158 11;
+  --c-amber-600: 217 119 6;
+  --c-amber-700: 180 83 9;
+  --c-rose-300: 190 18 60;
+  --c-rose-400: 225 29 72;
+  --c-rose-500: 244 63 94;
+  --c-rose-600: 225 29 72;
+  --c-rose-700: 190 18 60;
+  --c-red-200: 153 27 27;
+  --c-red-300: 185 28 28;
+  --c-red-800: 254 202 202;
+  --c-red-900: 254 226 226;
+  --c-red-950: 254 242 242;
+  --c-background: 244 247 250;
+  --c-surface: 244 247 250;
+  --c-surface-accent: 223 243 234;
+  --c-surface-container-lowest: 255 255 255;
+  --c-surface-container-low: 238 242 246;
+  --c-surface-container: 255 255 255;
+  --c-surface-container-high: 230 235 241;
+  --c-surface-container-highest: 217 225 234;
+  --c-surface-bright: 207 217 228;
+  --c-on-surface: 15 23 42;
+  --c-on-surface-variant: 71 85 105;
+  --c-outline: 100 116 139;
+  --c-outline-variant: 203 213 225;
+  --c-primary: 5 150 105;
+  --c-on-primary: 255 255 255;
+  --c-secondary: 217 119 6;
+  --c-secondary-container: 245 158 11;
+  --c-on-secondary-container: 28 16 0;
+  --c-tertiary: 5 150 105;
+  --c-tertiary-container: 4 120 87;
+  --c-tertiary-fixed: 4 120 87;
+}
+
 html,
 body {
   margin: 0;
@@ -10,6 +132,7 @@ body {
 
 body {
   overscroll-behavior: none;
+  transition: background-color 0.3s;
 }
 
 ::-webkit-scrollbar {

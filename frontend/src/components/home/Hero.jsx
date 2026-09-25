@@ -71,7 +71,7 @@ export default function Hero({ stats = {}, onNearby }) {
   const photo = PHOTOS[slide];
 
   return (
-    <section className="relative min-h-[860px] flex flex-col justify-between pt-12 pb-16 px-6 lg:px-12 overflow-hidden bg-[#070c11] text-white">
+    <section className="relative min-h-[860px] flex flex-col justify-between pt-12 pb-16 px-6 lg:px-12 overflow-hidden bg-surface-container-lowest text-white">
       {PHOTOS.map((p, i) => (
         <div
           key={p.src}
@@ -83,8 +83,8 @@ export default function Hero({ stats = {}, onNearby }) {
         />
       ))}
       {/* Dark gradients keep the text readable on any photo */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#070c11]/85 via-[#070c11]/50 to-transparent" />
-      <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#0b1117] via-[#0b1117]/20 to-[#070c11]/50" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-r from-surface-container-lowest/85 via-surface-container-lowest/50 to-transparent" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-t from-surface via-surface/20 to-surface-container-lowest/50" />
       <div className="absolute -top-32 -left-32 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="absolute right-6 lg:right-12 bottom-[250px] md:bottom-[170px] z-10 flex flex-col items-end gap-2 text-right">

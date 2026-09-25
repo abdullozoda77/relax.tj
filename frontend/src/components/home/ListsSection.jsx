@@ -69,7 +69,7 @@ export default function ListsSection({ onCopy }) {
   }, []);
 
   return (
-    <section className="py-24 px-6 lg:px-12 bg-[#0e1620] border-t border-slate-800/80 scroll-mt-20" id="lists">
+    <section className="py-24 px-6 lg:px-12 bg-surface-container-low border-t border-slate-800/80 scroll-mt-20" id="lists">
       <div className="max-w-7xl mx-auto">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">От путешественников</span>

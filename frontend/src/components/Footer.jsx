@@ -9,7 +9,7 @@ export default function Footer() {
   const { openSuggest } = useUi();
   const [name, setName] = useState("");
   return (
-    <footer className="w-full bg-[#070b0e] border-t border-slate-800/80 py-16">
+    <footer className="w-full bg-surface-container-lowest border-t border-slate-800/80 py-16">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2.5">

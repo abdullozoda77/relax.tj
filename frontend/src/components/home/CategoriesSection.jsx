@@ -3,7 +3,7 @@ import Icon from "../Icon.jsx";
 
 export default function CategoriesSection({ categories, onSelect }) {
   return (
-    <section className="py-24 px-6 lg:px-12 bg-[#0e1620] border-y border-slate-800/80 scroll-mt-20" id="categories">
+    <section className="py-24 px-6 lg:px-12 bg-surface-container-low border-y border-slate-800/80 scroll-mt-20" id="categories">
       <div className="max-w-7xl mx-auto">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">Для души и тела</span>

@@ -34,7 +34,7 @@ export default function App() {
           <div id="top">
             <ScrollToHash />
             <Header />
-            <main className="w-full pt-20 bg-[#0b1117] min-h-screen">
+            <main className="w-full pt-20 bg-surface min-h-screen">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/places/:id" element={<PlaceDetail />} />

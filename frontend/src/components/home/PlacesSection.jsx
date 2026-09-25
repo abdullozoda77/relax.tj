@@ -83,7 +83,7 @@ export default function PlacesSection({ filters, setFilters, onReset, regions, c
   };
 
   return (
-    <section className="py-24 px-6 lg:px-12 bg-[#0b1117] relative scroll-mt-20" id="places">
+    <section className="py-24 px-6 lg:px-12 bg-surface relative scroll-mt-20" id="places">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
           <div>

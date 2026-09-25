@@ -8,7 +8,7 @@ export default function MapSection() {
   const [open, setOpen] = useState(false);
 
   return (
-    <section className="py-24 px-6 lg:px-12 bg-[#0b1117] scroll-mt-20" id="map">
+    <section className="py-24 px-6 lg:px-12 bg-surface scroll-mt-20" id="map">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
           <div>

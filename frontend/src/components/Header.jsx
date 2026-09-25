@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useSearchParams } from "react-router-do
 import Icon from "./Icon.jsx";
 import Logo from "./Logo.jsx";
 import NotificationBell from "./NotificationBell.jsx";
+import ThemeToggle from "./ThemeToggle.jsx";
 import UserMenu from "./UserMenu.jsx";
 
 const NAV = [
@@ -59,6 +60,7 @@ export default function Header() {
               value={query}
             />
           </div>
+          <ThemeToggle />
           <NotificationBell />
           <UserMenu />
         </div>

@@ -17,7 +17,7 @@ const TIPS = [
 
 export default function InfoSection({ onSuggest }) {
   return (
-    <section className="py-24 px-6 lg:px-12 bg-[#0b1117] scroll-mt-20" id="info">
+    <section className="py-24 px-6 lg:px-12 bg-surface scroll-mt-20" id="info">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
         <div className="lg:col-span-1">
           <span className="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">Полезно знать</span>
@@ -25,7 +25,7 @@ export default function InfoSection({ onSuggest }) {
           <p className="text-body-md text-slate-400 mb-8 leading-relaxed">
             Планируйте поездку спокойно: когда лучше ехать и как добраться до гор.
           </p>
-          <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-900 to-[#13221d] border border-emerald-900/50 text-white shadow-xl">
+          <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-900 to-surface-accent border border-emerald-900/50 text-white shadow-xl">
             <h4 className="text-headline-sm font-headline-sm mb-2 text-emerald-300">Знаете красивое место?</h4>
             <p className="text-body-sm text-slate-300 mb-4 leading-relaxed">
               Предложите его — после проверки администратором оно появится на сайте.
