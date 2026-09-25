@@ -20,3 +20,19 @@ body {
   font-variation-settings: "FILL" 0;
   user-select: none;
 }
+
+/* Cesium credits must stay visible, but smaller so they do not cover the 3D view */
+.cesium-viewer .cesium-widget-credits,
+.cesium-viewer .cesium-widget-credits * {
+  font-size: 9px !important;
+  line-height: 12px !important;
+}
+
+.cesium-viewer .cesium-widget-credits {
+  max-width: 70%;
+  opacity: 0.75;
+}
+
+.cesium-viewer .cesium-credit-logoContainer img {
+  height: 14px;
+}
