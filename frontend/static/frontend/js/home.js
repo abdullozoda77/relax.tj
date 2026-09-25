@@ -140,7 +140,7 @@ function travelListCard(list, highlighted) {
     ${highlighted ? '<div class="absolute -top-3.5 right-8 bg-amber-500 text-slate-950 font-bold px-3 py-1 rounded-full text-label-sm font-label-sm shadow-md">Популярный</div>' : ""}
     <div>
       <div class="flex justify-between items-start mb-6 gap-3">
-        <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-3 py-1 rounded-full text-label-sm font-label-sm">${list.places_count} мест</span>
+        <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-3 py-1 rounded-full text-label-sm font-label-sm">${plural(list.places_count, ["место", "места", "мест"])}</span>
         <span class="text-body-sm text-slate-400 flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">person</span>${esc(list.user.username)}</span>
       </div>
       <h3 class="text-headline-md font-headline-md text-white mb-3">${esc(list.title)}</h3>

@@ -57,6 +57,16 @@ function formatFee(fee) {
   return amount > 0 ? `${amount.toLocaleString("ru-RU")} сомони` : "Бесплатно";
 }
 
+// plural(5, ["отзыв", "отзыва", "отзывов"]) -> "5 отзывов"
+function plural(n, [one, few, many]) {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  const word = mod10 === 1 && mod100 !== 11 ? one
+    : mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14) ? few
+    : many;
+  return `${n} ${word}`;
+}
+
 function formatRating(rating) {
   return rating ? Number(rating).toFixed(1) : "—";
 }
