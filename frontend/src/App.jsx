@@ -2,6 +2,9 @@ import { useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Footer from "./components/Footer.jsx";
 import Header from "./components/Header.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
+import { ToastProvider } from "./context/ToastContext.jsx";
+import { UiProvider } from "./context/UiContext.jsx";
 import Home from "./pages/Home.jsx";
 
 // Scrolls to #places, #lists... after navigation, or to the top when there is no hash.
@@ -20,15 +23,21 @@ function ScrollToHash() {
 
 export default function App() {
   return (
-    <div id="top">
-      <ScrollToHash />
-      <Header />
-      <main className="w-full pt-20 bg-[#0b1117] min-h-screen">
-        <Routes>
-          <Route path="/" element={<Home />} />
-        </Routes>
-      </main>
-      <Footer />
-    </div>
+    <ToastProvider>
+      <AuthProvider>
+        <UiProvider>
+          <div id="top">
+            <ScrollToHash />
+            <Header />
+            <main className="w-full pt-20 bg-[#0b1117] min-h-screen">
+              <Routes>
+                <Route path="/" element={<Home />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </UiProvider>
+      </AuthProvider>
+    </ToastProvider>
   );
 }
