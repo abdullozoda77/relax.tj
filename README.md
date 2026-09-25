@@ -74,6 +74,10 @@ npm run dev
 | `DEBUG` | Режим отладки | `True` |
 | `ALLOWED_HOSTS` | Хосты через запятую | `127.0.0.1,localhost` |
 | `CORS_ALLOWED_ORIGINS` | Адреса фронтенда через запятую | `http://localhost:3000,http://localhost:5173` |
+| `FRONTEND_URL` | Адрес фронтенда для ссылки в письме восстановления пароля | `http://localhost:5173` |
+
+В режиме разработки письма не отправляются, а печатаются в консоли Django; ссылка для
+восстановления пароля выводится отдельной строкой `[password reset] ...`.
 
 ## Роли
 
@@ -96,6 +100,8 @@ npm run dev
 | POST | `logout/` | Выход (refresh токен в чёрный список) |
 | GET, PUT, PATCH, DELETE | `profile/` | Свой профиль и статистика |
 | POST | `change-password/` | Смена пароля |
+| POST | `password-reset/` | Письмо со ссылкой для восстановления пароля |
+| POST | `password-reset/confirm/` | Новый пароль по ссылке (`uid`, `token`, `new_password`) |
 | GET, PUT, PATCH | `users/`, `users/{id}/` | Пользователи (только админ) |
 
 ### Места — `/api/`

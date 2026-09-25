@@ -1,3 +1,8 @@
+from django.conf import settings
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from rest_framework import generics, permissions, status, viewsets, mixins
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -10,6 +15,7 @@ from drf_yasg.utils import swagger_auto_schema
 from places.permissions import IsAdmin
 from .models import User
 from .serializers import (
+    PasswordResetSerializer, PasswordResetConfirmSerializer,
     RegisterSerializer, UserSerializer, ChangePasswordSerializer,
     LogoutSerializer, AdminUserSerializer,
 )
@@ -97,3 +103,48 @@ class UserAdminViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.
         if user == self.request.user and serializer.validated_data.get("is_active") is False:
             raise ValidationError({"is_active": "You cannot block yourself."})
         serializer.save()
+
+
+class PasswordResetView(APIView):
+    """Sends a link to reset the password. The answer is the same whether the email exists or not."""
+
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
+
+    @swagger_auto_schema(request_body=PasswordResetSerializer)
+    def post(self, request):
+        serializer = PasswordResetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data["email"]
+        for user in User.objects.filter(email__iexact=email, is_active=True):
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            link = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
+            send_mail(
+                subject="Relax.tj — восстановление пароля",
+                message=(
+                    f"Здравствуйте, {user.username}!\n\n"
+                    f"Чтобы задать новый пароль, откройте ссылку:\n{link}\n\n"
+                    "Если вы не запрашивали восстановление, просто проигнорируйте это письмо."
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+            )
+            if settings.DEBUG:
+                # The console email body is base64 encoded, so print the link separately for development.
+                print(f"[password reset] {user.email}: {link}", flush=True)
+        return Response({"detail": "Если такой email зарегистрирован, мы отправили на него ссылку для восстановления пароля."})
+
+
+class PasswordResetConfirmView(APIView):
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
+
+    @swagger_auto_schema(request_body=PasswordResetConfirmSerializer)
+    def post(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "Пароль изменён. Теперь можно войти с новым паролем."})

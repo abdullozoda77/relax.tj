@@ -8,6 +8,7 @@ import { UiProvider } from "./context/UiContext.jsx";
 import Home from "./pages/Home.jsx";
 import PlaceDetail from "./pages/PlaceDetail.jsx";
 import Profile from "./pages/Profile.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
 
 // Scrolls to #places, #lists... after navigation, or to the top when there is no hash.
 function ScrollToHash() {
@@ -36,6 +37,7 @@ export default function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/places/:id" element={<PlaceDetail />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
               </Routes>
             </main>
             <Footer />

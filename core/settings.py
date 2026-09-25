@@ -192,3 +192,7 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+# Password reset emails link to the React page /reset-password on this address
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Relax.tj <noreply@relax.tj>')

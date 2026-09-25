@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { api } from "../api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import Modal from "./Modal.jsx";
@@ -12,6 +13,53 @@ export function Field({ label, ...props }) {
       <span className="block text-label-md font-label-md text-slate-300 mb-1.5">{label}</span>
       <input className={inputClass} {...props} />
     </label>
+  );
+}
+
+// Asks for the email and sends a reset link (the answer is the same for unknown emails).
+function ForgotPassword({ onBack }) {
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      const data = await api("/auth/password-reset/", { method: "POST", body: { email } });
+      setSent(data.detail);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="p-8">
+      <h2 className="text-headline-md font-headline-md text-white mb-1">Восстановление пароля</h2>
+      <p className="text-body-sm text-slate-400 mb-6">Введите email, указанный при регистрации — мы пришлём ссылку для нового пароля.</p>
+      {sent ? (
+        <p className="text-body-sm text-emerald-200 bg-emerald-950/60 border border-emerald-800 rounded-lg px-4 py-3">{sent}</p>
+      ) : (
+        <form className="space-y-4" onSubmit={submit}>
+          <Field autoComplete="email" autoFocus label="Email" name="email" onChange={(e) => setEmail(e.target.value)} required type="email" value={email} />
+          {error && <p className="text-body-sm text-red-300 bg-red-950/60 border border-red-900 rounded-lg px-4 py-2.5">{error}</p>}
+          <button
+            className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl text-label-md font-label-md transition-all disabled:opacity-60"
+            disabled={busy}
+            type="submit"
+          >
+            {busy ? "Отправляем..." : "Отправить ссылку"}
+          </button>
+        </form>
+      )}
+      <button className="mt-4 w-full text-body-sm text-slate-400 hover:text-emerald-300" onClick={onBack} type="button">
+        ← Назад ко входу
+      </button>
+    </div>
   );
 }
 
@@ -42,6 +90,14 @@ export default function AuthModal({ tab: initialTab = "login", onClose }) {
 
   const tabClass = (active) =>
     active ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" : "text-slate-400 hover:text-white border border-transparent";
+
+  if (tab === "forgot") {
+    return (
+      <Modal onClose={onClose}>
+        <ForgotPassword onBack={() => setTab("login")} />
+      </Modal>
+    );
+  }
 
   return (
     <Modal onClose={onClose}>
@@ -91,6 +147,11 @@ export default function AuthModal({ tab: initialTab = "login", onClose }) {
           >
             {busy ? "Подождите..." : isLogin ? "Войти" : "Зарегистрироваться"}
           </button>
+          {isLogin && (
+            <button className="w-full text-body-sm text-slate-400 hover:text-emerald-300" onClick={() => setTab("forgot")} type="button">
+              Забыли пароль?
+            </button>
+          )}
         </form>
       </div>
     </Modal>
