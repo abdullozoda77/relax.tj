@@ -3,6 +3,8 @@ import { FullscreenControl, Map, Marker, NavigationControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import Icon from "../Icon.jsx";
 
+const ELEVATION_TILES = ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"];
+
 // Free tiles, no API key: satellite photos from Esri and real elevation data (AWS Terrain Tiles).
 const STYLE = {
   version: 8,
@@ -10,21 +12,37 @@ const STYLE = {
     satellite: {
       type: "raster",
       tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"],
-      tileSize: 256,
+      // 128 instead of 256 makes MapLibre load tiles one zoom level deeper: twice the detail.
+      tileSize: 128,
       maxzoom: 19,
       attribution: "Спутник: Esri, Maxar, Earthstar Geographics",
     },
     elevation: {
       type: "raster-dem",
-      tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
+      tiles: ELEVATION_TILES,
       tileSize: 256,
       encoding: "terrarium",
       maxzoom: 15,
       attribution: "Рельеф: Mapzen, AWS Terrain Tiles",
     },
+    // A second copy of the elevation for relief shading (MapLibre recommends a separate source).
+    shading: { type: "raster-dem", tiles: ELEVATION_TILES, tileSize: 256, encoding: "terrarium", maxzoom: 15 },
   },
-  layers: [{ id: "satellite", type: "raster", source: "satellite" }],
-  terrain: { source: "elevation", exaggeration: 1.4 },
+  layers: [
+    {
+      id: "satellite",
+      type: "raster",
+      source: "satellite",
+      paint: { "raster-contrast": 0.15, "raster-saturation": 0.25, "raster-resampling": "linear" },
+    },
+    {
+      id: "relief",
+      type: "hillshade",
+      source: "shading",
+      paint: { "hillshade-exaggeration": 0.35, "hillshade-shadow-color": "#0b1117", "hillshade-highlight-color": "rgba(255,255,255,0.15)" },
+    },
+  ],
+  terrain: { source: "elevation", exaggeration: 1.5 },
   sky: {
     "sky-color": "#5b9bd5",
     "horizon-color": "#cfe3f3",
@@ -42,8 +60,8 @@ function startView(place) {
   const mountain = (place.altitude || 0) >= 1000;
   return {
     center: [Number(place.longitude), Number(place.latitude)],
-    zoom: mountain ? 13 : 15.4,
-    pitch: mountain ? 72 : 62,
+    zoom: mountain ? 13.4 : 16,
+    pitch: mountain ? 65 : 55,
     bearing: -20,
   };
 }
@@ -63,6 +81,8 @@ export default function Terrain3D({ place }) {
         container: container.current,
         style: STYLE,
         maxPitch: 85,
+        // Render at least at 2x pixel density so photos and edges are sharp on normal screens too.
+        pixelRatio: Math.max(window.devicePixelRatio || 1, 2),
         attributionControl: { compact: true },
         ...startView(place),
       });
