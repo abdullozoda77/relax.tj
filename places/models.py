@@ -1,12 +1,13 @@
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from .validators import image_validators
 
 
 class Region(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True)
-    image = models.ImageField(upload_to="regions/", blank=True, null=True)
+    image = models.ImageField(upload_to="regions/", validators=image_validators, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -18,7 +19,7 @@ class Region(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    icon = models.ImageField(upload_to="categories/", blank=True, null=True)
+    icon = models.ImageField(upload_to="categories/", validators=image_validators, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -32,7 +33,7 @@ class Category(models.Model):
 class Activity(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True)
-    icon = models.ImageField(upload_to="activities/", blank=True, null=True)
+    icon = models.ImageField(upload_to="activities/", validators=image_validators, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "activities"
@@ -75,7 +76,7 @@ class Place(models.Model):
 
 class PlaceImage(models.Model):
     place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to="places/")
+    image = models.ImageField(upload_to="places/", validators=image_validators)
     is_main = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -160,7 +161,7 @@ class PlaceSuggestion(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     address = models.CharField(max_length=255, blank=True)
-    image = models.ImageField(upload_to="suggestions/", blank=True, null=True)
+    image = models.ImageField(upload_to="suggestions/", validators=image_validators, blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUSES, default="pending")
     admin_comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
