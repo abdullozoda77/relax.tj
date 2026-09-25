@@ -8,6 +8,7 @@ import UserMenu from "./UserMenu.jsx";
 const NAV = [
   { to: "/#top", label: "Главная" },
   { to: "/#places", label: "Места" },
+  { to: "/#map", label: "Карта" },
   { to: "/#categories", label: "Категории" },
   { to: "/#lists", label: "Маршруты" },
   { to: "/#info", label: "Советы" },

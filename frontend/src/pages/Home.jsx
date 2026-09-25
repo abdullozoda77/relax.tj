@@ -5,6 +5,7 @@ import CategoriesSection from "../components/home/CategoriesSection.jsx";
 import Hero from "../components/home/Hero.jsx";
 import InfoSection from "../components/home/InfoSection.jsx";
 import ListsSection from "../components/home/ListsSection.jsx";
+import MapSection from "../components/home/MapSection.jsx";
 import PlacesSection from "../components/home/PlacesSection.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import { useUi } from "../context/UiContext.jsx";
@@ -103,6 +104,7 @@ export default function Home() {
         regions={regions}
         setFilters={changeFilters}
       />
+      <MapSection />
       <CategoriesSection categories={categories} onSelect={selectCategory} />
       <InfoSection onSuggest={() => openSuggest()} />
       <ListsSection onCopy={copyList} />
