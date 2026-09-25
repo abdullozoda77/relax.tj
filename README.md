@@ -30,13 +30,16 @@ python manage.py runserver
 
 ## Запуск фронтенда
 
-Нужен Node.js 20+. Бэкенд должен быть запущен на порту 8000.
+Нужен Node.js 20+.
 
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+
+`npm run dev` запускает сразу оба сервера — Django (порт 8000) и React (порт 5173) — в одном окне.
+Только фронтенд: `npm run dev:react`, только бэкенд: `npm run dev:django`.
 
 Сайт откроется на http://localhost:5173. Vite перенаправляет запросы `/api` и `/media`
 на Django, поэтому отдельная настройка CORS для разработки не нужна.
