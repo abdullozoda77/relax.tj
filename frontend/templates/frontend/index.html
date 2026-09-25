@@ -1,0 +1,325 @@
+{% load static %}<!DOCTYPE html>
+<html class="dark scroll-smooth" lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Relax.tj — отдых в Таджикистане</title>
+<style>html,body{margin:0;padding:0}body{overscroll-behavior:none}::-webkit-scrollbar{display:none}</style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      fontFamily: {
+        "label-md": ["JetBrains Mono", "monospace"],
+        "label-sm": ["JetBrains Mono", "monospace"],
+        "headline-sm": ["Plus Jakarta Sans", "sans-serif"],
+        "headline-md": ["Plus Jakarta Sans", "sans-serif"],
+        "headline-lg": ["Plus Jakarta Sans", "sans-serif"],
+        "headline-xl": ["Plus Jakarta Sans", "sans-serif"],
+        "body-lg": ["Inter", "sans-serif"],
+        "body-md": ["Inter", "sans-serif"],
+        "body-sm": ["Inter", "sans-serif"]
+      },
+      fontSize: {
+        "label-md": ["13px", {lineHeight: "18px", letterSpacing: "0.04em", fontWeight: "500"}],
+        "label-sm": ["11px", {lineHeight: "16px", letterSpacing: "0.06em", fontWeight: "500"}],
+        "headline-sm": ["20px", {lineHeight: "28px", fontWeight: "600"}],
+        "headline-md": ["24px", {lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "600"}],
+        "headline-lg": ["36px", {lineHeight: "44px", letterSpacing: "-0.015em", fontWeight: "600"}],
+        "headline-xl": ["48px", {lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700"}],
+        "body-lg": ["18px", {lineHeight: "28px", fontWeight: "400"}],
+        "body-md": ["15px", {lineHeight: "24px", fontWeight: "400"}],
+        "body-sm": ["13px", {lineHeight: "20px", fontWeight: "400"}]
+      }
+    }
+  }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+</head>
+<body class="bg-[#0b1117] font-body-md text-slate-100 antialiased selection:bg-emerald-500 selection:text-white" id="top">
+
+<!-- Header -->
+<header class="fixed top-0 w-full z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
+  <div class="h-20 max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-4">
+    <a class="flex items-center gap-3" href="#top">
+      <span class="h-9 w-9 rounded-lg bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none"><path d="M2 19 9 7l4 6 3-4 6 10H2Z" fill="#10b981"/><path d="M9 7l2.2 3.6L9.5 12 8 10.5 6.6 11.4 9 7Z" fill="#f8fafc"/><circle cx="18" cy="5" r="2" fill="#f59e0b"/></svg>
+      </span>
+      <span class="text-headline-sm font-headline-sm text-white tracking-tight flex items-center gap-1.5">Relax.tj <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span></span>
+    </a>
+    <nav class="hidden md:flex items-center gap-6">
+      <a class="nav-link transition-colors text-body-md text-slate-300 hover:text-emerald-400" href="#top">Главная</a>
+      <a class="nav-link transition-colors text-body-md text-slate-300 hover:text-emerald-400" href="#places">Места</a>
+      <a class="nav-link transition-colors text-body-md text-slate-300 hover:text-emerald-400" href="#categories">Категории</a>
+      <a class="nav-link transition-colors text-body-md text-slate-300 hover:text-emerald-400" href="#lists">Маршруты</a>
+      <a class="nav-link transition-colors text-body-md text-slate-300 hover:text-emerald-400" href="#info">Советы</a>
+    </nav>
+    <div class="flex items-center gap-4">
+      <div class="relative hidden sm:block">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+        <input class="pl-9 pr-4 py-1.5 rounded-full bg-slate-900 border border-slate-700/80 text-body-sm text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400 w-48 focus:w-64 transition-all" id="search-input" placeholder="Поиск мест..." type="search"/>
+      </div>
+      <div class="relative" id="user-area">
+        <button class="w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 flex items-center justify-center transition-all shadow-md shadow-emerald-950" id="user-btn" title="Войти" type="button">
+          <span class="material-symbols-outlined text-[18px] font-semibold">person</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="w-full pt-20 bg-[#0b1117]">
+
+<!-- Hero -->
+<section class="relative min-h-[860px] flex flex-col justify-between pt-12 pb-16 px-6 lg:px-12 overflow-hidden bg-[#070c11] text-white">
+  <svg class="absolute inset-x-0 bottom-0 w-full h-[70%] z-0 opacity-60" preserveAspectRatio="none" viewBox="0 0 1440 600">
+    <path d="M0 600V330l140-120 110 90 190-210 150 150 120-90 200 230 160-170 190 160 180-190v420Z" fill="#13221d"/>
+    <path d="M0 600V420l200-130 140 90 210-160 170 150 150-80 180 140 190-120 200 110v180Z" fill="#0f1a17"/>
+    <path d="M440 90l-38 42 18 4 20-22 16 26 22-6Z" fill="#cbd5e1" opacity=".5"/>
+    <path d="M950 170l-30 34 16 2 14-14 14 20 16-4Z" fill="#cbd5e1" opacity=".4"/>
+  </svg>
+  <div class="absolute inset-0 bg-gradient-to-t from-[#0b1117] via-[#0b1117]/40 to-[#070c11]/70 z-0"></div>
+  <div class="absolute -top-32 -left-32 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute top-1/3 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+  <div class="max-w-7xl mx-auto w-full z-10 flex flex-col items-start my-auto py-16">
+    <div class="inline-flex items-center gap-2 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-4 py-1.5 rounded-full text-label-md font-label-md mb-6 shadow-[0_0_16px_rgba(16,185,129,0.15)] backdrop-blur-md">
+      <span class="material-symbols-outlined text-[18px] text-emerald-400" style="font-variation-settings:'FILL' 1;">landscape</span>
+      <span>Крыша мира</span>
+    </div>
+    <h1 class="text-4xl md:text-headline-xl font-headline-xl max-w-4xl tracking-tight mb-6 text-white drop-shadow-sm">
+      Лучшие места для отдыха в Таджикистане
+    </h1>
+    <p class="text-body-lg text-slate-300 max-w-2xl mb-10 leading-relaxed">
+      Горные озёра Фанских гор, Памир, ущелья Варзоба, горячие источники и древние крепости — находите места, читайте отзывы и собирайте свои маршруты.
+    </p>
+    <div class="flex flex-wrap gap-4 items-center">
+      <a class="bg-amber-500 text-slate-950 font-semibold hover:bg-amber-400 transition-all px-8 py-4 rounded-xl text-label-md font-label-md shadow-lg shadow-amber-950/40 flex items-center gap-2" href="#places">
+        <span>Смотреть места</span>
+        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+      </a>
+      <button class="bg-slate-900/80 backdrop-blur-md text-white hover:bg-slate-800 hover:border-emerald-500/40 transition-all px-8 py-4 rounded-xl text-label-md font-label-md border border-slate-700/80 flex items-center gap-2 shadow-lg" id="nearby-btn" type="button">
+        <span class="material-symbols-outlined text-[18px] text-emerald-400">near_me</span>
+        <span>Места рядом со мной</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="max-w-7xl mx-auto w-full z-10 grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-900/70 backdrop-blur-xl p-8 rounded-2xl border border-slate-700/60 shadow-2xl">
+    <div class="flex items-center gap-4">
+      <div class="min-w-14 h-14 px-2 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-400 flex items-center justify-center text-headline-md font-headline-md shadow-inner" id="stat-places">—</div>
+      <div>
+        <h3 class="text-headline-sm font-headline-sm text-white">Мест для отдыха</h3>
+        <p class="text-body-sm text-slate-400">Озёра, горы, ущелья и санатории</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="min-w-14 h-14 px-2 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-headline-md font-headline-md shadow-inner" id="stat-regions">—</div>
+      <div>
+        <h3 class="text-headline-sm font-headline-sm text-white">Регионов</h3>
+        <p class="text-body-sm text-slate-400">От Худжанда до Памира</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="min-w-14 h-14 px-2 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-400 flex items-center justify-center text-headline-md font-headline-md shadow-inner" id="stat-activities">—</div>
+      <div>
+        <h3 class="text-headline-sm font-headline-sm text-white">Видов активностей</h3>
+        <p class="text-body-sm text-slate-400">Походы, рыбалка, лыжи и купание</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Places -->
+<section class="py-24 px-6 lg:px-12 bg-[#0b1117] relative scroll-mt-20" id="places">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+      <div>
+        <span class="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">Куда поехать</span>
+        <h2 class="text-3xl md:text-headline-lg font-headline-lg text-white" id="places-title">Лучшие места для отдыха</h2>
+      </div>
+      <p class="text-body-md text-slate-400 max-w-md">
+        Выбирайте по региону, категории и сезону. Нажмите на карточку, чтобы увидеть подробности и отзывы.
+      </p>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-3 items-center mb-6">
+      <select class="bg-slate-900 border border-slate-700/80 rounded-lg text-body-sm text-white py-2 pl-3 pr-8 focus:ring-emerald-400 focus:border-emerald-400" id="filter-region">
+        <option value="">Все регионы</option>
+      </select>
+      <select class="bg-slate-900 border border-slate-700/80 rounded-lg text-body-sm text-white py-2 pl-3 pr-8 focus:ring-emerald-400 focus:border-emerald-400" id="filter-season">
+        <option value="">Любой сезон</option>
+        <option value="spring">Весна</option>
+        <option value="summer">Лето</option>
+        <option value="autumn">Осень</option>
+        <option value="winter">Зима</option>
+        <option value="all_year">Круглый год</option>
+      </select>
+      <select class="bg-slate-900 border border-slate-700/80 rounded-lg text-body-sm text-white py-2 pl-3 pr-8 focus:ring-emerald-400 focus:border-emerald-400" id="filter-ordering">
+        <option value="-created_at">Сначала новые</option>
+        <option value="-avg_rating">По рейтингу</option>
+        <option value="-favorites_total">Популярные</option>
+        <option value="-views_count">Самые просматриваемые</option>
+        <option value="entrance_fee">Сначала дешёвые</option>
+      </select>
+      <label class="flex items-center gap-2 text-body-sm text-slate-300 cursor-pointer select-none">
+        <input class="rounded bg-slate-900 border-slate-600 text-emerald-500 focus:ring-emerald-400" id="filter-free" type="checkbox"/>
+        Только бесплатные
+      </label>
+      <button class="hidden text-body-sm text-amber-400 hover:text-amber-300 items-center gap-1" id="filter-reset" type="button">
+        <span class="material-symbols-outlined text-[18px]">close</span> Сбросить
+      </button>
+    </div>
+    <div class="flex flex-wrap gap-2 mb-10" id="category-chips"></div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="places-grid"></div>
+    <p class="hidden text-center text-slate-400 py-16" id="places-empty">Ничего не найдено. Попробуйте изменить фильтры.</p>
+    <div class="flex justify-center mt-12">
+      <button class="hidden bg-slate-900 border border-slate-700 hover:border-emerald-500/40 text-emerald-300 px-8 py-3 rounded-xl text-label-md font-label-md transition-all" id="load-more" type="button">Показать ещё</button>
+    </div>
+  </div>
+</section>
+
+<!-- Categories -->
+<section class="py-24 px-6 lg:px-12 bg-[#0e1620] border-y border-slate-800/80 scroll-mt-20" id="categories">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center max-w-2xl mx-auto mb-16">
+      <span class="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">Для души и тела</span>
+      <h2 class="text-3xl md:text-headline-lg font-headline-lg text-white mb-4">Выберите свой отдых</h2>
+      <p class="text-body-md text-slate-400">
+        Горные озёра, целебные источники, ущелья и исторические места — нажмите на категорию, чтобы увидеть подходящие места.
+      </p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="categories-grid"></div>
+  </div>
+</section>
+
+<!-- Travel info -->
+<section class="py-24 px-6 lg:px-12 bg-[#0b1117] scroll-mt-20" id="info">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
+    <div class="lg:col-span-1">
+      <span class="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">Полезно знать</span>
+      <h2 class="text-3xl md:text-headline-lg font-headline-lg text-white mb-6">Советы путешественнику</h2>
+      <p class="text-body-md text-slate-400 mb-8 leading-relaxed">
+        Планируйте поездку спокойно: когда ехать, какие документы нужны и как добраться до гор.
+      </p>
+      <div class="p-6 rounded-2xl bg-gradient-to-br from-slate-900 to-[#13221d] border border-emerald-900/50 text-white shadow-xl">
+        <h4 class="text-headline-sm font-headline-sm mb-2 text-emerald-300">Знаете красивое место?</h4>
+        <p class="text-body-sm text-slate-300 mb-4 leading-relaxed">Предложите его — после проверки администратором оно появится на сайте.</p>
+        <button class="bg-amber-500 text-slate-950 font-semibold hover:bg-amber-400 transition-colors px-5 py-2.5 rounded-lg text-label-md font-label-md shadow-md" data-open-suggest type="button">Предложить место</button>
+      </div>
+    </div>
+    <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-slate-900/70 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between hover:border-slate-700 transition-all">
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-[20px]">event</span>
+          </div>
+          <h3 class="text-headline-sm font-headline-sm text-white mb-2">Когда ехать</h3>
+          <p class="text-body-sm text-slate-300 leading-relaxed">
+            С мая по октябрь — лучшее время для походов, озёр и перевалов. Зимой — лыжи в Сафеддаре.
+          </p>
+        </div>
+        <span class="text-label-sm font-label-sm text-emerald-400 mt-4 pt-4 border-t border-slate-800">Май – октябрь</span>
+      </div>
+      <div class="bg-slate-900/70 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between hover:border-slate-700 transition-all">
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-[20px]">badge</span>
+          </div>
+          <h3 class="text-headline-sm font-headline-sm text-white mb-2">Виза и пропуск</h3>
+          <p class="text-body-sm text-slate-300 leading-relaxed">
+            Иностранцы оформляют e-Visa онлайн. Для поездки на Памир (ГБАО) нужен отдельный пропуск.
+          </p>
+        </div>
+        <span class="text-label-sm font-label-sm text-emerald-400 mt-4 pt-4 border-t border-slate-800">Оформление онлайн</span>
+      </div>
+      <div class="bg-slate-900/70 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between hover:border-slate-700 transition-all">
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-[20px]">directions_car</span>
+          </div>
+          <h3 class="text-headline-sm font-headline-sm text-white mb-2">Транспорт</h3>
+          <p class="text-body-sm text-slate-300 leading-relaxed">
+            На горных дорогах нужен внедорожник 4x4 и опытный местный водитель.
+          </p>
+        </div>
+        <span class="text-label-sm font-label-sm text-emerald-400 mt-4 pt-4 border-t border-slate-800">Безопасные 4x4</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Public travel lists -->
+<section class="py-24 px-6 lg:px-12 bg-[#0e1620] border-t border-slate-800/80 scroll-mt-20" id="lists">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center max-w-2xl mx-auto mb-16">
+      <span class="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">От путешественников</span>
+      <h2 class="text-3xl md:text-headline-lg font-headline-lg text-white mb-4">Популярные маршруты</h2>
+      <p class="text-body-md text-slate-400">
+        Открытые списки путешествий других пользователей. Скопируйте понравившийся маршрут к себе.
+      </p>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch" id="lists-grid"></div>
+    <p class="hidden text-center text-slate-400" id="lists-empty">Пока нет открытых маршрутов. Создайте свой и сделайте его публичным!</p>
+  </div>
+</section>
+</main>
+
+<!-- Footer -->
+<footer class="w-full bg-[#070b0e] border-t border-slate-800/80 py-16">
+  <div class="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+    <div class="flex flex-col gap-4">
+      <div class="flex items-center gap-2.5">
+        <span class="h-7 w-7 rounded bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M2 19 9 7l4 6 3-4 6 10H2Z" fill="#10b981"/><circle cx="18" cy="5" r="2" fill="#f59e0b"/></svg>
+        </span>
+        <span class="text-headline-sm font-headline-sm text-white">Relax.tj</span>
+      </div>
+      <p class="text-body-sm text-slate-400 leading-relaxed">Места для отдыха в Таджикистане: горы Памира, озёра Фанских гор, санатории и древние крепости.</p>
+    </div>
+    <div class="flex flex-col gap-3">
+      <span class="text-label-md font-label-md text-white">Регионы</span>
+      <a class="text-body-sm text-slate-400 hover:text-emerald-400 transition-colors" data-search="Согд" href="#places">Согдийская область</a>
+      <a class="text-body-sm text-slate-400 hover:text-emerald-400 transition-colors" data-search="ГБАО" href="#places">Памир (ГБАО)</a>
+      <a class="text-body-sm text-slate-400 hover:text-emerald-400 transition-colors" data-search="Душанбе" href="#places">Душанбе</a>
+    </div>
+    <div class="flex flex-col gap-3">
+      <span class="text-label-md font-label-md text-white">Разделы</span>
+      <a class="text-body-sm text-slate-400 hover:text-emerald-400 transition-colors" href="#categories">Категории отдыха</a>
+      <a class="text-body-sm text-slate-400 hover:text-emerald-400 transition-colors" href="#lists">Маршруты</a>
+      <a class="text-body-sm text-slate-400 hover:text-emerald-400 transition-colors" href="/swagger/">Документация API</a>
+    </div>
+    <div class="flex flex-col gap-3">
+      <span class="text-label-md font-label-md text-white">Предложить место</span>
+      <p class="text-body-sm text-slate-400">Знаете место, которого нет на сайте? Расскажите о нём.</p>
+      <div class="flex gap-2">
+        <input class="px-3 py-2 rounded-lg bg-slate-900 text-body-sm border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400 flex-1 min-w-0" id="footer-suggest-name" placeholder="Название места" type="text"/>
+        <button class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-4 py-2 rounded-lg text-label-md font-label-md transition-colors shadow" data-open-suggest type="button">Далее</button>
+      </div>
+    </div>
+  </div>
+  <div class="max-w-7xl mx-auto px-6 lg:px-12 mt-12 pt-6 border-t border-slate-800/80 text-center text-slate-400 text-label-sm">© 2026 Relax.tj. Все права защищены.</div>
+</footer>
+
+<!-- Modal shell: content is filled by JS -->
+<div class="fixed inset-0 z-50 hidden items-start md:items-center justify-center bg-black/70 backdrop-blur-sm p-4 overflow-y-auto" id="modal">
+  <div class="relative w-full max-w-lg my-8 bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl" id="modal-box">
+    <button class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-slate-950/70 hover:bg-slate-800 text-slate-300 flex items-center justify-center" id="modal-close" type="button">
+      <span class="material-symbols-outlined text-[20px]">close</span>
+    </button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] hidden px-5 py-3 rounded-xl border shadow-2xl text-body-sm" id="toast"></div>
+
+</body>
+</html>

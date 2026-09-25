@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'accounts',
     'places',
+    'frontend',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
