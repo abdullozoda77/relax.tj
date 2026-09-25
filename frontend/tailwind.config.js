@@ -1,0 +1,58 @@
+import forms from "@tailwindcss/forms";
+
+/** @type {import('tailwindcss').Config} */
+export default {
+  darkMode: "class",
+  content: ["./index.html", "./src/**/*.{js,jsx}"],
+  theme: {
+    extend: {
+      colors: {
+        background: "#0b1117",
+        surface: "#0b1117",
+        "surface-container-lowest": "#070b0e",
+        "surface-container-low": "#0e1620",
+        "surface-container": "#16202c",
+        "surface-container-high": "#1c2836",
+        "surface-container-highest": "#243242",
+        "surface-bright": "#1e293b",
+        "on-surface": "#f8fafc",
+        "on-surface-variant": "#94a3b8",
+        outline: "#64748b",
+        "outline-variant": "#334155",
+        primary: "#10b981",
+        "on-primary": "#003824",
+        secondary: "#f59e0b",
+        "secondary-container": "#f59e0b",
+        "on-secondary-container": "#1c1000",
+        tertiary: "#10b981",
+        "tertiary-container": "#059669",
+        "tertiary-fixed": "#85f8c4",
+      },
+      fontFamily: {
+        "label-md": ["JetBrains Mono", "monospace"],
+        "label-sm": ["JetBrains Mono", "monospace"],
+        "headline-sm": ["Plus Jakarta Sans", "sans-serif"],
+        "headline-md": ["Plus Jakarta Sans", "sans-serif"],
+        "headline-lg": ["Plus Jakarta Sans", "sans-serif"],
+        "headline-xl": ["Plus Jakarta Sans", "sans-serif"],
+        "title-md": ["Plus Jakarta Sans", "sans-serif"],
+        "body-lg": ["Inter", "sans-serif"],
+        "body-md": ["Inter", "sans-serif"],
+        "body-sm": ["Inter", "sans-serif"],
+      },
+      fontSize: {
+        "label-md": ["13px", { lineHeight: "18px", letterSpacing: "0.04em", fontWeight: "500" }],
+        "label-sm": ["11px", { lineHeight: "16px", letterSpacing: "0.06em", fontWeight: "500" }],
+        "title-md": ["16px", { lineHeight: "22px", fontWeight: "600" }],
+        "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+        "headline-md": ["24px", { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "600" }],
+        "headline-lg": ["36px", { lineHeight: "44px", letterSpacing: "-0.015em", fontWeight: "600" }],
+        "headline-xl": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],
+        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+        "body-md": ["15px", { lineHeight: "24px", fontWeight: "400" }],
+        "body-sm": ["13px", { lineHeight: "20px", fontWeight: "400" }],
+      },
+    },
+  },
+  plugins: [forms],
+};
