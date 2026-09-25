@@ -18,39 +18,39 @@ function Stat({ value, title, text, amber }) {
   );
 }
 
-// Photos from Wikimedia Commons. The licenses require showing the author, so the credit is shown under the slide.
-const COMMONS = "https://upload.wikimedia.org/wikipedia/commons/thumb";
+// Photos from Wikimedia Commons, saved in public/hero. The licenses require showing the author,
+// so the credit is shown under the slide.
 const PHOTOS = [
   {
-    src: `${COMMONS}/c/cb/-Rudaki_in_Park_Dushanbe_city.jpg/1920px--Rudaki_in_Park_Dushanbe_city.jpg`,
+    src: "/hero/rudaki.jpg",
     place: "Душанбе · Памятник Рудаки",
     author: "Шухрат Саъдиев",
     license: "CC BY-SA 4.0",
     page: "https://commons.wikimedia.org/wiki/File:-Rudaki_in_Park_Dushanbe_city.jpg",
   },
   {
-    src: `${COMMONS}/e/eb/Panorama_with_Dousti_Square_and_Dushanbe_Flagpole.jpg/1920px-Panorama_with_Dousti_Square_and_Dushanbe_Flagpole.jpg`,
+    src: "/hero/flagpole.jpg",
     place: "Душанбе · Площадь Дусти и флагшток",
     author: "Adam Harangozó",
     license: "CC BY-SA 4.0",
     page: "https://commons.wikimedia.org/wiki/File:Panorama_with_Dousti_Square_and_Dushanbe_Flagpole.jpg",
   },
   {
-    src: `${COMMONS}/6/60/Ustod_Rudaki_Park_and_Palace_of_the_Nation_in_Dushanbe_-_panoramio.jpg/1920px-Ustod_Rudaki_Park_and_Palace_of_the_Nation_in_Dushanbe_-_panoramio.jpg`,
+    src: "/hero/palace.jpg",
     place: "Душанбе · Парк Рудаки и Дворец нации",
     author: "Maris Teteris",
     license: "CC BY 3.0",
     page: "https://commons.wikimedia.org/wiki/File:Ustod_Rudaki_Park_and_Palace_of_the_Nation_in_Dushanbe_-_panoramio.jpg",
   },
   {
-    src: `${COMMONS}/5/5c/Panorama_with_buildings%2C_Dushanbe.jpg/1920px-Panorama_with_buildings%2C_Dushanbe.jpg`,
+    src: "/hero/city.jpg",
     place: "Душанбе · Современный центр",
     author: "Adam Harangozó",
     license: "CC BY-SA 4.0",
     page: "https://commons.wikimedia.org/wiki/File:Panorama_with_buildings,_Dushanbe.jpg",
   },
   {
-    src: `${COMMONS}/4/46/Pamir_Mountains%2C_Lake_Yashikul_viewed_from_the_south_%28August_2017%29.jpg/1920px-Pamir_Mountains%2C_Lake_Yashikul_viewed_from_the_south_%28August_2017%29.jpg`,
+    src: "/hero/yashikul.jpg",
     place: "Памир · Озеро Яшилькуль",
     author: "Kondephy",
     license: "CC BY-SA 4.0",
