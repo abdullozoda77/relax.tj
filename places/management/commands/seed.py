@@ -1,6 +1,11 @@
+from pathlib import Path
+
+from django.core.files import File
 from django.core.management.base import BaseCommand
 
-from places.models import Activity, Category, Place, Region
+from places.models import Activity, Category, Place, PlaceImage, Region
+
+PHOTOS_DIR = Path(__file__).resolve().parents[2] / "seed_photos"
 
 REGIONS = [
     ("Душанбе", "Столица Таджикистана"),
@@ -42,6 +47,21 @@ PLACES = [
      38.5767, 68.7806, 800, "all_year", 0),
 ]
 
+# Extra info and photos for some places. Photos are in places/seed_photos/<folder>, the first one is main.
+# Authors and licenses of the photos: places/seed_photos/CREDITS.md
+DETAILS = {
+    "Парк Рудаки": {
+        "description": (
+            "Главный парк Душанбе в самом центре города, названный в честь поэта Абуабдуллоха Рудаки.\n"
+            "Здесь стоит памятник Рудаки под мозаичной аркой, есть аллеи фонтанов, клумбы, "
+            "а рядом находятся Дворец нации и флагшток. Вечером парк красиво подсвечен."
+        ),
+        "address": "проспект Рудаки, центр Душанбе",
+        "how_to_get_there": "Парк в центре города на проспекте Рудаки: пешком от площади Дусти или на любом транспорте до остановки «Парк Рудаки».",
+        "photos": ("rudaki", ["rudaki_monument.jpg", "rudaki_arch_flowers.jpg", "rudaki_fountains.jpg", "rudaki_square.jpg", "rudaki_night.jpg"]),
+    },
+}
+
 
 class Command(BaseCommand):
     help = "Заполняет базу регионами, категориями, активностями и местами Таджикистана"
@@ -70,7 +90,28 @@ class Command(BaseCommand):
                 place.activities.set(activities[a] for a in acts)
                 created += 1
 
+        photos_added = sum(self.add_details(name, info) for name, info in DETAILS.items())
+
         self.stdout.write(self.style.SUCCESS(
             f"Регионов: {len(regions)}, категорий: {len(categories)}, "
-            f"активностей: {len(activities)}, новых мест: {created}"
+            f"активностей: {len(activities)}, новых мест: {created}, новых фото: {photos_added}"
         ))
+
+    def add_details(self, name, info):
+        """Fills empty text fields and adds photos if the place has none yet. Returns the number of photos added."""
+        place = Place.objects.filter(name=name).first()
+        if not place:
+            return 0
+        changed = [field for field in ("description", "address", "how_to_get_there") if not getattr(place, field)]
+        for field in changed:
+            setattr(place, field, info[field])
+        if changed:
+            place.save(update_fields=changed)
+
+        if place.images.exists():
+            return 0
+        folder, files = info["photos"]
+        for i, filename in enumerate(files):
+            with open(PHOTOS_DIR / folder / filename, "rb") as f:
+                PlaceImage.objects.create(place=place, image=File(f, name=filename), is_main=i == 0)
+        return len(files)
