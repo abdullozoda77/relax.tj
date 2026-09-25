@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../api.js";
 import Icon from "../components/Icon.jsx";
@@ -9,6 +9,28 @@ import PlaceSidebar from "../components/place/PlaceSidebar.jsx";
 import Reviews from "../components/place/Reviews.jsx";
 import Stars from "../components/Stars.jsx";
 import { SEASONS, formatRating, plural } from "../utils.js";
+
+// The 3D map library is big, so it is loaded only when a place page opens.
+const Terrain3D = lazy(() => import("../components/place/Terrain3D.jsx"));
+
+function Terrain3DSection({ place }) {
+  return (
+    <section className="bg-surface-container-low/70 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <span className="text-label-sm font-label-sm text-primary uppercase tracking-wider">Как в жизни</span>
+          <h2 className="text-headline-md font-headline-md text-on-surface">3D-вид местности</h2>
+        </div>
+        <span className="text-label-sm font-label-sm text-outline flex items-center gap-1.5">
+          <Icon name="3d_rotation" className="text-[16px]" /> Тяните мышью, чтобы вращать · правой кнопкой — наклон
+        </span>
+      </div>
+      <Suspense fallback={<div className="h-[420px] rounded-xl bg-surface-container-lowest animate-pulse" />}>
+        <Terrain3D place={place} />
+      </Suspense>
+    </section>
+  );
+}
 
 export default function PlaceDetail() {
   const { id } = useParams();
@@ -113,6 +135,7 @@ export default function PlaceDetail() {
       <div className="max-w-7xl mx-auto px-6 lg:px-12 w-full py-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           <div className="lg:col-span-8 flex flex-col gap-14 min-w-0">
+            {place.latitude && place.longitude && <Terrain3DSection place={place} />}
             <LocationCard place={place} />
             <DetailsAccordion place={place} />
             <GoodToKnow place={place} />
