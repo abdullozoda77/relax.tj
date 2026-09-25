@@ -190,7 +190,6 @@ export function GoodToKnow({ place }) {
     place.altitude > 2500 && `Высота ${place.altitude} м — поднимайтесь постепенно, возможна горная болезнь`,
     place.altitude > 1500 && "В горах погода меняется быстро — возьмите тёплую одежду",
     place.best_season !== "all_year" && `Лучшее время для поездки — ${SEASONS[place.best_season].toLowerCase()}`,
-    place.region.name === "ГБАО" && "Для поездки в ГБАО иностранцам нужен специальный пропуск",
   ].filter(Boolean);
 
   const List = ({ items, icon, color }) => (

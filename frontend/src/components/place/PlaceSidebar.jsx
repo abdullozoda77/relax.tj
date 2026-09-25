@@ -149,7 +149,7 @@ export default function PlaceSidebar({ place }) {
       <div className="bg-surface-container-lowest/70 p-3.5 rounded-xl flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Icon name="chat" className="text-outline text-[18px]" />
-          <span className="text-label-sm font-label-sm text-on-surface">Вопросы о визе и дороге?</span>
+          <span className="text-label-sm font-label-sm text-on-surface">Как лучше добраться?</span>
         </div>
         <Link className="text-label-sm font-label-sm text-primary font-medium hover:underline shrink-0" to="/#info">
           Советы

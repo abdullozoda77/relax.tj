@@ -8,12 +8,6 @@ const TIPS = [
     footer: "Май – октябрь",
   },
   {
-    icon: "badge",
-    title: "Виза и пропуск",
-    text: "Иностранцы оформляют e-Visa онлайн. Для поездки на Памир (ГБАО) нужен отдельный пропуск.",
-    footer: "Оформление онлайн",
-  },
-  {
     icon: "directions_car",
     title: "Транспорт",
     text: "На горных дорогах нужен внедорожник 4x4 и опытный местный водитель.",
@@ -29,7 +23,7 @@ export default function InfoSection({ onSuggest }) {
           <span className="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">Полезно знать</span>
           <h2 className="text-3xl md:text-headline-lg font-headline-lg text-white mb-6">Советы путешественнику</h2>
           <p className="text-body-md text-slate-400 mb-8 leading-relaxed">
-            Планируйте поездку спокойно: когда ехать, какие документы нужны и как добраться до гор.
+            Планируйте поездку спокойно: когда лучше ехать и как добраться до гор.
           </p>
           <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-900 to-[#13221d] border border-emerald-900/50 text-white shadow-xl">
             <h4 className="text-headline-sm font-headline-sm mb-2 text-emerald-300">Знаете красивое место?</h4>
@@ -45,7 +39,7 @@ export default function InfoSection({ onSuggest }) {
             </button>
           </div>
         </div>
-        <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
           {TIPS.map((tip) => (
             <div key={tip.title} className="bg-slate-900/70 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between hover:border-slate-700 transition-all">
               <div>
