@@ -8,7 +8,7 @@ const itemClass = "w-full text-left px-4 py-2 text-body-sm text-slate-300 hover:
 
 export default function UserMenu() {
   const { user, logout } = useAuth();
-  const { openAuth } = useUi();
+  const { openAuth, openSuggest } = useUi();
   const toast = useToast();
   const [open, setOpen] = useState(false);
   const box = useRef(null);
@@ -59,6 +59,16 @@ export default function UserMenu() {
               {user.email || (user.role === "admin" ? "Администратор" : "Путешественник")}
             </p>
           </div>
+          <button
+            className={itemClass}
+            onClick={() => {
+              setOpen(false);
+              openSuggest();
+            }}
+            type="button"
+          >
+            <Icon name="add_location_alt" className="text-[18px]" /> Предложить место
+          </button>
           {user.role === "admin" && (
             <a className={itemClass} href="http://127.0.0.1:8000/admin/" rel="noreferrer" target="_blank">
               <Icon name="admin_panel_settings" className="text-[18px]" /> Админка

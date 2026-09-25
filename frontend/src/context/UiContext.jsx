@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 import { api } from "../api.js";
 import AuthModal from "../components/AuthModal.jsx";
 import PlaceModal from "../components/place/PlaceModal.jsx";
+import SuggestModal from "../components/SuggestModal.jsx";
 import { useAuth } from "./AuthContext.jsx";
 import { useToast } from "./ToastContext.jsx";
 
@@ -15,6 +16,7 @@ export function useUi() {
 const MODALS = {
   auth: AuthModal,
   place: PlaceModal,
+  suggest: SuggestModal,
 };
 
 export function UiProvider({ children }) {
@@ -43,6 +45,13 @@ export function UiProvider({ children }) {
     [user, toast, openAuth]
   );
 
+  const openSuggest = useCallback(
+    (name = "") => {
+      if (requireLogin("Войдите, чтобы предложить место")) setModal({ type: "suggest", props: { name } });
+    },
+    [requireLogin]
+  );
+
   const isFavorite = useCallback((place) => favorites[place.id] ?? Boolean(place.is_favorite), [favorites]);
 
   const toggleFavorite = useCallback(
@@ -64,7 +73,7 @@ export function UiProvider({ children }) {
 
   return (
     <UiContext.Provider
-      value={{ openAuth, openPlace, closeModal, requireLogin, isFavorite, toggleFavorite, favoritesVersion }}
+      value={{ openAuth, openPlace, openSuggest, closeModal, requireLogin, isFavorite, toggleFavorite, favoritesVersion }}
     >
       {children}
       {ModalComponent && <ModalComponent key={JSON.stringify(modal.props)} onClose={closeModal} {...modal.props} />}

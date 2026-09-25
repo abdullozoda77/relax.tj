@@ -26,7 +26,8 @@ function buildQuery(filters, page) {
   return params.toString();
 }
 
-export default function PlacesSection({ filters, setFilters, onReset, regions, categories }) {
+// nearby = { title, places } shows places near the user instead of the filtered list.
+export default function PlacesSection({ filters, setFilters, onReset, regions, categories, nearby }) {
   const { user } = useAuth();
   const [places, setPlaces] = useState([]);
   const [page, setPage] = useState(1);
@@ -61,7 +62,7 @@ export default function PlacesSection({ filters, setFilters, onReset, regions, c
   }
 
   const update = (changes) => setFilters((prev) => ({ ...prev, ...changes }));
-  const active = filters.search || filters.region || filters.category || filters.best_season || filters.is_free;
+  const active = nearby || filters.search || filters.region || filters.category || filters.best_season || filters.is_free;
 
   const chip = (id, name) => {
     const on = String(filters.category) === String(id);
@@ -88,7 +89,7 @@ export default function PlacesSection({ filters, setFilters, onReset, regions, c
           <div>
             <span className="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">Куда поехать</span>
             <h2 className="text-3xl md:text-headline-lg font-headline-lg text-white">
-              {filters.search ? `Результаты поиска: «${filters.search}»` : "Лучшие места для отдыха"}
+              {nearby ? nearby.title : filters.search ? `Результаты поиска: «${filters.search}»` : "Лучшие места для отдыха"}
             </h2>
           </div>
           <p className="text-body-md text-slate-400 max-w-md">
@@ -141,13 +142,15 @@ export default function PlacesSection({ filters, setFilters, onReset, regions, c
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {loading ? <SkeletonCards /> : places.map((p) => <PlaceCard key={p.id} place={p} />)}
+          {nearby && !nearby.places && <SkeletonCards />}
+          {nearby?.places?.map((p) => <PlaceCard key={p.id} place={p} />)}
+          {!nearby && (loading ? <SkeletonCards /> : places.map((p) => <PlaceCard key={p.id} place={p} />))}
         </div>
         {error && <p className="text-center text-rose-300 py-16">{error}</p>}
-        {!loading && !error && places.length === 0 && (
+        {!loading && !error && (nearby ? nearby.places?.length === 0 : places.length === 0) && (
           <p className="text-center text-slate-400 py-16">Ничего не найдено. Попробуйте изменить фильтры.</p>
         )}
-        {hasMore && !loading && (
+        {hasMore && !loading && !nearby && (
           <div className="flex justify-center mt-12">
             <button
               className="bg-slate-900 border border-slate-700 hover:border-emerald-500/40 text-emerald-300 px-8 py-3 rounded-xl text-label-md font-label-md transition-all"
