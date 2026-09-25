@@ -377,7 +377,7 @@ class TravelListViewSet(viewsets.ModelViewSet):
         with transaction.atomic():
             new_list = TravelList.objects.create(
                 user=request.user,
-                title=f"{original.title} (copy)",
+                title=f"{original.title} (копия)",
                 description=original.description,
                 is_public=False,
             )
