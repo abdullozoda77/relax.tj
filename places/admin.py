@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     Region, Category, Place, PlaceImage, Activity, Favorite,
-    Review, TravelList, TravelListPlace, PlaceSuggestion,
+    Review, ReviewImage, TravelList, TravelListPlace, PlaceSuggestion,
 )
 
 
@@ -53,8 +53,14 @@ class FavoriteAdmin(admin.ModelAdmin):
     search_fields = ["user__username", "place__name"]
 
 
+class ReviewImageInline(admin.TabularInline):
+    model = ReviewImage
+    extra = 0
+
+
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
+    inlines = [ReviewImageInline]
     list_display = ["id", "user", "place", "rating", "created_at"]
     list_filter = ["rating"]
     search_fields = ["user__username", "place__name", "comment"]

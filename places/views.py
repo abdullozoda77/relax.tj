@@ -154,7 +154,7 @@ class PlaceViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["get"], serializer_class=ReviewSerializer, filterset_class=None)
     def reviews(self, request, pk=None):
         place = self.get_object()
-        qs = place.reviews.select_related("user")
+        qs = place.reviews.select_related("user").prefetch_related("images")
         rating = request.query_params.get("rating")
         if rating:
             qs = qs.filter(rating=rating)
@@ -260,7 +260,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     ordering_fields = ["created_at", "rating"]
 
     def get_queryset(self):
-        qs = Review.objects.select_related("user", "place")
+        qs = Review.objects.select_related("user", "place").prefetch_related("images")
         if not is_admin(self.request.user):
             qs = qs.filter(place__is_active=True)
         return qs
@@ -272,7 +272,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated])
     def my(self, request):
-        qs = self.filter_queryset(Review.objects.filter(user=request.user).select_related("user", "place"))
+        qs = self.filter_queryset(Review.objects.filter(user=request.user).select_related("user", "place").prefetch_related("images"))
         page = self.paginate_queryset(qs)
         return self.get_paginated_response(self.get_serializer(page, many=True).data)
 

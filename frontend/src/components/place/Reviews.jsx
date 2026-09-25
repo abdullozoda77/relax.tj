@@ -6,19 +6,42 @@ import { useUi } from "../../context/UiContext.jsx";
 import Icon from "../Icon.jsx";
 import Stars from "../Stars.jsx";
 
+const MAX_PHOTOS = 5;
+
 function ReviewForm({ placeId, onSaved }) {
   const toast = useToast();
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [comment, setComment] = useState("");
+  const [files, setFiles] = useState([]);
   const [busy, setBusy] = useState(false);
+
+  // Previews for the chosen photos; object URLs are freed when the list changes.
+  const [previews, setPreviews] = useState([]);
+  useEffect(() => {
+    const urls = files.map((f) => URL.createObjectURL(f));
+    setPreviews(urls);
+    return () => urls.forEach((u) => URL.revokeObjectURL(u));
+  }, [files]);
+
+  function pickFiles(e) {
+    const chosen = [...files, ...e.target.files].slice(0, MAX_PHOTOS);
+    if (files.length + e.target.files.length > MAX_PHOTOS) toast(`Можно прикрепить не больше ${MAX_PHOTOS} фото`, "error");
+    setFiles(chosen);
+    e.target.value = "";
+  }
 
   async function submit(e) {
     e.preventDefault();
     if (!rating) return toast("Поставьте оценку от 1 до 5 звёзд", "error");
     setBusy(true);
+    const body = new FormData();
+    body.append("place", placeId);
+    body.append("rating", rating);
+    body.append("comment", comment.trim());
+    files.forEach((f) => body.append("uploaded_images", f));
     try {
-      await api("/reviews/", { method: "POST", body: { place: placeId, rating, comment: comment.trim() } });
+      await api("/reviews/", { method: "POST", body });
       toast("Спасибо за отзыв!");
       onSaved();
     } catch (err) {
@@ -44,6 +67,29 @@ function ReviewForm({ placeId, onSaved }) {
         rows={3}
         value={comment}
       />
+      <div className="flex flex-wrap items-center gap-2">
+        {previews.map((url, i) => (
+          <div key={url} className="relative w-16 h-16 rounded-lg overflow-hidden border border-slate-700">
+            <img alt="" className="w-full h-full object-cover" src={url} />
+            <button
+              className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-slate-950/80 text-slate-200 flex items-center justify-center"
+              onClick={() => setFiles(files.filter((_, j) => j !== i))}
+              title="Убрать фото"
+              type="button"
+            >
+              <Icon name="close" className="text-[14px]" />
+            </button>
+          </div>
+        ))}
+        {files.length < MAX_PHOTOS && (
+          <label className="w-16 h-16 rounded-lg border border-dashed border-slate-600 hover:border-emerald-400 text-slate-400 hover:text-emerald-300 flex flex-col items-center justify-center cursor-pointer text-[10px] gap-0.5">
+            <Icon name="add_a_photo" className="text-[20px]" />
+            Фото
+            <input accept=".jpg,.jpeg,.png,.webp" className="hidden" multiple onChange={pickFiles} type="file" />
+          </label>
+        )}
+        <span className="text-label-sm font-label-sm text-slate-500">до {MAX_PHOTOS} фото, jpg/png/webp до 5 МБ</span>
+      </div>
       <button
         className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-5 py-2 rounded-lg text-label-md font-label-md disabled:opacity-60"
         disabled={busy}
@@ -147,6 +193,15 @@ export default function Reviews({ placeId, onSummary }) {
               </div>
             </div>
             {r.comment && <p className="text-body-sm text-slate-300 leading-relaxed">{r.comment}</p>}
+            {r.images?.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {r.images.map((img) => (
+                  <a key={img.id} href={img.image} rel="noreferrer" target="_blank">
+                    <img alt="" className="w-20 h-20 object-cover rounded-lg border border-slate-800 hover:opacity-80 transition-opacity" src={img.image} />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>

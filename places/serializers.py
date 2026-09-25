@@ -1,9 +1,10 @@
 from django.db.models import Avg
 from rest_framework import serializers
 from accounts.serializers import UserShortSerializer
+from .validators import image_validators
 from .models import (
     Region, Category, Activity, Place, PlaceImage, Favorite,
-    Review, TravelList, TravelListPlace, PlaceSuggestion,
+    Review, ReviewImage, TravelList, TravelListPlace, PlaceSuggestion,
 )
 
 class RegionSerializer(serializers.ModelSerializer):
@@ -128,14 +129,43 @@ class PlaceWriteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Entrance fee cannot be negative.")
         return value
 
+class ReviewImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReviewImage
+        fields = ["id", "image"]
+
 class ReviewSerializer(serializers.ModelSerializer):
+    MAX_IMAGES = 5
+
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     author = UserShortSerializer(source="user", read_only=True)
     place_name = serializers.CharField(source="place.name", read_only=True)
+    images = ReviewImageSerializer(many=True, read_only=True)
+    # Send photos as multipart form data: uploaded_images=<file> several times.
+    uploaded_images = serializers.ListField(
+        child=serializers.ImageField(validators=image_validators),
+        write_only=True,
+        required=False,
+        max_length=MAX_IMAGES,
+    )
 
     class Meta:
         model = Review
-        fields = ["id", "user", "author", "place", "place_name", "rating", "comment", "created_at", "updated_at"]
+        fields = ["id", "user", "author", "place", "place_name", "rating", "comment", "images", "uploaded_images", "created_at", "updated_at"]
+
+    def create(self, validated_data):
+        files = validated_data.pop("uploaded_images", [])
+        review = super().create(validated_data)
+        ReviewImage.objects.bulk_create([ReviewImage(review=review, image=f) for f in files])
+        return review
+
+    def update(self, instance, validated_data):
+        files = validated_data.pop("uploaded_images", [])
+        if instance.images.count() + len(files) > self.MAX_IMAGES:
+            raise serializers.ValidationError({"uploaded_images": f"Не больше {self.MAX_IMAGES} фото в одном отзыве."})
+        review = super().update(instance, validated_data)
+        ReviewImage.objects.bulk_create([ReviewImage(review=review, image=f) for f in files])
+        return review
 
     def validate_place(self, value):
         if self.instance and self.instance.place != value:

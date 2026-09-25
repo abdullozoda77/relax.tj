@@ -53,6 +53,13 @@ export default function ReviewsCard({ onChanged }) {
                   <span className="font-label-sm text-label-sm text-on-surface-variant">{new Date(r.created_at).toLocaleDateString("ru-RU")}</span>
                 </span>
                 {r.comment && <span className="text-body-sm text-on-surface-variant truncate mt-1">{r.comment}</span>}
+                {r.images?.length > 0 && (
+                  <span className="flex gap-1 mt-1.5">
+                    {r.images.slice(0, 4).map((img) => (
+                      <img key={img.id} alt="" className="w-8 h-8 rounded object-cover" src={img.image} />
+                    ))}
+                  </span>
+                )}
               </div>
             </div>
             <div className="flex shrink-0">

@@ -123,6 +123,17 @@ class Review(models.Model):
     def __str__(self):
         return f"{self.user} - {self.place} ({self.rating})"
 
+class ReviewImage(models.Model):
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to="reviews/", validators=image_validators)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["id"]
+
+    def __str__(self):
+        return f"Photo for {self.review}"
+
 class TravelList(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="travel_lists")
     title = models.CharField(max_length=255)
