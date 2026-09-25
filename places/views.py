@@ -117,8 +117,9 @@ class PlaceViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         place = self.get_object()
-        Place.objects.filter(pk=place.pk).update(views_count=F("views_count") + 1)
-        place.views_count += 1
+        if not is_admin(request.user):
+            Place.objects.filter(pk=place.pk).update(views_count=F("views_count") + 1)
+            place.views_count += 1
         return Response(self.get_serializer(place).data)
 
     @swagger_auto_schema(request_body=PlaceWriteSerializer, responses={201: PlaceDetailSerializer})

@@ -5,6 +5,7 @@ import Header from "./components/Header.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { ToastProvider } from "./context/ToastContext.jsx";
 import { UiProvider } from "./context/UiContext.jsx";
+import AdminPanel from "./pages/AdminPanel.jsx";
 import Home from "./pages/Home.jsx";
 import PlaceDetail from "./pages/PlaceDetail.jsx";
 import Profile from "./pages/Profile.jsx";
@@ -37,6 +38,7 @@ export default function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/places/:id" element={<PlaceDetail />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/admin-panel" element={<AdminPanel />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
               </Routes>
             </main>

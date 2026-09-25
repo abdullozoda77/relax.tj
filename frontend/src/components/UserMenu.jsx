@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import { useUi } from "../context/UiContext.jsx";
+import { isAdmin } from "../pages/AdminPanel.jsx";
 import Icon from "./Icon.jsx";
 
 const itemClass = "w-full text-left px-4 py-2 text-body-sm text-slate-300 hover:bg-slate-800 hover:text-emerald-300 flex items-center gap-2";
@@ -73,10 +74,10 @@ export default function UserMenu() {
           >
             <Icon name="add_location_alt" className="text-[18px]" /> Предложить место
           </button>
-          {user.role === "admin" && (
-            <a className={itemClass} href="http://127.0.0.1:8000/admin/" rel="noreferrer" target="_blank">
-              <Icon name="admin_panel_settings" className="text-[18px]" /> Админка
-            </a>
+          {isAdmin(user) && (
+            <Link className={itemClass} onClick={() => setOpen(false)} to="/admin-panel">
+              <Icon name="admin_panel_settings" className="text-[18px]" /> Панель управления
+            </Link>
           )}
           <button className={`${itemClass} !text-rose-300 border-t border-slate-800 mt-1`} onClick={handleLogout} type="button">
             <Icon name="logout" className="text-[18px]" /> Выйти
