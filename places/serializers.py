@@ -1,16 +1,13 @@
 from django.db.models import Avg
 from rest_framework import serializers
-
 from accounts.serializers import UserShortSerializer
 from .models import (
     Region, Category, Activity, Place, PlaceImage, Favorite,
     Review, TravelList, TravelListPlace, PlaceSuggestion,
 )
 
-
 class RegionSerializer(serializers.ModelSerializer):
     places_count = serializers.SerializerMethodField()
-
     class Meta:
         model = Region
         fields = ["id", "name", "description", "image", "places_count", "created_at"]
@@ -18,18 +15,15 @@ class RegionSerializer(serializers.ModelSerializer):
     def get_places_count(self, obj):
         return obj.places.filter(is_active=True).count()
 
-
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ["id", "name", "icon", "created_at"]
 
-
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
         fields = ["id", "name", "description", "icon"]
-
 
 class PlaceImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -47,13 +41,11 @@ class PlaceImageSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"is_main": "This place already has a main image."})
         return attrs
 
-
 class PlaceRatingMixin(serializers.Serializer):
     average_rating = serializers.SerializerMethodField()
     reviews_count = serializers.SerializerMethodField()
     is_favorite = serializers.SerializerMethodField()
 
-    # The views annotate these values on the queryset; fall back to a query otherwise.
     def get_average_rating(self, obj):
         if hasattr(obj, "avg_rating"):
             avg = obj.avg_rating
@@ -73,7 +65,6 @@ class PlaceRatingMixin(serializers.Serializer):
         if not request or not request.user.is_authenticated:
             return False
         return obj.favorited_by.filter(user=request.user).exists()
-
 
 class PlaceListSerializer(PlaceRatingMixin, serializers.ModelSerializer):
     region = serializers.CharField(source="region.name", read_only=True)
@@ -95,7 +86,6 @@ class PlaceListSerializer(PlaceRatingMixin, serializers.ModelSerializer):
         request = self.context.get("request")
         return request.build_absolute_uri(image.image.url) if request else image.image.url
 
-
 class PlaceDetailSerializer(PlaceRatingMixin, serializers.ModelSerializer):
     region = RegionSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
@@ -111,7 +101,6 @@ class PlaceDetailSerializer(PlaceRatingMixin, serializers.ModelSerializer):
             "best_season", "entrance_fee", "average_rating", "reviews_count",
             "is_favorite", "is_active", "created_by", "created_at", "updated_at",
         ]
-
 
 class PlaceWriteSerializer(serializers.ModelSerializer):
     activities = serializers.PrimaryKeyRelatedField(queryset=Activity.objects.all(), many=True, required=False)
@@ -204,16 +193,12 @@ class PlaceSuggestionReviewSerializer(serializers.ModelSerializer):
         return value
 
 class SuggestionApproveSerializer(serializers.Serializer):
-    """For admins: optional fixes before a suggestion becomes a real place."""
-
     region = serializers.PrimaryKeyRelatedField(queryset=Region.objects.all(), required=False)
     category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), required=False, allow_null=True)
     admin_comment = serializers.CharField(required=False, allow_blank=True)
 
-
 class RejectSerializer(serializers.Serializer):
     admin_comment = serializers.CharField()
-
 
 class TravelListAddPlaceSerializer(serializers.Serializer):
     place = serializers.PrimaryKeyRelatedField(queryset=Place.objects.filter(is_active=True))

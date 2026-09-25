@@ -73,7 +73,6 @@ class Place(models.Model):
     def __str__(self):
         return self.name
 
-
 class PlaceImage(models.Model):
     place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name="images")
     image = models.ImageField(upload_to="places/")
@@ -122,7 +121,6 @@ class Review(models.Model):
     def __str__(self):
         return f"{self.user} - {self.place} ({self.rating})"
 
-
 class TravelList(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="travel_lists")
     title = models.CharField(max_length=255)
@@ -136,7 +134,6 @@ class TravelList(models.Model):
 
     def __str__(self):
         return self.title
-
 
 class TravelListPlace(models.Model):
     travel_list = models.ForeignKey(TravelList, on_delete=models.CASCADE, related_name="items")
@@ -154,7 +151,6 @@ class TravelListPlace(models.Model):
 
     def __str__(self):
         return f"{self.place} in {self.travel_list}"
-
 
 class PlaceSuggestion(models.Model):
     STATUSES = (("pending", "Pending"), ("approved", "Approved"), ("rejected", "Rejected"))

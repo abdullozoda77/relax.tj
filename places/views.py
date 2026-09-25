@@ -166,7 +166,6 @@ class PlaceViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["get"], filterset_class=None)
     def similar(self, request, pk=None):
-        """Other places in the same category or region, best rated first."""
         place = self.get_object()
         qs = (
             places_queryset(request)
