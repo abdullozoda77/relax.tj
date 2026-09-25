@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { api } from "../../api.js";
 import { plural } from "../../utils.js";
 import Icon from "../Icon.jsx";
@@ -24,7 +25,9 @@ function TravelListCard({ list, highlighted, onCopy }) {
             {list.user.username}
           </span>
         </div>
-        <h3 className="text-headline-md font-headline-md text-white mb-3">{list.title}</h3>
+        <Link className="block text-headline-md font-headline-md text-white mb-3 hover:text-emerald-300 transition-colors" to={`/lists/${list.id}`}>
+          {list.title}
+        </Link>
         <p className="text-body-sm text-slate-300 mb-6 leading-relaxed">{list.description || "Маршрут без описания"}</p>
         <ul className="space-y-3 mb-8 text-body-sm text-slate-200">
           {list.items.slice(0, 3).map((item) => (
@@ -36,6 +39,9 @@ function TravelListCard({ list, highlighted, onCopy }) {
           {list.items.length > 3 && <li className="text-slate-400 pl-7">и ещё {list.items.length - 3}</li>}
         </ul>
       </div>
+      <Link className="mb-3 text-center text-label-md font-label-md text-emerald-300 hover:text-emerald-200 flex items-center justify-center gap-1.5" to={`/lists/${list.id}`}>
+        <Icon name="map" className="text-[18px]" /> Маршрут на 3D-карте
+      </Link>
       {onCopy && (
         <button
           className={`w-full ${

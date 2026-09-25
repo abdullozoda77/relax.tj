@@ -10,6 +10,7 @@ import Home from "./pages/Home.jsx";
 import PlaceDetail from "./pages/PlaceDetail.jsx";
 import Profile from "./pages/Profile.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
+import TravelListPage from "./pages/TravelListPage.jsx";
 
 // Scrolls to #places, #lists... after navigation, or to the top when there is no hash.
 function ScrollToHash() {
@@ -37,6 +38,7 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/places/:id" element={<PlaceDetail />} />
+                <Route path="/lists/:id" element={<TravelListPage />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/admin-panel" element={<AdminPanel />} />
                 <Route path="/reset-password" element={<ResetPassword />} />

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { api } from "../../api.js";
 import { useToast } from "../../context/ToastContext.jsx";
 import { useUi } from "../../context/UiContext.jsx";
@@ -257,6 +258,10 @@ export default function RouteCard({ onChanged }) {
               <Icon name={list.is_public ? "lock" : "public"} className="text-[20px]" />
               <span>{list.is_public ? "Сделать личным" : "Сделать публичным"}</span>
             </button>
+            <Link className={secondaryBtn} to={`/lists/${list.id}`}>
+              <Icon name="map" className="text-[20px]" />
+              <span>Страница маршрута</span>
+            </Link>
             <button
               className={secondaryBtn}
               onClick={() => confirm(`Удалить маршрут «${list.title}»?`) && run(() => api(`/travel-lists/${list.id}/`, { method: "DELETE" }), "Маршрут удалён")}

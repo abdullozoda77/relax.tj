@@ -2,31 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import {
   Cartesian3,
   Cartographic,
-  Color,
   HeadingPitchRange,
-  HeightReference,
-  JulianDate,
   Math as CesiumMath,
-  PinBuilder,
   ScreenSpaceEventHandler,
   ScreenSpaceEventType,
-  Terrain,
-  VerticalOrigin,
-  Viewer,
   sampleTerrainMostDetailed,
 } from "cesium";
-import "cesium/Build/Cesium/Widgets/widgets.css";
+import { createViewer, pin } from "../cesium.js";
 import Icon from "../Icon.jsx";
 
-// Cesium loads its workers and images from here (see cesiumStatic() in vite.config.js).
-window.CESIUM_BASE_URL = "/cesium/";
-
-// Cesium World Terrain + Bing Maps Aerial through Cesium ion. Without our own ion account Cesium uses
-// the public token built into the library, which is meant for demos: fine for this project.
-
 const DEGREES_PER_SECOND = 5;
-// Sun position: a summer day in Tajikistan (12:00 local time), bright light with soft shadows on slopes.
-const SUNNY_DAY = JulianDate.fromIso8601("2026-06-21T07:00:00Z");
 
 // Mountains are looked at from further away, city places from closer.
 function startView(place) {
@@ -47,19 +32,7 @@ export default function Terrain3D({ place }) {
   useEffect(() => {
     let viewer;
     try {
-      viewer = new Viewer(container.current, {
-        terrain: Terrain.fromWorldTerrain({ requestVertexNormals: true, requestWaterMask: true }),
-        animation: false,
-        timeline: false,
-        baseLayerPicker: false,
-        geocoder: false,
-        homeButton: false,
-        sceneModePicker: false,
-        navigationHelpButton: false,
-        fullscreenButton: false,
-        infoBox: false,
-        selectionIndicator: false,
-      });
+      viewer = createViewer(container.current);
     } catch {
       setError("Ваш браузер не поддерживает 3D (WebGL).");
       return;
@@ -67,28 +40,11 @@ export default function Terrain3D({ place }) {
     viewerRef.current = viewer;
     const { scene, camera } = viewer;
 
-    // Quality: full pixel density, more detailed terrain, sunlight, atmosphere and anti-aliasing.
-    viewer.useBrowserRecommendedResolution = false;
-    scene.globe.maximumScreenSpaceError = 1.2;
-    scene.globe.enableLighting = true;
-    scene.light.intensity = 3; // default 2 looks too dark on satellite photos
-    scene.highDynamicRange = false; // HDR tone mapping makes the photos dull and dark
-    scene.globe.depthTestAgainstTerrain = true;
-    scene.postProcessStages.fxaa.enabled = true;
-    scene.fog.density = 0.00012;
-    viewer.clock.currentTime = SUNNY_DAY.clone();
-    viewer.clock.shouldAnimate = false;
-
     const lng = Number(place.longitude);
     const lat = Number(place.latitude);
     viewer.entities.add({
       position: Cartesian3.fromDegrees(lng, lat),
-      billboard: {
-        image: new PinBuilder().fromColor(Color.fromCssColorString("#f59e0b"), 48).toDataURL(),
-        verticalOrigin: VerticalOrigin.BOTTOM,
-        heightReference: HeightReference.CLAMP_TO_GROUND,
-        disableDepthTestDistance: Number.POSITIVE_INFINITY,
-      },
+      billboard: pin("#f59e0b"),
     });
 
     // Look at the place from above, then circle around it. Mouse dragging also rotates around the place.

@@ -70,3 +70,10 @@ export function plural(n, [one, few, many]) {
     mod10 === 1 && mod100 !== 11 ? one : mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14) ? few : many;
   return `${n} ${word}`;
 }
+
+// Distance between two points on Earth in km (haversine formula), same as distance_km() in the backend.
+export function distanceKm(lat1, lng1, lat2, lng2) {
+  const rad = (d) => (Number(d) * Math.PI) / 180;
+  const a = Math.sin((rad(lat2) - rad(lat1)) / 2) ** 2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin((rad(lng2) - rad(lng1)) / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(a));
+}
