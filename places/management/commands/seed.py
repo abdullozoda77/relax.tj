@@ -5,6 +5,8 @@ from django.core.management.base import BaseCommand
 
 from places.models import Activity, Category, Place, PlaceImage, Region
 
+from ._details import DETAILS
+
 PHOTOS_DIR = Path(__file__).resolve().parents[2] / "seed_photos"
 
 REGIONS = [
@@ -46,21 +48,6 @@ PLACES = [
     ("Парк Рудаки", "Душанбе", "Парки", ["Фотография"],
      38.5767, 68.7806, 800, "all_year", 0),
 ]
-
-# Extra info and photos for some places. Photos are in places/seed_photos/<folder>, the first one is main.
-# Authors and licenses of the photos: places/seed_photos/CREDITS.md
-DETAILS = {
-    "Парк Рудаки": {
-        "description": (
-            "Главный парк Душанбе в самом центре города, названный в честь поэта Абуабдуллоха Рудаки.\n"
-            "Здесь стоит памятник Рудаки под мозаичной аркой, есть аллеи фонтанов, клумбы, "
-            "а рядом находятся Дворец нации и флагшток. Вечером парк красиво подсвечен."
-        ),
-        "address": "проспект Рудаки, центр Душанбе",
-        "how_to_get_there": "Парк в центре города на проспекте Рудаки: пешком от площади Дусти или на любом транспорте до остановки «Парк Рудаки».",
-        "photos": ("rudaki", ["rudaki_monument.jpg", "rudaki_arch_flowers.jpg", "rudaki_fountains.jpg", "rudaki_square.jpg", "rudaki_night.jpg"]),
-    },
-}
 
 
 class Command(BaseCommand):
@@ -108,7 +95,7 @@ class Command(BaseCommand):
         if changed:
             place.save(update_fields=changed)
 
-        if place.images.exists():
+        if place.images.exists() or not info["photos"]:
             return 0
         folder, files = info["photos"]
         for i, filename in enumerate(files):
