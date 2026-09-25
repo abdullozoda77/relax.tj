@@ -1,5 +1,4 @@
 import math
-
 from django.db import transaction
 from django.db.models import Avg, Count, Exists, F, Max, OuterRef, ProtectedError, Q, Value, BooleanField
 from drf_yasg import openapi
@@ -25,13 +24,11 @@ from .serializers import (
 )
 
 def distance_km(lat1, lng1, lat2, lng2):
-    """Distance between two points on Earth (haversine formula)."""
     lat1, lng1, lat2, lng2 = map(math.radians, (lat1, lng1, lat2, lng2))
     a = math.sin((lat2 - lat1) / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin((lng2 - lng1) / 2) ** 2
     return 6371 * 2 * math.asin(math.sqrt(a))
 
 def places_queryset(request):
-    """Places with rating, review count, favorite count and is_favorite calculated in one query."""
     qs = (
         Place.objects.select_related("region", "category", "created_by")
         .prefetch_related("images", "activities")
@@ -52,7 +49,6 @@ def places_queryset(request):
 
 class PlacesOfMixin:
     places_lookup = None
-
     @action(detail=True, methods=["get"], serializer_class=PlaceListSerializer)
     def places(self, request, pk=None):
         obj = self.get_object()
@@ -215,7 +211,6 @@ class PlaceViewSet(viewsets.ModelViewSet):
     ])
     @action(detail=False, methods=["get"])
     def nearby(self, request):
-        """Places within a radius (km) of the given point, closest first."""
         try:
             lat = float(request.query_params["lat"])
             lng = float(request.query_params["lng"])
@@ -372,7 +367,6 @@ class TravelListViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(request_body=no_body, responses={201: TravelListSerializer})
     @action(detail=True, methods=["post"])
     def copy(self, request, pk=None):
-        """Copy a public travel list (or your own) into your lists."""
         original = self.get_object()
         with transaction.atomic():
             new_list = TravelList.objects.create(
