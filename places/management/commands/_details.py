@@ -86,7 +86,7 @@ DETAILS = {
         ),
         "address": "Варзобский район",
         "how_to_get_there": "Около 50 км от Душанбе по трассе М34 на север, затем поворот на Ходжа-Оби-Гарм.",
-        "photos": None,
+        "photos": numbered("khoja_obi_garm", 1),
     },
     "Озеро Сарез": {
         "description": (
