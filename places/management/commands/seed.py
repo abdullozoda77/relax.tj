@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 from places.models import Activity, Category, Place, PlaceImage, Region
 
 from ._details import DETAILS
+from ._new_places import NEW_PLACES
 
 PHOTOS_DIR = Path(__file__).resolve().parents[2] / "seed_photos"
 
@@ -17,11 +18,15 @@ REGIONS = [
     ("РРП", "Районы республиканского подчинения, Варзоб и Рашт"),
 ]
 
-CATEGORIES = ["Озёра", "Горы", "Ущелья", "Курорты и санатории", "Исторические места", "Парки"]
+CATEGORIES = [
+    "Озёра", "Горы", "Ущелья", "Курорты и санатории", "Исторические места", "Парки",
+    "Музеи", "Долины", "Перевалы и дороги",
+]
 
 ACTIVITIES = ["Походы", "Рыбалка", "Купание", "Кемпинг", "Лыжи", "Фотография", "Экскурсии"]
 
-# name, region, category, activities, lat, lng, altitude, season, fee
+# The first places of the project: name, region, category, activities, lat, lng, altitude, season, fee.
+# Details and photos for them are in _details.py; all other places are in _new_places.py.
 PLACES = [
     ("Искандеркуль", "Согдийская область", "Озёра", ["Походы", "Кемпинг", "Фотография"],
      39.0772, 68.3683, 2195, "summer", 0),
@@ -59,8 +64,22 @@ class Command(BaseCommand):
         categories = {name: Category.objects.get_or_create(name=name)[0] for name in CATEGORIES}
         activities = {name: Activity.objects.get_or_create(name=name)[0] for name in ACTIVITIES}
 
+        # Both lists are turned into the same shape: (name, region, category, activities, lat, lng, altitude, season, fee)
+        all_places = list(PLACES) + [
+            (p["name"], p["region"], p["category"], p["activities"], p["lat"], p["lng"], p["altitude"], p["season"], p["fee"])
+            for p in NEW_PLACES
+        ]
+        details = dict(DETAILS)
+        for p in NEW_PLACES:
+            details[p["name"]] = {
+                "description": p["description"],
+                "address": p["address"],
+                "how_to_get_there": p["how_to_get_there"],
+                "photos": (p["slug"], [p["photo"]]) if p["photo"] else None,
+            }
+
         created = 0
-        for name, region, category, acts, lat, lng, alt, season, fee in PLACES:
+        for name, region, category, acts, lat, lng, alt, season, fee in all_places:
             place, is_new = Place.objects.get_or_create(
                 name=name,
                 defaults={
@@ -77,7 +96,7 @@ class Command(BaseCommand):
                 place.activities.set(activities[a] for a in acts)
                 created += 1
 
-        photos_added = sum(self.add_details(name, info) for name, info in DETAILS.items())
+        photos_added = sum(self.add_details(name, info) for name, info in details.items())
 
         self.stdout.write(self.style.SUCCESS(
             f"Регионов: {len(regions)}, категорий: {len(categories)}, "

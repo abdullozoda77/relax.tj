@@ -38,6 +38,21 @@ const CATEGORY_STYLES = {
     gradient: "from-green-600 via-emerald-900 to-slate-950",
     text: t("Парки и заповедники для прогулок, семейного отдыха и фотографий."),
   },
+  "Музеи": {
+    icon: "museum",
+    gradient: "from-violet-700 via-slate-800 to-slate-950",
+    text: t("Музеи, дворцы и памятники — история и культура Таджикистана."),
+  },
+  "Долины": {
+    icon: "forest",
+    gradient: "from-lime-700 via-emerald-900 to-slate-950",
+    text: t("Горные долины с кишлаками, садами и пастбищами — настоящая жизнь в горах."),
+  },
+  "Перевалы и дороги": {
+    icon: "route",
+    gradient: "from-sky-700 via-slate-800 to-slate-950",
+    text: t("Высокогорные перевалы и легендарные дороги вроде Памирского тракта."),
+  },
 };
 
 export function categoryStyle(name) {
