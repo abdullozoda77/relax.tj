@@ -20,7 +20,7 @@ const MODALS = {
 };
 
 export function UiProvider({ children }) {
-  const { user } = useAuth();
+  const { user, reloadUser } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
   const [modal, setModal] = useState(null);
@@ -28,6 +28,18 @@ export function UiProvider({ children }) {
   const [favorites, setFavorites] = useState({});
   // Increases after every favorite change, so lists of favorites know to reload.
   const [favoritesVersion, setFavoritesVersion] = useState(0);
+  // Increases after the user sends a suggestion, so "My suggestions" reloads.
+  const [suggestionsVersion, setSuggestionsVersion] = useState(0);
+
+  // The counters in the profile (favorites, reviews, routes, suggestions) come with the user's profile,
+  // so reload it after anything that changes them — they update without restarting the page.
+  const refreshMyData = useCallback(() => {
+    reloadUser().catch(() => {});
+  }, [reloadUser]);
+  const suggestionSent = useCallback(() => {
+    setSuggestionsVersion((v) => v + 1);
+    refreshMyData();
+  }, [refreshMyData]);
 
   useEffect(() => setFavorites({}), [user?.id]);
 
@@ -66,16 +78,29 @@ export function UiProvider({ children }) {
       }
       setFavorites((prev) => ({ ...prev, [placeId]: !current }));
       setFavoritesVersion((v) => v + 1);
+      refreshMyData();
       toast(current ? t("Удалено из избранного") : t("Добавлено в избранное"));
     },
-    [requireLogin, toast]
+    [requireLogin, toast, refreshMyData]
   );
 
   const ModalComponent = modal && MODALS[modal.type];
 
   return (
     <UiContext.Provider
-      value={{ openAuth, openPlace, openSuggest, closeModal, requireLogin, isFavorite, toggleFavorite, favoritesVersion }}
+      value={{
+        openAuth,
+        openPlace,
+        openSuggest,
+        closeModal,
+        requireLogin,
+        isFavorite,
+        toggleFavorite,
+        favoritesVersion,
+        refreshMyData,
+        suggestionSent,
+        suggestionsVersion,
+      }}
     >
       {children}
       {ModalComponent && <ModalComponent key={JSON.stringify(modal.props)} onClose={closeModal} {...modal.props} />}

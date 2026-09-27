@@ -12,7 +12,7 @@ import { locale, t } from "../../i18n.js";
 // Right column: price, favorite, "add to my route", map and share.
 export default function PlaceSidebar({ place }) {
   const { user } = useAuth();
-  const { requireLogin } = useUi();
+  const { requireLogin, refreshMyData } = useUi();
   const toast = useToast();
   const [lists, setLists] = useState([]);
   const [listId, setListId] = useState("");
@@ -41,7 +41,8 @@ export default function PlaceSidebar({ place }) {
         target = await api("/travel-lists/", { method: "POST", body: { title: place.name, is_public: false } });
       }
       await api(`/travel-lists/${target.id}/add-place/`, { method: "POST", body: { place: place.id } });
-      toast(t("Добавлено в маршрут «{0}»", target.title));
+      toast(t("Добавлено в маршрут «{0}»", t(target.title)));
+      refreshMyData();
       const d = await api("/travel-lists/?page_size=50");
       setLists(d.results);
       setListId(target.id);

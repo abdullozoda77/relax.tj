@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
 import { useToast } from "../context/ToastContext.jsx";
+import { useUi } from "../context/UiContext.jsx";
 import { inputClass } from "./AuthModal.jsx";
 import LocationPicker from "./LocationPicker.jsx";
 import { inTajikistanBox } from "../utils.js";
@@ -29,6 +30,7 @@ function Label({ text, children }) {
 
 export default function SuggestModal({ name = "", onClose }) {
   const toast = useToast();
+  const { suggestionSent } = useUi();
   const [regions, setRegions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [mine, setMine] = useState([]);
@@ -54,6 +56,7 @@ export default function SuggestModal({ name = "", onClose }) {
     try {
       await api("/suggestions/", { method: "POST", body: data });
       toast(t("Спасибо! Ваше предложение отправлено на проверку."));
+      suggestionSent();
       onClose();
     } catch (err) {
       toast(err.message, "error");

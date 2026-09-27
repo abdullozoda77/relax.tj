@@ -105,7 +105,7 @@ function ReviewForm({ placeId, onSaved }) {
 // Reviews of one place. onSummary gets the new average and count after changes.
 export default function Reviews({ placeId, onSummary }) {
   const { user } = useAuth();
-  const { openAuth } = useUi();
+  const { openAuth, refreshMyData } = useUi();
   const toast = useToast();
   const [data, setData] = useState(null);
 
@@ -126,6 +126,7 @@ export default function Reviews({ placeId, onSummary }) {
       await api(`/reviews/${id}/`, { method: "DELETE" });
       toast(t("Отзыв удалён"));
       load();
+      refreshMyData();
     } catch (err) {
       toast(err.message, "error");
     }
@@ -166,7 +167,15 @@ export default function Reviews({ placeId, onSummary }) {
               </button>
             </div>
           ) : (
-            !myReview && <ReviewForm onSaved={load} placeId={placeId} />
+            !myReview && (
+              <ReviewForm
+                onSaved={() => {
+                  load();
+                  refreshMyData();
+                }}
+                placeId={placeId}
+              />
+            )
           )}
         </div>
       </div>

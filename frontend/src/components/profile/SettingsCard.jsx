@@ -20,14 +20,15 @@ function Label({ text, children }) {
 }
 
 export function SuggestionsCard() {
-  const { openSuggest } = useUi();
+  const { openSuggest, suggestionsVersion } = useUi();
   const [items, setItems] = useState(null);
 
+  // Reloads when a new suggestion is sent from this page.
   useEffect(() => {
     api("/suggestions/?page_size=20")
       .then((d) => setItems(d.results))
       .catch(() => setItems([]));
-  }, []);
+  }, [suggestionsVersion]);
 
   return (
     <div className="bg-surface-container rounded-xl p-6 lg:p-7 shadow-xl flex flex-col gap-4">

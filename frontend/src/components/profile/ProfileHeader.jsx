@@ -80,8 +80,8 @@ export default function ProfileHeader({ user }) {
             accent="secondary"
             icon="add_location_alt"
             label={t("ПРЕДЛОЖЕНИЯ")}
-            note={t("Новые места от вас")}
-            value={t("{0} отправлено", stats.suggestions ?? 0)}
+            note={t("Предложено вами")}
+            value={plural(stats.suggestions ?? 0, [t("место"), t("места"), t("мест")])}
           />
           <InfoTile icon="contact_mail" label={t("КОНТАКТЫ")} note={user.phone_number || t("Телефон не указан")} value={user.email || t("Email не указан")} />
         </div>
