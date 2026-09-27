@@ -8,7 +8,8 @@ import {
   ScreenSpaceEventType,
   sampleTerrainMostDetailed,
 } from "cesium";
-import { createViewer, pin } from "../cesium.js";
+import { CATEGORY_COLORS, createViewer, iconFontReady, placeMarker } from "../cesium.js";
+import { categoryStyle } from "../../utils.js";
 import Icon from "../Icon.jsx";
 import { t } from "../../i18n.js";
 
@@ -43,9 +44,14 @@ export default function Terrain3D({ place }) {
 
     const lng = Number(place.longitude);
     const lat = Number(place.latitude);
-    viewer.entities.add({
-      position: Cartesian3.fromDegrees(lng, lat),
-      billboard: pin("#f59e0b"),
+    // The same marker as on the main map: the category colour and icon.
+    const category = place.category?.name;
+    iconFontReady().then(() => {
+      if (viewer.isDestroyed()) return;
+      viewer.entities.add({
+        position: Cartesian3.fromDegrees(lng, lat),
+        billboard: placeMarker(CATEGORY_COLORS[category] || "#f59e0b", categoryStyle(category).icon),
+      });
     });
 
     // Look at the place from above, then circle around it. Mouse dragging also rotates around the place.

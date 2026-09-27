@@ -1,5 +1,5 @@
 // Shared CesiumJS setup for all 3D views (place terrain, route map, map of all places).
-import { Color, HeightReference, JulianDate, PinBuilder, Terrain, VerticalOrigin, Viewer } from "cesium";
+import { Color, HeightReference, JulianDate, Terrain, VerticalOrigin, Viewer } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 
 // Cesium loads its workers and images from here (see cesiumStatic() in vite.config.js).
@@ -42,28 +42,30 @@ export function createViewer(container) {
   return viewer;
 }
 
-const pinBuilder = new PinBuilder();
+// Marker colour of each category, the same on every 3D map and in the map legend.
+export const CATEGORY_COLORS = {
+  "Озёра": "#06b6d4",
+  "Горы": "#94a3b8",
+  "Ущелья": "#f59e0b",
+  "Курорты и санатории": "#10b981",
+  "Исторические места": "#f97316",
+  "Парки": "#22c55e",
+  "Музеи": "#a855f7",
+  "Долины": "#84cc16",
+  "Перевалы и дороги": "#0ea5e9",
+};
 
-// Map pin clamped to the ground. `text` (e.g. "3") is drawn inside the pin.
-export function pin(color = "#f59e0b", text = null, size = 48) {
-  const image = text
-    ? pinBuilder.fromText(String(text), Color.fromCssColorString(color), size).toDataURL()
-    : pinBuilder.fromColor(Color.fromCssColorString(color), size).toDataURL();
-  return {
-    image,
-    verticalOrigin: VerticalOrigin.BOTTOM,
-    heightReference: HeightReference.CLAMP_TO_GROUND,
-    disableDepthTestDistance: Number.POSITIVE_INFINITY,
-  };
-}
+// The icon font must be loaded before markers are drawn, or the icon names are drawn as words.
+export const iconFontReady = () => document.fonts.load('38px "Material Symbols Outlined"').catch(() => {});
 
 const markers = new Map();
 
 // Round map marker: the category icon (a Material Symbols name) in white on a coloured badge,
 // with a white ring, a short pointer and a soft shadow. Drawn at double size for sharp edges.
-// Call it after the icon font has loaded (document.fonts.load), or the icon name is drawn as text.
-export function placeMarker(color, icon) {
-  const key = `${color}|${icon}`;
+// With `label` (e.g. a stop number) the label is drawn instead of the icon.
+// Call it after iconFontReady(), or the icon name is drawn as text.
+export function placeMarker(color, icon, label = null) {
+  const key = `${color}|${icon}|${label}`;
   if (!markers.has(key)) {
     const S = 2;
     const canvas = document.createElement("canvas");
@@ -100,10 +102,11 @@ export function placeMarker(color, icon) {
     g.fill();
 
     g.fillStyle = "#ffffff";
-    g.font = `${19 * S}px "Material Symbols Outlined"`;
+    const size = (label == null ? 19 : String(label).length > 1 ? 14 : 16) * S; // two-digit numbers a bit smaller
+    g.font = label == null ? `${size}px "Material Symbols Outlined"` : `700 ${size}px Inter, sans-serif`;
     g.textAlign = "center";
     g.textBaseline = "middle";
-    g.fillText(icon, cx, cy + S);
+    g.fillText(label == null ? icon : String(label), cx, cy + S);
     markers.set(key, canvas.toDataURL());
   }
   return {

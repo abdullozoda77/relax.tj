@@ -14,22 +14,11 @@ import {
 import { api } from "../../api.js";
 import { useUi } from "../../context/UiContext.jsx";
 import { categoryStyle, formatRating } from "../../utils.js";
-import { createViewer, placeMarker } from "../cesium.js";
+import { CATEGORY_COLORS, createViewer, iconFontReady, placeMarker } from "../cesium.js";
 import Icon from "../Icon.jsx";
 import PlaceBackground from "../PlaceBackground.jsx";
 import { t } from "../../i18n.js";
 
-const CATEGORY_COLORS = {
-  "Озёра": "#06b6d4",
-  "Горы": "#94a3b8",
-  "Ущелья": "#f59e0b",
-  "Курорты и санатории": "#10b981",
-  "Исторические места": "#f97316",
-  "Парки": "#22c55e",
-  "Музеи": "#a855f7",
-  "Долины": "#84cc16",
-  "Перевалы и дороги": "#0ea5e9",
-};
 // The whole Earth seen from space, centred on Central Asia.
 const GLOBE = { destination: Cartesian3.fromDegrees(71, 25, 21000000) };
 const OVERVIEW = {
@@ -130,14 +119,11 @@ export default function PlacesMap3D() {
   // The markers show icons from the Material Symbols font, so they are drawn once it has loaded.
   useEffect(() => {
     let cancelled = false;
-    document.fonts
-      .load('38px "Material Symbols Outlined"')
-      .catch(() => {})
-      .then(() => {
-        const viewer = viewerRef.current;
-        if (cancelled || !viewer || viewer.isDestroyed()) return;
-        addMarkers(viewer);
-      });
+    iconFontReady().then(() => {
+      const viewer = viewerRef.current;
+      if (cancelled || !viewer || viewer.isDestroyed()) return;
+      addMarkers(viewer);
+    });
     return () => {
       cancelled = true;
     };

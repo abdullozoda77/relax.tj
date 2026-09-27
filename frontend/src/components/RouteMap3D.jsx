@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ArcType, BoundingSphere, Cartesian3, Color, HeadingPitchRange, Math as CesiumMath, PolylineDashMaterialProperty } from "cesium";
-import { createViewer, pin } from "./cesium.js";
+import { createViewer, placeMarker } from "./cesium.js";
 import Icon from "./Icon.jsx";
 import { t } from "../i18n.js";
 
@@ -29,7 +29,7 @@ export default function RouteMap3D({ points, onSelect, path, color = "#f59e0b" }
         id: `stop-${p.id}`,
         name: p.name,
         position: positions[i],
-        billboard: pin(p.visited ? "#10b981" : "#f59e0b", i + 1, 44),
+        billboard: placeMarker(p.visited ? "#10b981" : "#f59e0b", null, i + 1),
         properties: { placeId: p.id },
       });
     });
