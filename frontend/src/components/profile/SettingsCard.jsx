@@ -63,6 +63,19 @@ export default function SettingsCard() {
   const toast = useToast();
   const [busy, setBusy] = useState(false);
   const [passwords, setPasswords] = useState({ old_password: "", new_password: "" });
+  const [resetSent, setResetSent] = useState(false);
+
+  // Forgot the current password: a link for a new one goes to the email of the profile.
+  async function forgotPassword() {
+    if (!user.email) return toast(t("Сначала укажите email в профиле."), "error");
+    try {
+      await api("/auth/password-reset/", { method: "POST", body: { email: user.email } });
+      setResetSent(true);
+      toast(t("Мы отправили ссылку для нового пароля на {0}.", user.email));
+    } catch (err) {
+      toast(err.message, "error");
+    }
+  }
 
   async function saveProfile(e) {
     e.preventDefault();
@@ -150,6 +163,14 @@ export default function SettingsCard() {
           type="password"
           value={passwords.old_password}
         />
+        <button
+          className="self-end -mt-1 text-label-sm font-label-sm text-primary hover:underline disabled:opacity-60 disabled:no-underline"
+          disabled={resetSent}
+          onClick={forgotPassword}
+          type="button"
+        >
+          {resetSent ? t("Ссылка отправлена на почту") : t("Забыли пароль?")}
+        </button>
         <input
           autoComplete="new-password"
           className={input}
