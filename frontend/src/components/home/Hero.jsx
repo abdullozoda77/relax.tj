@@ -126,14 +126,13 @@ function AnimatedHeading({ text, start = 200, charDelay = 30, className = "", li
 
   let index = 0;
   return (
-    <h1 aria-label={text.replace("\n", " ")} className={className} style={{ letterSpacing: "-0.035em" }}>
+    <h1 aria-label={text.replace("\n", " ")} className={className} style={{ letterSpacing: "-0.04em" }}>
       {text.split("\n").map((line, li) => (
         <span key={li} aria-hidden className={`block ${lineClasses[li] || ""}`}>
           {line.split(" ").map((word, wi) => (
             <span key={wi}>
               {wi > 0 && " "}
-              {/* The tight letter spacing also narrows spaces, so words get a little extra room. */}
-              <span className={`inline-block whitespace-nowrap ${wi > 0 ? "ml-[0.12em]" : ""}`}>
+              <span className="inline-block whitespace-nowrap">
                 {[...word].map((char, ci) => {
                   const delay = index++ * charDelay;
                   return (
@@ -202,7 +201,7 @@ export default function Hero({ onNearby }) {
               </span>
             </FadeIn>
             <AnimatedHeading
-              className="font-headline-xl font-extrabold text-[2.5rem] leading-[1.06] sm:text-6xl lg:text-[4.25rem] xl:text-[4.75rem] mb-6"
+              className="font-label-md font-extrabold text-[2.3rem] leading-[1.1] sm:text-[3.4rem] lg:text-[3.9rem] xl:text-[4.4rem] mb-6"
               lineClasses={["", "text-[#6ee7b7]"]}
               start={250}
               text={t("Откройте Таджикистан\nвыше облаков.")}
