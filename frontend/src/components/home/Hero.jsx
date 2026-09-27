@@ -202,7 +202,7 @@ export default function Hero({ onNearby }) {
               </span>
             </FadeIn>
             <AnimatedHeading
-              className="font-headline-xl font-bold text-[2.6rem] leading-[1.05] sm:text-6xl lg:text-7xl xl:text-[5.25rem] mb-6"
+              className="font-headline-xl font-extrabold text-[2.5rem] leading-[1.06] sm:text-6xl lg:text-[4.25rem] xl:text-[4.75rem] mb-6"
               lineClasses={["", "text-[#6ee7b7]"]}
               start={250}
               text={t("Откройте Таджикистан\nвыше облаков.")}
