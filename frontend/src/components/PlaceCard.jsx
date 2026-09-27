@@ -9,7 +9,7 @@ export default function PlaceCard({ place }) {
   const { openPlace } = useUi();
   return (
     <article
-      className="group relative rounded-2xl overflow-hidden bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 shadow-xl transition-all duration-300 flex flex-col justify-end h-[420px] cursor-pointer"
+      className="group relative rounded-2xl overflow-hidden bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 hover:-translate-y-1.5 hover:shadow-[0_24px_60px_-18px_rgba(16,185,129,0.45)] shadow-xl transition-all duration-500 ease-out flex flex-col justify-end h-[420px] cursor-pointer"
       onClick={() => openPlace(place.id)}
     >
       <PlaceBackground place={place} />
@@ -52,6 +52,6 @@ export default function PlaceCard({ place }) {
 
 export function SkeletonCards({ count = 3 }) {
   return Array.from({ length: count }, (_, i) => (
-    <div key={i} className="rounded-2xl h-[420px] bg-slate-900/80 border border-slate-800 animate-pulse" />
+    <div key={i} className="rounded-2xl h-[420px] border border-slate-800 skeleton" />
   ));
 }

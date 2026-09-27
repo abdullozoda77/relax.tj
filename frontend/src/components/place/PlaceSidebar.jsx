@@ -37,8 +37,8 @@ export default function PlaceSidebar({ place }) {
     try {
       let target = lists.find((l) => l.id === Number(listId));
       if (!target) {
-        // No routes yet: create the first one automatically.
-        target = await api("/travel-lists/", { method: "POST", body: { title: t("Мой маршрут"), is_public: false } });
+        // No routes yet: create the first one, named after this place.
+        target = await api("/travel-lists/", { method: "POST", body: { title: place.name, is_public: false } });
       }
       await api(`/travel-lists/${target.id}/add-place/`, { method: "POST", body: { place: place.id } });
       toast(t("Добавлено в маршрут «{0}»", target.title));
@@ -93,12 +93,12 @@ export default function PlaceSidebar({ place }) {
           >
             {lists.map((l) => (
               <option key={l.id} value={l.id}>
-                {l.title} ({l.items.length})
+                {t(l.title)} ({l.items.length})
               </option>
             ))}
           </select>
         )}
-        {user && lists.length === 0 && <p className="text-label-sm font-label-sm text-outline">{t("У вас нет маршрутов — создадим «Мой маршрут».")}</p>}
+        {user && lists.length === 0 && <p className="text-label-sm font-label-sm text-outline">{t("У вас нет маршрутов — создадим новый с этим местом.")}</p>}
         <button
           className="w-full py-3 rounded-xl bg-primary hover:bg-tertiary-container text-on-primary font-title-md text-title-md transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
           disabled={Boolean(selected && inList(selected))}

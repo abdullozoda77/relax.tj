@@ -6,7 +6,7 @@ import PlaceBackground from "../components/PlaceBackground.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import { useUi } from "../context/UiContext.jsx";
-import { SEASONS, distanceKm, formatDate, formatFee, plural } from "../utils.js";
+import { SEASONS, TRAVEL_MODES, distanceKm, formatDate, formatDuration, formatFee, googleMapsUrl, plural } from "../utils.js";
 import { t } from "../i18n.js";
 
 // The 3D library is big, so it is loaded only when this page opens.
@@ -64,6 +64,32 @@ export default function TravelListPage() {
     [items]
   );
 
+  // Road route through the stops, like a navigator: by car, on foot or by bike.
+  const [modeId, setModeId] = useState("car");
+  const mode = TRAVEL_MODES.find((m) => m.id === modeId);
+  const [route, setRoute] = useState(null); // { loading } | { data } | { error }
+  const coords = points.map((p) => `${p.lng},${p.lat}`).join(";");
+  useEffect(() => {
+    if (points.length < 2) return setRoute(null);
+    let cancelled = false;
+    setRoute({ loading: true });
+    api(`/route/?mode=${modeId}&points=${encodeURIComponent(coords)}`)
+      .then((data) => !cancelled && setRoute({ data }))
+      .catch((err) => !cancelled && setRoute({ error: err.message }));
+    return () => {
+      cancelled = true;
+    };
+  }, [modeId, coords]); // eslint-disable-line react-hooks/exhaustive-deps
+  const road = route?.data;
+  // The road leg that ends at each stop (stops without coordinates are not part of the road route).
+  const roadLegs = useMemo(() => {
+    const onMap = items.map((item) => Boolean(item.place_detail.latitude && item.place_detail.longitude));
+    return items.map((item, i) => {
+      const point = onMap.slice(0, i).filter(Boolean).length; // position of this stop in `points`
+      return onMap[i] && point > 0 ? (road?.legs[point - 1] ?? null) : null;
+    });
+  }, [items, road]);
+
   if (error) {
     return (
       <div className="max-w-xl mx-auto px-6 py-32 text-center">
@@ -78,7 +104,6 @@ export default function TravelListPage() {
   if (!list) return <div className="max-w-7xl mx-auto px-6 lg:px-12 py-12"><div className="h-96 rounded-2xl bg-surface-container-low animate-pulse" /></div>;
 
   const isOwner = user?.id === list.user.id;
-  const visited = items.filter((i) => i.is_visited).length;
   const maxAltitude = Math.max(0, ...items.map((i) => i.place_detail.altitude || 0));
 
   async function share() {
@@ -119,7 +144,7 @@ export default function TravelListPage() {
               <Icon name="arrow_back" className="text-[16px]" /> {isOwner ? t("Мой профиль") : t("Маршруты")}
             </Link>
             <span className="text-outline-variant">/</span>
-            <span className="text-primary">{list.title}</span>
+            <span className="text-primary">{t(list.title)}</span>
             <span className={`ml-auto inline-flex items-center gap-1.5 px-3 py-1 rounded-full border ${list.is_public ? "bg-primary/10 text-primary border-primary/20" : "bg-secondary/10 text-secondary border-secondary/20"}`}>
               <Icon name={list.is_public ? "public" : "lock"} className="text-[14px]" />
               {list.is_public ? t("Открытый маршрут") : t("Виден только вам")}
@@ -127,8 +152,8 @@ export default function TravelListPage() {
           </div>
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <div className="flex flex-col gap-2">
-              <h1 className="text-4xl md:text-headline-xl font-headline-xl text-on-surface tracking-tight">{list.title}</h1>
-              {list.description && <p className="text-body-lg text-on-surface-variant max-w-3xl">{list.description}</p>}
+              <h1 className="text-4xl md:text-headline-xl font-headline-xl text-on-surface tracking-tight">{t(list.title)}</h1>
+              {list.description && <p className="text-body-lg text-on-surface-variant max-w-3xl">{t(list.description)}</p>}
               <p className="text-label-md font-label-md text-on-surface-variant flex items-center gap-2">
                 <Icon name="person" className="text-[16px] text-primary" /> @{list.user.username} {t("· обновлён")} {formatDate(list.updated_at)}
               </p>
@@ -150,19 +175,55 @@ export default function TravelListPage() {
       <div className="max-w-7xl mx-auto px-6 lg:px-12 w-full py-8 flex flex-col gap-8">
         <div className="bg-surface-container-low/80 rounded-2xl p-6 shadow-lg grid grid-cols-2 md:grid-cols-4 gap-6">
           <Stat icon="location_on" label={t("Мест")} value={items.length} />
-          <Stat accent icon="straighten" label={t("Длина по прямой")} value={t("{0} км", Math.round(total))} />
-          <Stat icon="altitude" label={t("Самая высокая точка")} value={maxAltitude ? t("{0} м", maxAltitude) : "—"} />
-          <Stat accent icon="flag" label={t("Посещено")} value={t("{0} из {1}", visited, items.length)} />
+          {road ? (
+            <Stat accent icon="route" label={t("По дороге")} value={t("{0} км", Math.round(road.distance_km))} />
+          ) : (
+            <Stat accent icon="straighten" label={t("Длина по прямой")} value={t("{0} км", Math.round(total))} />
+          )}
+          <Stat icon={mode.icon} label={t("В пути")} value={road ? formatDuration(road.duration_min) : route?.loading ? "…" : "—"} />
+          <Stat accent icon="altitude" label={t("Самая высокая точка")} value={maxAltitude ? t("{0} м", maxAltitude) : "—"} />
         </div>
 
         {points.length > 0 && (
           <section className={`${card} flex flex-col gap-4`}>
-            <div>
-              <span className="text-label-sm font-label-sm text-primary uppercase tracking-wider">{t("3D-карта")}</span>
-              <h2 className="text-headline-md font-headline-md text-on-surface">{t("Маршрут на карте")}</h2>
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <span className="text-label-sm font-label-sm text-primary uppercase tracking-wider">{t("3D-карта")}</span>
+                <h2 className="text-headline-md font-headline-md text-on-surface">{t("Маршрут на карте")}</h2>
+              </div>
+              {points.length > 1 && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex bg-surface-container-lowest rounded-lg p-1" role="group">
+                    {TRAVEL_MODES.map((m) => (
+                      <button
+                        key={m.id}
+                        aria-pressed={m.id === modeId}
+                        className={`px-3 py-1.5 rounded-md text-body-sm flex items-center gap-1.5 transition-colors ${
+                          m.id === modeId ? "bg-primary text-on-primary font-semibold" : "text-on-surface-variant hover:text-on-surface"
+                        }`}
+                        onClick={() => setModeId(m.id)}
+                        title={m.label}
+                        type="button"
+                      >
+                        <Icon name={m.icon} className="text-[18px]" />
+                        <span className="hidden sm:inline">{m.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <a
+                    className="press bg-surface-container-high hover:bg-surface-bright text-on-surface text-body-sm px-3 py-2 rounded-lg flex items-center gap-1.5"
+                    href={googleMapsUrl(points, mode)}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    <Icon name="navigation" className="text-[18px] text-primary" /> {t("Открыть в Google Maps")}
+                  </a>
+                </div>
+              )}
             </div>
+            {route?.error && <p className="text-body-sm text-on-surface-variant">{t("Маршрут по дорогам сейчас недоступен — показаны расстояния по прямой.")}</p>}
             <Suspense fallback={<div className="h-[420px] rounded-xl bg-surface-container-lowest animate-pulse" />}>
-              <RouteMap3D onSelect={openPlace} points={points} />
+              <RouteMap3D color={mode.color} onSelect={openPlace} path={road?.geometry} points={points} />
             </Suspense>
           </section>
         )}
@@ -178,7 +239,20 @@ export default function TravelListPage() {
                   {legs[i] !== null && (
                     <div className="flex items-center gap-2 pl-5 py-1 text-label-sm font-label-sm text-outline">
                       <span className="w-px h-5 bg-outline-variant ml-[3px]" />
-                      <Icon name="south" className="text-[14px]" /> {Math.round(legs[i])} {t("км")}
+                      {roadLegs[i] ? (
+                        <>
+                          <span className="flex" style={{ color: mode.color }}>
+                            <Icon name={mode.icon} className="text-[16px]" />
+                          </span>
+                          <span className="text-on-surface-variant">
+                            {t("{0} км", roadLegs[i].distance_km)} · {formatDuration(roadLegs[i].duration_min)}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <Icon name="south" className="text-[14px]" /> {t("{0} км по прямой", Math.round(legs[i]))}
+                        </>
+                      )}
                     </div>
                   )}
                   <div className="flex items-center gap-4 bg-surface-container-lowest/60 rounded-xl p-3">
@@ -191,7 +265,7 @@ export default function TravelListPage() {
                     <button className="flex-1 min-w-0 text-left" onClick={() => openPlace(item.place)} type="button">
                       <span className="block font-title-md text-title-md text-on-surface truncate hover:text-primary">{p.name}</span>
                       <span className="block text-label-sm font-label-sm text-on-surface-variant truncate">
-                        {p.region} · {SEASONS[p.best_season]} · {formatFee(p.entrance_fee)}
+                        {t(p.region)} · {SEASONS[p.best_season]} · {formatFee(p.entrance_fee)}
                         {p.altitude ? t(" · {0} м", p.altitude) : ""}
                       </span>
                       {item.note && <span className="block text-body-sm text-on-surface-variant italic truncate">«{item.note}»</span>}
@@ -213,11 +287,17 @@ export default function TravelListPage() {
               );
             })}
           </ol>
-          {items.length > 0 && (
-            <p className="text-label-sm font-label-sm text-outline">
-              {plural(items.length, [t("остановка"), t("остановки"), t("остановок")])}{t(", около")} {Math.round(total)} {t("км по прямой. Реальная дорога обычно в 1,3–1,8 раза длиннее.")}
-            </p>
-          )}
+          {items.length > 0 &&
+            (road ? (
+              <p className="text-label-sm font-label-sm text-outline">
+                {plural(items.length, [t("остановка"), t("остановки"), t("остановок")])} ·{" "}
+                {t("{0} км по дороге, в пути около {1} ({2}).", Math.round(road.distance_km), formatDuration(road.duration_min), mode.label.toLowerCase())}
+              </p>
+            ) : (
+              <p className="text-label-sm font-label-sm text-outline">
+                {plural(items.length, [t("остановка"), t("остановки"), t("остановок")])}{t(", около")} {Math.round(total)} {t("км по прямой. Реальная дорога обычно в 1,3–1,8 раза длиннее.")}
+              </p>
+            ))}
         </section>
       </div>
     </div>

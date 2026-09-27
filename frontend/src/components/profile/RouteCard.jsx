@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../api.js";
 import { useToast } from "../../context/ToastContext.jsx";
-import { useUi } from "../../context/UiContext.jsx";
 import { formatDate, plural } from "../../utils.js";
 import Icon from "../Icon.jsx";
 import PlaceBackground from "../PlaceBackground.jsx";
@@ -13,39 +12,67 @@ const input =
 const secondaryBtn =
   "bg-surface-container-high hover:bg-surface-bright text-on-surface font-title-md text-body-md px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all";
 
-function NewListForm({ onCreated }) {
+// A new route is made only from places on the site (all in Tajikistan): from one place to another.
+// Its name is made from them, "Искандеркуль → Семь озёр"; more stops can be added in between later.
+function NewRouteForm({ places, onCreated }) {
   const toast = useToast();
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [busy, setBusy] = useState(false);
+  const sorted = [...places].sort((a, b) => a.name.localeCompare(b.name));
 
   async function submit(e) {
     e.preventDefault();
+    const start = places.find((p) => p.id === Number(from));
+    const end = places.find((p) => p.id === Number(to));
+    if (!start || !end) return;
+    if (start.id === end.id) return toast(t("Выберите два разных места."), "error");
+    setBusy(true);
     try {
-      const list = await api("/travel-lists/", { method: "POST", body: { title, description, is_public: false } });
+      const list = await api("/travel-lists/", { method: "POST", body: { title: `${start.name} → ${end.name}`, is_public: false } });
+      await api(`/travel-lists/${list.id}/add-place/`, { method: "POST", body: { place: start.id, order: 0 } });
+      await api(`/travel-lists/${list.id}/add-place/`, { method: "POST", body: { place: end.id, order: 1 } });
       toast(t("Маршрут «{0}» создан", list.title));
-      setTitle("");
-      setDescription("");
+      setFrom("");
+      setTo("");
       onCreated(list.id);
     } catch (err) {
       toast(err.message, "error");
+    } finally {
+      setBusy(false);
     }
   }
 
+  const choose = (value, onChange, placeholder) => (
+    <select className={`${input} flex-1 min-w-0`} onChange={(e) => onChange(e.target.value)} required value={value}>
+      <option value="">{placeholder}</option>
+      {sorted.map((p) => (
+        <option key={p.id} value={p.id}>
+          {p.name}
+        </option>
+      ))}
+    </select>
+  );
+
   return (
-    <form className="flex flex-col sm:flex-row gap-2" onSubmit={submit}>
-      <input className={`${input} flex-1`} onChange={(e) => setTitle(e.target.value)} placeholder={t("Название маршрута")} required value={title} />
-      <input className={`${input} flex-1`} onChange={(e) => setDescription(e.target.value)} placeholder={t("Описание (необязательно)")} value={description} />
-      <button className="bg-primary hover:bg-tertiary-container text-on-primary font-title-md text-body-md px-4 py-2 rounded-lg flex items-center gap-1.5" type="submit">
-        <Icon name="add" className="text-[18px]" /> {t("Создать")}
+    <form className="flex flex-col sm:flex-row sm:items-center gap-2" onSubmit={submit}>
+      {choose(from, setFrom, t("Откуда"))}
+      <Icon name="arrow_forward" className="hidden sm:block text-outline text-[20px] shrink-0" />
+      {choose(to, setTo, t("Куда"))}
+      <button
+        className="bg-primary hover:bg-tertiary-container text-on-primary font-title-md text-body-md px-4 py-2 rounded-lg flex items-center justify-center gap-1.5 disabled:opacity-60"
+        disabled={busy}
+        type="submit"
+      >
+        <Icon name="add_road" className="text-[18px]" /> {t("Создать")}
       </button>
     </form>
   );
 }
 
-// "My travel route": the selected travel list with progress, visited marks and actions.
+// The user's travel lists in the profile: the selected list with its places, visited marks and actions.
 export default function RouteCard({ onChanged }) {
   const toast = useToast();
-  const { openPlace } = useUi();
   const [lists, setLists] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [allPlaces, setAllPlaces] = useState([]);
@@ -81,11 +108,16 @@ export default function RouteCard({ onChanged }) {
 
   const list = lists.find((l) => l.id === selectedId);
   const items = list?.items || [];
-  const visited = items.filter((i) => i.is_visited).length;
-  const percent = items.length ? Math.round((visited * 100) / items.length) : 0;
-  const next = items.find((i) => !i.is_visited);
   const cover = items[0]?.place_detail;
   const available = allPlaces.filter((p) => !items.some((i) => i.place === p.id));
+
+  // A new stop goes before the destination, so the route stays "start → stops → destination".
+  async function addStop(placeId) {
+    const destination = items.length >= 2 ? items[items.length - 1] : null;
+    if (!destination) return api(`/travel-lists/${list.id}/add-place/`, { method: "POST", body: { place: placeId } });
+    await api(`/travel-list-places/${destination.id}/`, { method: "PATCH", body: { order: destination.order + 1 } });
+    return api(`/travel-lists/${list.id}/add-place/`, { method: "POST", body: { place: placeId, order: destination.order } });
+  }
 
   return (
     <div className="bg-surface-container rounded-xl p-6 lg:p-8 shadow-xl relative overflow-hidden">
@@ -100,7 +132,7 @@ export default function RouteCard({ onChanged }) {
               onClick={() => setSelectedId(l.id)}
               type="button"
             >
-              {l.title}
+              {t(l.title)}
             </button>
           ))}
         </div>
@@ -108,30 +140,16 @@ export default function RouteCard({ onChanged }) {
 
       {!list ? (
         <div className="flex flex-col gap-4">
-          <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">{t("МОЙ МАРШРУТ")}</span>
           <h2 className="font-headline-md text-headline-md text-on-surface">{t("У вас пока нет маршрутов")}</h2>
           <p className="text-body-md text-on-surface-variant">{t("Создайте список мест, которые хотите посетить, и отмечайте, где уже были.")}</p>
-          <NewListForm onCreated={(id) => run(() => load(id))} />
+          <NewRouteForm onCreated={(id) => run(() => load(id))} places={allPlaces} />
         </div>
       ) : (
         <>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6">
             <div>
-              <div className="flex items-center gap-2">
-                <span className="bg-secondary-container/20 text-secondary font-label-sm text-label-sm px-2.5 py-0.5 rounded-full">{t("МОЙ МАРШРУТ")}</span>
-                <span className="font-label-sm text-label-sm text-on-surface-variant tracking-wider">REF: #LIST-{list.id}</span>
-              </div>
-              <h2 className="font-headline-lg text-3xl md:text-headline-lg text-on-surface mt-1.5">{list.title}</h2>
-              {list.description && <p className="text-body-sm text-on-surface-variant mt-1">{list.description}</p>}
-            </div>
-            <div className="bg-surface-container-lowest px-4 py-3 rounded-lg flex items-center gap-3 shrink-0">
-              <Icon name="flag" className="text-secondary text-[26px]" />
-              <div>
-                <div className="font-label-sm text-label-sm text-on-surface-variant">{t("ПОСЕЩЕНО")}</div>
-                <div className="font-label-md text-label-md text-on-surface font-semibold">
-                  {visited} / {plural(items.length, [t("места"), t("мест"), t("мест")])}
-                </div>
-              </div>
+              <h2 className="font-headline-lg text-3xl md:text-headline-lg text-on-surface">{t(list.title)}</h2>
+              {list.description && <p className="text-body-sm text-on-surface-variant mt-1">{t(list.description)}</p>}
             </div>
           </div>
 
@@ -153,24 +171,7 @@ export default function RouteCard({ onChanged }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-            <button
-              className="bg-surface-container-low p-4 rounded-xl flex items-center gap-4 text-left disabled:cursor-default"
-              disabled={!next}
-              onClick={() => next && openPlace(next.place)}
-              type="button"
-            >
-              <div className="group relative w-14 h-14 rounded-full overflow-hidden bg-surface-container-highest shrink-0">
-                {next ? <PlaceBackground place={next.place_detail} /> : <Icon name="celebration" className="absolute inset-0 m-auto h-fit w-fit text-primary text-[28px]" />}
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="font-label-sm text-label-sm text-primary">{t("СЛЕДУЮЩЕЕ МЕСТО")}</span>
-                <div className="font-title-md text-title-md text-on-surface truncate">{next ? next.place_detail.name : t("Все места посещены!")}</div>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">
-                  {next ? `${next.place_detail.region} · ${next.place_detail.category || t("Без категории")}` : t("Отличная поездка")}
-                </p>
-              </div>
-            </button>
+          <div className="mt-6">
             <div className="bg-surface-container-low p-4 rounded-xl flex items-center gap-4">
               <div className="w-14 h-14 rounded-full bg-surface-container-highest shrink-0 flex items-center justify-center text-secondary">
                 <Icon name="add_location" className="text-[28px]" />
@@ -189,11 +190,7 @@ export default function RouteCard({ onChanged }) {
                   <button
                     className="bg-secondary text-on-secondary-container px-3 rounded-lg disabled:opacity-40"
                     disabled={!placeToAdd}
-                    onClick={() =>
-                      run(() => api(`/travel-lists/${list.id}/add-place/`, { method: "POST", body: { place: Number(placeToAdd) } }), t("Место добавлено")).then(() =>
-                        setPlaceToAdd("")
-                      )
-                    }
+                    onClick={() => run(() => addStop(Number(placeToAdd)), t("Место добавлено")).then(() => setPlaceToAdd(""))}
                     type="button"
                   >
                     <Icon name="add" className="text-[20px]" />
@@ -204,15 +201,9 @@ export default function RouteCard({ onChanged }) {
           </div>
 
           <div className="mt-6 bg-surface-container-lowest/60 rounded-xl p-4 flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Icon name="checklist" className="text-primary text-[20px]" />
-                <span className="font-title-md text-title-md text-on-surface">{t("Прогресс маршрута")}</span>
-              </div>
-              <span className="font-label-md text-label-md text-primary font-semibold">{percent}{t("% пройдено")}</span>
-            </div>
-            <div className="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
-              <div className="bg-primary h-full rounded-full transition-all duration-500" style={{ width: `${percent}%` }} />
+            <div className="flex items-center gap-2">
+              <Icon name="checklist" className="text-primary text-[20px]" />
+              <span className="font-title-md text-title-md text-on-surface">{t("Места маршрута")}</span>
             </div>
             <div className="flex flex-wrap gap-2 text-body-sm font-body-sm">
               {items.length === 0 && <span className="text-on-surface-variant">{t("Добавьте места в маршрут.")}</span>}
@@ -275,7 +266,7 @@ export default function RouteCard({ onChanged }) {
 
           <div className="mt-6 pt-6 border-t border-outline-variant/50">
             <span className="block font-label-sm text-label-sm text-on-surface-variant mb-2">{t("НОВЫЙ МАРШРУТ")}</span>
-            <NewListForm onCreated={(id) => run(() => load(id))} />
+            <NewRouteForm onCreated={(id) => run(() => load(id))} places={allPlaces} />
           </div>
         </>
       )}

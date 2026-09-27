@@ -3,7 +3,7 @@ import Icon from "./Icon.jsx";
 
 // Photo of the place, or a gradient with the category icon when there is no photo.
 export default function PlaceBackground({ place, className = "" }) {
-  const base = `absolute inset-0 group-hover:scale-105 transition-transform duration-500 ${className}`;
+  const base = `absolute inset-0 group-hover:scale-110 transition-transform duration-700 ease-out ${className}`;
   if (place.main_image) {
     return <div className={`${base} bg-cover bg-center`} style={{ backgroundImage: `url("${place.main_image}")` }} />;
   }

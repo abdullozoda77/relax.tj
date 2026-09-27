@@ -46,13 +46,13 @@ export default function FavoritesCard() {
             <div className="relative h-36 overflow-hidden">
               <PlaceBackground place={p} />
               <span className="absolute top-2 right-2 bg-surface-container-lowest/80 backdrop-blur-md text-primary font-label-sm text-label-sm px-2 py-0.5 rounded">
-                {p.category || t("Место")} · {SEASONS[p.best_season]}
+                {p.category ? t(p.category) : t("Место")} · {SEASONS[p.best_season]}
               </span>
             </div>
             <div className="p-4 flex flex-col gap-2 flex-1">
               <div className="font-title-md text-title-md text-on-surface leading-snug">{p.name}</div>
               <p className="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">
-                {p.region} · {formatFee(p.entrance_fee)}
+                {t(p.region)} · {formatFee(p.entrance_fee)}
               </p>
               <div className="flex items-center justify-between pt-2 mt-auto">
                 <span className="font-label-sm text-label-sm text-secondary flex items-center gap-1">

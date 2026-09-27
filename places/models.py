@@ -56,6 +56,9 @@ class Place(models.Model):
     activities = models.ManyToManyField(Activity, blank=True, related_name="places")
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="created_places")
     name = models.CharField(max_length=255)
+    # Optional translations of the name; the API falls back to `name` (Russian) when empty.
+    name_en = models.CharField(max_length=255, blank=True)
+    name_tg = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
     address = models.CharField(max_length=255, blank=True)
     how_to_get_there = models.TextField(blank=True)
@@ -173,6 +176,9 @@ class PlaceSuggestion(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     address = models.CharField(max_length=255, blank=True)
+    # Where the place is; new suggestions must point inside Tajikistan (checked in the serializer).
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     image = models.ImageField(upload_to="suggestions/", validators=image_validators, blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUSES, default="pending")
     admin_comment = models.TextField(blank=True)

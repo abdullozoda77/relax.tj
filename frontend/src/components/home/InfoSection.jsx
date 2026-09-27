@@ -1,4 +1,5 @@
 import Icon from "../Icon.jsx";
+import Reveal from "../Reveal.jsx";
 import { t } from "../../i18n.js";
 
 const TIPS = [
@@ -20,7 +21,7 @@ export default function InfoSection({ onSuggest }) {
   return (
     <section className="py-24 px-6 lg:px-12 bg-surface scroll-mt-20" id="info">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
-        <div className="lg:col-span-1">
+        <Reveal className="lg:col-span-1">
           <span className="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">{t("Полезно знать")}</span>
           <h2 className="text-3xl md:text-headline-lg font-headline-lg text-white mb-6">{t("Советы путешественнику")}</h2>
           <p className="text-body-md text-slate-400 mb-8 leading-relaxed">
@@ -39,19 +40,21 @@ export default function InfoSection({ onSuggest }) {
               {t("Предложить место")}
             </button>
           </div>
-        </div>
+        </Reveal>
         <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {TIPS.map((tip) => (
-            <div key={tip.title} className="bg-slate-900/70 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between hover:border-slate-700 transition-all">
-              <div>
-                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
-                  <Icon name={tip.icon} className="text-[20px]" />
+          {TIPS.map((tip, i) => (
+            <Reveal key={tip.title} delay={100 + i * 110}>
+              <div className="h-full bg-slate-900/70 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between hover:border-emerald-500/30 hover:-translate-y-1 transition-all duration-500 ease-out">
+                <div>
+                  <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
+                    <Icon name={tip.icon} className="text-[20px]" />
+                  </div>
+                  <h3 className="text-headline-sm font-headline-sm text-white mb-2">{tip.title}</h3>
+                  <p className="text-body-sm text-slate-300 leading-relaxed">{tip.text}</p>
                 </div>
-                <h3 className="text-headline-sm font-headline-sm text-white mb-2">{tip.title}</h3>
-                <p className="text-body-sm text-slate-300 leading-relaxed">{tip.text}</p>
+                <span className="text-label-sm font-label-sm text-emerald-400 mt-4 pt-4 border-t border-slate-800">{tip.footer}</span>
               </div>
-              <span className="text-label-sm font-label-sm text-emerald-400 mt-4 pt-4 border-t border-slate-800">{tip.footer}</span>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

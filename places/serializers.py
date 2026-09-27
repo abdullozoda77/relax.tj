@@ -1,11 +1,36 @@
 from django.db.models import Avg
 from rest_framework import serializers
 from accounts.serializers import UserShortSerializer
+from .geo import in_tajikistan
 from .validators import image_validators
 from .models import (
     Region, Category, Activity, Place, PlaceImage, Favorite,
     Review, ReviewImage, TravelList, TravelListPlace, PlaceSuggestion, Notification,
 )
+
+LANGUAGES = ("en", "tg")  # Russian is the base language of the data
+
+
+def request_language(request):
+    """The site language the client asked for: ?lang=en or the Accept-Language header. Defaults to Russian."""
+    if request is None:
+        return "ru"
+    lang = (request.query_params.get("lang") or request.headers.get("Accept-Language", ""))[:2].lower()
+    return lang if lang in LANGUAGES else "ru"
+
+
+def place_name(place, request):
+    """The place name in the requested language, or the Russian name when there is no translation."""
+    lang = request_language(request)
+    return (lang != "ru" and getattr(place, f"name_{lang}", "")) or place.name
+
+
+class LocalizedNameMixin(serializers.Serializer):
+    name = serializers.SerializerMethodField()
+
+    def get_name(self, obj):
+        return place_name(obj, self.context.get("request"))
+
 
 class RegionSerializer(serializers.ModelSerializer):
     places_count = serializers.SerializerMethodField()
@@ -67,7 +92,7 @@ class PlaceRatingMixin(serializers.Serializer):
             return False
         return obj.favorited_by.filter(user=request.user).exists()
 
-class PlaceListSerializer(PlaceRatingMixin, serializers.ModelSerializer):
+class PlaceListSerializer(LocalizedNameMixin, PlaceRatingMixin, serializers.ModelSerializer):
     region = serializers.CharField(source="region.name", read_only=True)
     category = serializers.CharField(source="category.name", read_only=True, default=None)
     main_image = serializers.SerializerMethodField()
@@ -88,7 +113,9 @@ class PlaceListSerializer(PlaceRatingMixin, serializers.ModelSerializer):
         request = self.context.get("request")
         return request.build_absolute_uri(image.image.url) if request else image.image.url
 
-class PlaceDetailSerializer(PlaceRatingMixin, serializers.ModelSerializer):
+class PlaceDetailSerializer(LocalizedNameMixin, PlaceRatingMixin, serializers.ModelSerializer):
+    # The original names for the admin edit form; `name` is already in the visitor's language.
+    name_ru = serializers.CharField(source="name", read_only=True)
     region = RegionSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
     activities = ActivitySerializer(many=True, read_only=True)
@@ -98,7 +125,7 @@ class PlaceDetailSerializer(PlaceRatingMixin, serializers.ModelSerializer):
     class Meta:
         model = Place
         fields = [
-            "id", "name", "description", "region", "category", "activities", "images",
+            "id", "name", "name_ru", "name_en", "name_tg", "description", "region", "category", "activities", "images",
             "address", "how_to_get_there", "latitude", "longitude", "altitude",
             "best_season", "entrance_fee", "views_count", "average_rating", "reviews_count",
             "is_favorite", "is_active", "created_by", "created_at", "updated_at",
@@ -110,7 +137,7 @@ class PlaceWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Place
         fields = [
-            "id", "name", "description", "region", "category", "activities",
+            "id", "name", "name_en", "name_tg", "description", "region", "category", "activities",
             "address", "how_to_get_there", "latitude", "longitude", "altitude",
             "best_season", "entrance_fee", "is_active",
         ]
@@ -124,6 +151,15 @@ class PlaceWriteSerializer(serializers.ModelSerializer):
         if value is not None and not -180 <= value <= 180:
             raise serializers.ValidationError("Longitude must be between -180 and 180.")
         return value
+
+    def validate(self, attrs):
+        # Places on the site must be in Tajikistan; checked when the point is set or changed.
+        lat = attrs.get("latitude", getattr(self.instance, "latitude", None))
+        lng = attrs.get("longitude", getattr(self.instance, "longitude", None))
+        changed = "latitude" in attrs or "longitude" in attrs
+        if changed and lat is not None and lng is not None and not in_tajikistan(lat, lng):
+            raise serializers.ValidationError({"location": OUTSIDE_TAJIKISTAN})
+        return attrs
 
     def validate_entrance_fee(self, value):
         if value < 0:
@@ -140,7 +176,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     author = UserShortSerializer(source="user", read_only=True)
-    place_name = serializers.CharField(source="place.name", read_only=True)
+    place_name = serializers.SerializerMethodField()
     images = ReviewImageSerializer(many=True, read_only=True)
     # Send photos as multipart form data: uploaded_images=<file> several times.
     uploaded_images = serializers.ListField(
@@ -153,6 +189,9 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ["id", "user", "author", "place", "place_name", "rating", "comment", "images", "uploaded_images", "created_at", "updated_at"]
+
+    def get_place_name(self, obj):
+        return place_name(obj.place, self.context.get("request"))
 
     def create(self, validated_data):
         files = validated_data.pop("uploaded_images", [])
@@ -204,15 +243,27 @@ class TravelListSerializer(serializers.ModelSerializer):
     def get_places_count(self, obj):
         return obj.items.count()
 
+OUTSIDE_TAJIKISTAN = "This point is outside Tajikistan. Only places in Tajikistan can be added."
+
+
 class PlaceSuggestionSerializer(serializers.ModelSerializer):
     user = UserShortSerializer(read_only=True)
+    # The point on the map is required: it is how we know the place really is in Tajikistan.
+    latitude = serializers.DecimalField(max_digits=9, decimal_places=6)
+    longitude = serializers.DecimalField(max_digits=9, decimal_places=6)
+
     class Meta:
         model = PlaceSuggestion
         fields = [
             "id", "user", "name", "description", "region", "category",
-            "address", "image", "status", "admin_comment", "created_at",
+            "address", "latitude", "longitude", "image", "status", "admin_comment", "created_at",
         ]
         read_only_fields = ["status", "admin_comment"]
+
+    def validate(self, attrs):
+        if not in_tajikistan(attrs["latitude"], attrs["longitude"]):
+            raise serializers.ValidationError({"location": OUTSIDE_TAJIKISTAN})
+        return attrs
 
 class PlaceSuggestionReviewSerializer(serializers.ModelSerializer):
     class Meta:

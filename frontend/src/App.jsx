@@ -26,6 +26,16 @@ function ScrollToHash() {
   return null;
 }
 
+// Each new page fades in. Keyed by path, so changing only the #hash does not replay it.
+function PageTransition({ children }) {
+  const { pathname } = useLocation();
+  return (
+    <div key={pathname} className="page-enter">
+      {children}
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <ToastProvider>
@@ -35,14 +45,16 @@ export default function App() {
             <ScrollToHash />
             <Header />
             <main className="w-full pt-20 bg-surface min-h-screen">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/places/:id" element={<PlaceDetail />} />
-                <Route path="/lists/:id" element={<TravelListPage />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/admin-panel" element={<AdminPanel />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-              </Routes>
+              <PageTransition>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/places/:id" element={<PlaceDetail />} />
+                  <Route path="/lists/:id" element={<TravelListPage />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/admin-panel" element={<AdminPanel />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                </Routes>
+              </PageTransition>
             </main>
             <Footer />
           </div>

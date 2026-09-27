@@ -4,9 +4,10 @@ import { createViewer, pin } from "./cesium.js";
 import Icon from "./Icon.jsx";
 import { t } from "../i18n.js";
 
-// 3D map of a route: numbered pins for every stop and a dashed line between them.
+// 3D map of a route: numbered pins for every stop and the road between them.
 // points: [{ id, name, lat, lng, visited }]
-export default function RouteMap3D({ points, onSelect }) {
+// path: [[lng, lat], …] along the roads (from /api/route/); without it a dashed straight line is drawn.
+export default function RouteMap3D({ points, onSelect, path, color = "#f59e0b" }) {
   const box = useRef(null);
   const container = useRef(null);
   const viewerRef = useRef(null);
@@ -32,18 +33,6 @@ export default function RouteMap3D({ points, onSelect }) {
         properties: { placeId: p.id },
       });
     });
-    if (positions.length > 1) {
-      viewer.entities.add({
-        polyline: {
-          positions,
-          width: 4,
-          clampToGround: true,
-          arcType: ArcType.GEODESIC,
-          material: new PolylineDashMaterialProperty({ color: Color.fromCssColorString("#f59e0b"), dashLength: 18 }),
-        },
-      });
-    }
-
     // Clicking a pin opens that place.
     viewer.selectedEntityChanged.addEventListener((entity) => {
       const placeId = entity?.properties?.placeId?.getValue();
@@ -54,6 +43,25 @@ export default function RouteMap3D({ points, onSelect }) {
     showAll(viewer, positions, 0);
     return () => viewer.destroy();
   }, [points, onSelect]);
+
+  // The route line: the road when it is known, otherwise a dashed straight line between the stops.
+  useEffect(() => {
+    const viewer = viewerRef.current;
+    if (!viewer || viewer.isDestroyed()) return;
+    viewer.entities.removeById("route");
+    const road = path?.length > 1;
+    if (!road && points.length < 2) return;
+    viewer.entities.add({
+      id: "route",
+      polyline: {
+        positions: road ? Cartesian3.fromDegreesArray(path.flat()) : points.map((p) => Cartesian3.fromDegrees(p.lng, p.lat)),
+        width: road ? 6 : 4,
+        clampToGround: true,
+        arcType: ArcType.GEODESIC,
+        material: road ? Color.fromCssColorString(color) : new PolylineDashMaterialProperty({ color: Color.fromCssColorString(color), dashLength: 18 }),
+      },
+    });
+  }, [points, path, color]);
 
   function showAll(viewer, positions, duration = 1.5) {
     if (!positions.length) return;

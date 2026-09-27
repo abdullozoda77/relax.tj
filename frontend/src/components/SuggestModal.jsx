@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { api } from "../api.js";
 import { useToast } from "../context/ToastContext.jsx";
 import { inputClass } from "./AuthModal.jsx";
+import LocationPicker from "./LocationPicker.jsx";
+import { inTajikistanBox } from "../utils.js";
 import Modal from "./Modal.jsx";
 import { t } from "../i18n.js";
 
@@ -31,6 +33,7 @@ export default function SuggestModal({ name = "", onClose }) {
   const [categories, setCategories] = useState([]);
   const [mine, setMine] = useState([]);
   const [busy, setBusy] = useState(false);
+  const [location, setLocation] = useState(null); // { lat, lng } chosen on the map
 
   useEffect(() => {
     api("/regions/?page_size=100").then((d) => setRegions(d.results)).catch(() => {});
@@ -40,7 +43,12 @@ export default function SuggestModal({ name = "", onClose }) {
 
   async function submit(e) {
     e.preventDefault();
+    // Only places in Tajikistan: the point on the map is required (the server checks the exact border).
+    if (!location) return toast(t("Отметьте место на карте."), "error");
+    if (!inTajikistanBox(location)) return toast(t("Это место за пределами Таджикистана. Добавлять можно только места в Таджикистане."), "error");
     const data = new FormData(e.target);
+    data.set("latitude", location.lat.toFixed(6));
+    data.set("longitude", location.lng.toFixed(6));
     if (!data.get("image")?.size) data.delete("image");
     setBusy(true);
     try {
@@ -62,13 +70,16 @@ export default function SuggestModal({ name = "", onClose }) {
           <Label text={t("Название *")}>
             <input className={inputClass} defaultValue={name} name="name" required />
           </Label>
+          <Label text={t("Где находится место *")}>
+            <LocationPicker onChange={setLocation} value={location} />
+          </Label>
           <div className="grid grid-cols-2 gap-3">
             <Label text={t("Регион")}>
               <select className={inputClass} name="region">
                 <option value="">—</option>
                 {regions.map((r) => (
                   <option key={r.id} value={r.id}>
-                    {r.name}
+                    {t(r.name)}
                   </option>
                 ))}
               </select>
@@ -78,7 +89,7 @@ export default function SuggestModal({ name = "", onClose }) {
                 <option value="">—</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.name}
+                    {t(c.name)}
                   </option>
                 ))}
               </select>

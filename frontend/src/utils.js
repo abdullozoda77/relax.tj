@@ -96,3 +96,34 @@ export function distanceKm(lat1, lng1, lat2, lng2) {
   const a = Math.sin((rad(lat2) - rad(lat1)) / 2) ** 2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin((rad(lng2) - rad(lng1)) / 2) ** 2;
   return 6371 * 2 * Math.asin(Math.sqrt(a));
 }
+
+// Travel time from minutes: "45 мин", "3 ч 29 мин", "1 д 5 ч".
+export function formatDuration(minutes) {
+  const m = Math.max(0, Math.round(minutes));
+  if (m < 60) return t("{0} мин", m);
+  const days = Math.floor(m / 1440);
+  const hours = Math.floor((m % 1440) / 60);
+  if (days) return hours ? t("{0} д {1} ч", days, hours) : t("{0} д", days);
+  return m % 60 ? t("{0} ч {1} мин", hours, m % 60) : t("{0} ч", hours);
+}
+
+// Ways to travel a route: the router profile, the Google Maps travel mode and the line colour on the map.
+export const TRAVEL_MODES = [
+  { id: "car", icon: "directions_car", label: t("На машине"), google: "driving", color: "#f59e0b" },
+  { id: "foot", icon: "directions_walk", label: t("Пешком"), google: "walking", color: "#10b981" },
+  { id: "bike", icon: "directions_bike", label: t("На велосипеде"), google: "bicycling", color: "#0ea5e9" },
+];
+
+// A box around Tajikistan, the same as in the backend (places/geo.py). It gives a quick hint on the map;
+// the server checks the exact border when a place is sent.
+export const TAJIKISTAN_BOX = { lat: [36.6, 41.1], lng: [67.3, 75.2] };
+export const inTajikistanBox = ({ lat, lng }) =>
+  lat >= TAJIKISTAN_BOX.lat[0] && lat <= TAJIKISTAN_BOX.lat[1] && lng >= TAJIKISTAN_BOX.lng[0] && lng <= TAJIKISTAN_BOX.lng[1];
+
+// Google Maps turn-by-turn directions through the points ({ lat, lng }) in order.
+export function googleMapsUrl(points, mode) {
+  const at = (p) => `${p.lat},${p.lng}`;
+  const q = new URLSearchParams({ api: "1", origin: at(points[0]), destination: at(points[points.length - 1]), travelmode: mode.google });
+  if (points.length > 2) q.set("waypoints", points.slice(1, -1).map(at).join("|"));
+  return `https://www.google.com/maps/dir/?${q}`;
+}

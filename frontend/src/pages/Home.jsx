@@ -24,7 +24,6 @@ export default function Home() {
   const [nearby, setNearby] = useState(null);
   const [regions, setRegions] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [stats, setStats] = useState({});
 
   // The search text lives in the URL (?search=...), so the header and footer links can change it.
   useEffect(() => {
@@ -35,10 +34,6 @@ export default function Home() {
   useEffect(() => {
     api("/regions/?page_size=100").then((d) => setRegions(d.results)).catch(() => {});
     api("/categories/?page_size=100").then((d) => setCategories(d.results)).catch(() => {});
-    const count = (path) => api(`${path}?page_size=1`).then((d) => d.count).catch(() => "—");
-    Promise.all([count("/places/"), count("/regions/"), count("/activities/")]).then(([places, regionsCount, activities]) =>
-      setStats({ places, regions: regionsCount, activities })
-    );
   }, []);
 
   // Any filter change leaves the "nearby" mode.
@@ -96,7 +91,7 @@ export default function Home() {
 
   return (
     <>
-      <Hero onNearby={findNearby} stats={stats} />
+      <Hero onNearby={findNearby} />
       <PlacesSection
         categories={categories}
         filters={filters}

@@ -43,13 +43,7 @@ export default function ProfileHeader({ user }) {
       <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-primary/5 via-primary/0 to-transparent pointer-events-none" />
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-          <div className="relative">
-            <Avatar user={user} />
-            <div className="absolute -bottom-1 -right-1 bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md">
-              <Icon name="workspace_premium" filled className="text-[13px]" />
-              <span>{isAdmin ? t("АДМИН") : t("УРОВЕНЬ {0}", Math.min(1 + Math.floor((stats.reviews || 0) / 3), 5))}</span>
-            </div>
-          </div>
+          <Avatar user={user} />
           <div className="flex flex-col gap-1.5">
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="font-headline-lg text-3xl md:text-headline-lg text-on-surface">{fullName || user.username}</h1>

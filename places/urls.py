@@ -17,5 +17,6 @@ router.register("notifications", views.NotificationViewSet, basename="notificati
 
 urlpatterns = [
     path("stats/", views.StatsView.as_view(), name="stats"),
+    path("route/", views.RouteView.as_view(), name="route"),
     path("", include(router.urls)),
 ]

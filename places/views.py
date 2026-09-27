@@ -1,4 +1,7 @@
+import json
 import math
+import urllib.request
+from django.core.cache import cache
 from django.db import transaction
 from django.db.models import Avg, Count, Exists, F, Max, OuterRef, ProtectedError, Q, Value, BooleanField
 from drf_yasg import openapi
@@ -20,7 +23,7 @@ from .serializers import (
     ActivitySerializer, CategorySerializer, FavoriteSerializer, NotificationSerializer, PlaceDetailSerializer,
     PlaceImageSerializer, PlaceListSerializer, PlaceSuggestionSerializer, PlaceWriteSerializer,
     RegionSerializer, RejectSerializer, ReviewSerializer, SuggestionApproveSerializer,
-    TravelListAddPlaceSerializer, TravelListPlaceSerializer, TravelListSerializer,
+    TravelListAddPlaceSerializer, TravelListPlaceSerializer, TravelListSerializer, place_name,
 )
 
 def distance_km(lat1, lng1, lat2, lng2):
@@ -96,7 +99,7 @@ class ActivityViewSet(PlacesOfMixin, viewsets.ModelViewSet):
 class PlaceViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
     filterset_class = PlaceFilter
-    search_fields = ["name", "description", "address", "region__name", "category__name", "activities__name"]
+    search_fields = ["name", "name_en", "name_tg", "description", "address", "region__name", "category__name", "activities__name"]
     ordering_fields = ["name", "created_at", "entrance_fee", "altitude", "views_count", "avg_rating", "reviews_total", "favorites_total"]
     ordering = ["-created_at"]
 
@@ -477,6 +480,8 @@ class PlaceSuggestionViewSet(viewsets.ModelViewSet):
                 name=suggestion.name,
                 description=suggestion.description,
                 address=suggestion.address,
+                latitude=suggestion.latitude,
+                longitude=suggestion.longitude,
                 region=region,
                 category=category,
                 created_by=suggestion.user,
@@ -523,6 +528,89 @@ class PlaceSuggestionViewSet(viewsets.ModelViewSet):
         )
         return Response(PlaceSuggestionSerializer(suggestion, context={"request": request}).data)
 
+# Road routes come from the public OSRM servers of OpenStreetMap (FOSSGIS); no API key is needed.
+ROUTING_URL = "https://routing.openstreetmap.de/routed-{mode}/route/v1/{profile}/{coords}?overview=full&geometries=geojson"
+ROUTING_PROFILES = {"car": "driving", "foot": "foot", "bike": "bike"}
+ROUTING_MAX_POINTS = 25
+ROUTING_CACHE_SECONDS = 60 * 60 * 24  # roads rarely change; this also keeps the load on the free servers low
+
+
+def simplify_line(points, tolerance=0.00015):
+    """Ramer–Douglas–Peucker: drops points that lie within `tolerance` degrees (~15 m) of the line.
+    A road of 6000 points becomes a few hundred without visible change."""
+    if len(points) < 3:
+        return points
+    keep = [False] * len(points)
+    keep[0] = keep[-1] = True
+    stack = [(0, len(points) - 1)]
+    while stack:
+        first, last = stack.pop()
+        (x1, y1), (x2, y2) = points[first], points[last]
+        dx, dy = x2 - x1, y2 - y1
+        length = math.hypot(dx, dy) or 1e-12
+        far, far_dist = None, tolerance
+        for i in range(first + 1, last):
+            x, y = points[i]
+            dist = abs(dy * x - dx * y + x2 * y1 - y2 * x1) / length
+            if dist > far_dist:
+                far, far_dist = i, dist
+        if far is not None:
+            keep[far] = True
+            stack += [(first, far), (far, last)]
+    return [p for p, k in zip(points, keep) if k]
+
+
+class RouteView(APIView):
+    """Road route through the given points: total and per-leg distance and time, and the line to draw on a map."""
+
+    permission_classes = [permissions.AllowAny]
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter("mode", openapi.IN_QUERY, type=openapi.TYPE_STRING, enum=list(ROUTING_PROFILES), default="car"),
+            openapi.Parameter(
+                "points", openapi.IN_QUERY, type=openapi.TYPE_STRING, required=True,
+                description="lng,lat;lng,lat;… — from 2 to 25 points in the order of the trip",
+            ),
+        ],
+    )
+    def get(self, request):
+        mode = request.query_params.get("mode", "car")
+        if mode not in ROUTING_PROFILES:
+            raise ValidationError({"mode": f"Use one of: {', '.join(ROUTING_PROFILES)}."})
+        try:
+            points = [tuple(float(x) for x in p.split(",")) for p in request.query_params.get("points", "").split(";") if p]
+            valid = all(len(p) == 2 and -180 <= p[0] <= 180 and -90 <= p[1] <= 90 for p in points)
+        except ValueError:
+            valid = False
+        if not valid or not 2 <= len(points) <= ROUTING_MAX_POINTS:
+            raise ValidationError({"points": f"Give 2 to {ROUTING_MAX_POINTS} points as lng,lat;lng,lat."})
+
+        coords = ";".join(f"{lng:.5f},{lat:.5f}" for lng, lat in points)
+        key = f"route:{mode}:{coords}"
+        data = cache.get(key)
+        if data is None:
+            url = ROUTING_URL.format(mode=mode, profile=ROUTING_PROFILES[mode], coords=coords)
+            try:
+                req = urllib.request.Request(url, headers={"User-Agent": "Relax.tj travel site"})
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    osrm = json.load(resp)
+            except (OSError, ValueError):
+                return Response({"detail": "The routing service is not available right now."}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+            if osrm.get("code") != "Ok" or not osrm.get("routes"):
+                return Response({"detail": "No road route was found between these places."}, status=status.HTTP_404_NOT_FOUND)
+            route = osrm["routes"][0]
+            data = {
+                "mode": mode,
+                "distance_km": round(route["distance"] / 1000, 1),
+                "duration_min": round(route["duration"] / 60),
+                "legs": [{"distance_km": round(leg["distance"] / 1000, 1), "duration_min": round(leg["duration"] / 60)} for leg in route["legs"]],
+                "geometry": simplify_line(route["geometry"]["coordinates"]),  # [[lng, lat], …] along the roads
+            }
+            cache.set(key, data, ROUTING_CACHE_SECONDS)
+        return Response(data)
+
+
 class StatsView(APIView):
     permission_classes = [IsAdmin]
 
@@ -548,7 +636,7 @@ class StatsView(APIView):
                 Region.objects.annotate(places_total=Count("places")).values("id", "name", "places_total")
             ),
             "top_places": [
-                {"id": p.id, "name": p.name, "average_rating": round(p.avg_rating, 1), "reviews": p.reviews_total}
+                {"id": p.id, "name": place_name(p, request), "average_rating": round(p.avg_rating, 1), "reviews": p.reviews_total}
                 for p in top_places
             ],
         })

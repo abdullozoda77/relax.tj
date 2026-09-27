@@ -63,7 +63,7 @@ export default function StatsTab({ onOpenSuggestions }) {
             {stats.places_by_region.map((r) => (
               <div key={r.id}>
                 <div className="flex justify-between text-body-sm text-on-surface-variant mb-1">
-                  <span>{r.name}</span>
+                  <span>{t(r.name)}</span>
                   <span className="text-on-surface">{r.places_total}</span>
                 </div>
                 <div className="h-2 rounded-full bg-surface-container-highest overflow-hidden">

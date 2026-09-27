@@ -3,7 +3,9 @@ from pathlib import Path
 from django.core.files import File
 from django.core.management.base import BaseCommand
 
-from places.models import Activity, Category, Place, PlaceImage, Region
+from accounts.models import User
+from places.models import Activity, Category, Place, PlaceImage, Region, TravelList, TravelListPlace
+from places.place_names import NAMES
 
 from ._details import DETAILS
 from ._new_places import NEW_PLACES
@@ -55,6 +57,35 @@ PLACES = [
 ]
 
 
+# Ready-made public routes shown in "Popular routes": title, description, stops in the order of the trip.
+# They belong to the site's own account; titles and descriptions are translated in the frontend.
+# The home page shows the newest routes first, so they are created from the last of this list to the first.
+ROUTES_OWNER = "relaxtj"
+ROUTES = [
+    ("Фанские горы за 3 дня", "Из Душанбе через Анзобский перевал к Искандеркулю, Алаудинским и Куликалонским озёрам и к Семи озёрам.", [
+        "Варзобское ущелье", "Анзобский перевал", "Искандеркуль", "Фанские горы и Алаудинские озёра",
+        "Куликалонские озёра", "Семь озёр (Маргузор)", "Древний Пенджикент",
+    ]),
+    ("Памирский тракт", "Хорог, Ваханский коридор с древними крепостями и высокогорные озёра Восточного Памира.", [
+        "Хорог и Памирский ботанический сад", "Ваханский коридор и ступа Вранг", "Крепость Каахка",
+        "Крепость Ямчун и источник Биби Фатима", "Кишлак Лянгар и петроглифы", "Озеро Булункуль", "Аличур",
+        "Мургаб", "Перевал Ак-Байтал (Памирский тракт)", "Озеро Каракуль",
+    ]),
+    ("Душанбе за один день", "Главные места столицы: парки, музеи и площадь с самым высоким флагштоком.", [
+        "Ботанический сад Душанбе", "Парк Рудаки", "Национальный музей древностей", "Флагшток и площадь Дусти",
+        "Национальный музей Таджикистана", "Кохи Навруз",
+    ]),
+    ("Север: Худжанд и Истаравшан", "Кайраккумское море, древний Худжанд и старый город Истаравшана.", [
+        "Искусственное озеро Кайраккум", "Худжандская крепость", "Центр Худжанда: мавзолей Муслихиддина и Панчшанбе",
+        "Исторический центр Истаравшана",
+    ]),
+    ("Юг: Хатлон", "Нурекское море, крепость Хульбук, древние буддийские и греческие памятники и заповедник Тигровая балка.", [
+        "Нурекское водохранилище", "Крепость Хульбук", "Куляб и мавзолей Хамадони", "Аджина-Тепа", "Тахти-Сангин",
+        "Заповедник Тигровая балка",
+    ]),
+]
+
+
 class Command(BaseCommand):
     help = "Заполняет базу регионами, категориями, активностями и местами Таджикистана"
 
@@ -95,13 +126,40 @@ class Command(BaseCommand):
             if is_new:
                 place.activities.set(activities[a] for a in acts)
                 created += 1
+            # English and Tajik names; places that already have them are left as they are.
+            if name in NAMES and not (place.name_en or place.name_tg):
+                place.name_en, place.name_tg = NAMES[name]
+                place.save(update_fields=["name_en", "name_tg"])
 
         photos_added = sum(self.add_details(name, info) for name, info in details.items())
+        routes_added = self.add_routes()
 
         self.stdout.write(self.style.SUCCESS(
             f"Регионов: {len(regions)}, категорий: {len(categories)}, "
-            f"активностей: {len(activities)}, новых мест: {created}, новых фото: {photos_added}"
+            f"активностей: {len(activities)}, новых мест: {created}, новых фото: {photos_added}, "
+            f"новых маршрутов: {routes_added}"
         ))
+
+    def add_routes(self):
+        """Creates the ready-made public routes that do not exist yet. Returns how many were created."""
+        owner, is_new = User.objects.get_or_create(username=ROUTES_OWNER, defaults={"first_name": "Relax.tj"})
+        if is_new:
+            owner.set_unusable_password()  # nobody logs in with this account
+            owner.save()
+        added = 0
+        for title, description, stops in reversed(ROUTES):
+            travel_list, is_new = TravelList.objects.get_or_create(
+                user=owner, title=title, defaults={"description": description, "is_public": True}
+            )
+            if not is_new:
+                continue
+            places = {p.name: p for p in Place.objects.filter(name__in=stops)}
+            TravelListPlace.objects.bulk_create(
+                TravelListPlace(travel_list=travel_list, place=places[name], order=i)
+                for i, name in enumerate(stops) if name in places
+            )
+            added += 1
+        return added
 
     def add_details(self, name, info):
         """Fills empty text fields and adds photos if the place has none yet. Returns the number of photos added."""

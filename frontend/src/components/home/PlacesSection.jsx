@@ -3,6 +3,7 @@ import { api } from "../../api.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { SEASONS } from "../../utils.js";
 import Icon from "../Icon.jsx";
+import Reveal from "../Reveal.jsx";
 import PlaceCard, { SkeletonCards } from "../PlaceCard.jsx";
 import { t } from "../../i18n.js";
 
@@ -86,7 +87,7 @@ export default function PlacesSection({ filters, setFilters, onReset, regions, c
   return (
     <section className="py-24 px-6 lg:px-12 bg-surface relative scroll-mt-20" id="places">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+        <Reveal className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
           <div>
             <span className="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">{t("Куда поехать")}</span>
             <h2 className="text-3xl md:text-headline-lg font-headline-lg text-white">
@@ -96,7 +97,7 @@ export default function PlacesSection({ filters, setFilters, onReset, regions, c
           <p className="text-body-md text-slate-400 max-w-md">
             {t("Выбирайте по региону, категории и сезону. Нажмите на карточку, чтобы увидеть подробности и отзывы.")}
           </p>
-        </div>
+        </Reveal>
 
         <div className="flex flex-wrap gap-3 items-center mb-6">
           <select className={select} onChange={(e) => update({ region: e.target.value })} value={filters.region}>
@@ -144,8 +145,21 @@ export default function PlacesSection({ filters, setFilters, onReset, regions, c
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {nearby && !nearby.places && <SkeletonCards />}
-          {nearby?.places?.map((p) => <PlaceCard key={p.id} place={p} />)}
-          {!nearby && (loading ? <SkeletonCards /> : places.map((p) => <PlaceCard key={p.id} place={p} />))}
+          {nearby?.places?.map((p, i) => (
+            <Reveal key={p.id} delay={(i % 3) * 110}>
+              <PlaceCard place={p} />
+            </Reveal>
+          ))}
+          {!nearby &&
+            (loading ? (
+              <SkeletonCards />
+            ) : (
+              places.map((p, i) => (
+                <Reveal key={p.id} delay={(i % 3) * 110}>
+                  <PlaceCard place={p} />
+                </Reveal>
+              ))
+            ))}
         </div>
         {error && <p className="text-center text-rose-300 py-16">{error}</p>}
         {!loading && !error && (nearby ? nearby.places?.length === 0 : places.length === 0) && (

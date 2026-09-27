@@ -70,7 +70,7 @@ function SuggestionCard({ s, regions, categories, onDone }) {
                 <option value="">{t("— выберите —")}</option>
                 {regions.map((r) => (
                   <option key={r.id} value={r.id}>
-                    {r.name}
+                    {t(r.name)}
                   </option>
                 ))}
               </select>
@@ -80,7 +80,7 @@ function SuggestionCard({ s, regions, categories, onDone }) {
                 <option value="">{t("— без категории —")}</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.name}
+                    {t(c.name)}
                   </option>
                 ))}
               </select>

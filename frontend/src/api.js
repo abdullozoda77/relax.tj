@@ -1,4 +1,4 @@
-import { t } from "./i18n.js";
+import { lang, t } from "./i18n.js";
 // API calls to Django with JWT tokens. Tokens are stored in localStorage.
 
 const API = "/api";
@@ -38,13 +38,20 @@ async function refreshAccessToken() {
   return true;
 }
 
+// Server messages that are shown to visitors, in the site language.
+const SERVER_MESSAGES = {
+  "This point is outside Tajikistan. Only places in Tajikistan can be added.": t(
+    "Это место за пределами Таджикистана. Добавлять можно только места в Таджикистане."
+  ),
+};
+
 export function errorText(data) {
   if (!data) return "";
-  if (typeof data === "string") return data;
+  if (typeof data === "string") return SERVER_MESSAGES[data] || data;
   if (data.detail) return data.detail;
   return Object.values(data)
     .flat()
-    .map((m) => (typeof m === "string" ? m : errorText(m)))
+    .map((m) => (typeof m === "string" ? SERVER_MESSAGES[m] || m : errorText(m)))
     .join(" ");
 }
 
@@ -55,7 +62,8 @@ export async function api(path, { method = "GET", body } = {}) {
   const payload = body && !isForm ? JSON.stringify(body) : body;
 
   const send = () => {
-    const headers = {};
+    // The API returns place names in the site language (Russian when there is no translation).
+    const headers = { "Accept-Language": lang };
     if (body && !isForm) headers["Content-Type"] = "application/json";
     if (tokens.access) headers.Authorization = `Bearer ${tokens.access}`;
     return fetch(API + path, { method, headers, body: payload });

@@ -11,6 +11,8 @@ import { t } from "../../i18n.js";
 
 const EMPTY_PLACE = {
   name: "",
+  name_en: "",
+  name_tg: "",
   region: "",
   category: "",
   activities: [],
@@ -120,6 +122,7 @@ function PlaceEditor({ placeId, regions, categories, activities, onClose, onSave
         setForm({
           ...EMPTY_PLACE,
           ...Object.fromEntries(Object.keys(EMPTY_PLACE).map((k) => [k, p[k] ?? EMPTY_PLACE[k]])),
+          name: p.name_ru, // `name` comes in the site language; the form edits the original Russian one
           region: p.region.id,
           category: p.category?.id || "",
           activities: p.activities.map((a) => a.id),
@@ -165,12 +168,18 @@ function PlaceEditor({ placeId, regions, categories, activities, onClose, onSave
             <Label className="sm:col-span-2" text={t("НАЗВАНИЕ *")}>
               <input className={input} onChange={set("name")} required value={form.name} />
             </Label>
+            <Label text={t("НАЗВАНИЕ (АНГЛ.)")}>
+              <input className={input} onChange={set("name_en")} placeholder="Iskanderkul" value={form.name_en} />
+            </Label>
+            <Label text={t("НАЗВАНИЕ (ТАДЖ.)")}>
+              <input className={input} onChange={set("name_tg")} placeholder="Искандаркӯл" value={form.name_tg} />
+            </Label>
             <Label text={t("РЕГИОН *")}>
               <select className={input} onChange={set("region")} required value={form.region}>
                 <option value="">{t("— выберите —")}</option>
                 {regions.map((r) => (
                   <option key={r.id} value={r.id}>
-                    {r.name}
+                    {t(r.name)}
                   </option>
                 ))}
               </select>
@@ -180,7 +189,7 @@ function PlaceEditor({ placeId, regions, categories, activities, onClose, onSave
                 <option value="">{t("— без категории —")}</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.name}
+                    {t(c.name)}
                   </option>
                 ))}
               </select>
@@ -231,7 +240,7 @@ function PlaceEditor({ placeId, regions, categories, activities, onClose, onSave
                     onClick={() => toggleActivity(a.id)}
                     type="button"
                   >
-                    {a.name}
+                    {t(a.name)}
                   </button>
                 ))}
               </div>
@@ -328,7 +337,7 @@ export default function PlacesTab() {
                 {!p.is_active && <span className="text-[10px] font-bold text-rose-300 bg-rose-500/15 px-1.5 py-0.5 rounded">{t("СКРЫТО")}</span>}
               </div>
               <span className="text-label-sm font-label-sm text-on-surface-variant">
-                {p.region} · {p.category || t("без категории")} · {formatFee(p.entrance_fee)} · ★ {formatRating(p.average_rating)} · 👁 {p.views_count}
+                {t(p.region)} · {p.category ? t(p.category) : t("без категории")} · {formatFee(p.entrance_fee)} · ★ {formatRating(p.average_rating)} · 👁 {p.views_count}
               </span>
             </div>
             <div className="flex gap-1 shrink-0">

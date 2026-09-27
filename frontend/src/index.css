@@ -159,3 +159,152 @@ body {
 .cesium-viewer .cesium-credit-logoContainer img {
   height: 14px;
 }
+
+/* Liquid glass: frosted panel with a thin light edge (hero buttons and the header over the hero). */
+.liquid-glass,
+.liquid-glass-dark {
+  background-color: rgba(0, 0, 0, 0.4);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+/* The header's dropdown menus must be able to leave the bar, so only the hero glass clips. */
+.liquid-glass-dark {
+  overflow: hidden;
+}
+.liquid-glass::before,
+.liquid-glass-dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.1) 20%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0.1) 80%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+/* The header follows the site theme, so in the light theme its glass is light too.
+   The hero buttons (.liquid-glass-dark) always sit on the photos and stay dark. */
+html.light .liquid-glass {
+  background-color: rgba(255, 255, 255, 0.55);
+}
+/* Keeps white hero text readable on bright parts of the photos, without darkening the photos. */
+.hero-shadow {
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+/* ---- Motion ---- */
+/* Scroll reveal (see Reveal.jsx): content fades in and slides up the first time it is seen. */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-in {
+  opacity: 1;
+  transform: none;
+}
+/* A new page fades in after navigation. */
+.page-enter {
+  animation: page-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* Buttons give way a little when pressed. `scale` is separate from `transform`, so hover lifts still work. */
+button:not(:disabled):active,
+a.press:active {
+  scale: 0.97;
+}
+button,
+a.press {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform, scale;
+  transition-duration: 200ms;
+}
+/* Loading placeholders: a light sweeping across instead of blinking. */
+.skeleton {
+  background: linear-gradient(100deg, rgb(var(--c-slate-900)) 30%, rgb(var(--c-slate-800)) 50%, rgb(var(--c-slate-900)) 70%);
+  background-size: 250% 100%;
+  animation: skeleton 1.4s ease-in-out infinite;
+}
+@keyframes skeleton {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -150% 0;
+  }
+}
+/* The hero's scroll hint: a dot moving down inside a mouse outline. */
+@keyframes scroll-hint {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+.scroll-hint {
+  animation: scroll-hint 1.8s ease-in-out infinite;
+}
+/* Hero slider: the active dot fills up; the place name fades in with each photo. */
+.slide-progress {
+  animation: slide-progress linear forwards;
+}
+@keyframes slide-progress {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+.fade-up {
+  animation: fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .page-enter,
+  .skeleton,
+  .scroll-hint,
+  .fade-up {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+}

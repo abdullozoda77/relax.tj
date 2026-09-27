@@ -3,14 +3,15 @@ import { Link } from "react-router-dom";
 import { api } from "../../api.js";
 import { plural } from "../../utils.js";
 import Icon from "../Icon.jsx";
+import Reveal from "../Reveal.jsx";
 import { t } from "../../i18n.js";
 
 function TravelListCard({ list, highlighted, onCopy }) {
   const box = highlighted
     ? "bg-slate-900/95 border-2 border-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.15)] lg:-translate-y-2"
-    : "bg-slate-900/90 border border-slate-800 hover:border-slate-700";
+    : "bg-slate-900/90 border border-slate-800 hover:border-emerald-500/30 hover:-translate-y-1";
   return (
-    <div className={`${box} rounded-2xl p-8 shadow-xl flex flex-col justify-between relative transition-all`}>
+    <div className={`${box} h-full rounded-2xl p-8 shadow-xl flex flex-col justify-between relative transition-all duration-500 ease-out`}>
       {highlighted && (
         <div className="absolute -top-3.5 right-8 bg-amber-500 text-slate-950 font-bold px-3 py-1 rounded-full text-label-sm font-label-sm shadow-md">
           {t("Популярный")}
@@ -27,9 +28,9 @@ function TravelListCard({ list, highlighted, onCopy }) {
           </span>
         </div>
         <Link className="block text-headline-md font-headline-md text-white mb-3 hover:text-emerald-300 transition-colors" to={`/lists/${list.id}`}>
-          {list.title}
+          {t(list.title)}
         </Link>
-        <p className="text-body-sm text-slate-300 mb-6 leading-relaxed">{list.description || t("Маршрут без описания")}</p>
+        <p className="text-body-sm text-slate-300 mb-6 leading-relaxed">{list.description ? t(list.description) : t("Маршрут без описания")}</p>
         <ul className="space-y-3 mb-8 text-body-sm text-slate-200">
           {list.items.slice(0, 3).map((item) => (
             <li key={item.id} className="flex items-center gap-2.5">
@@ -72,16 +73,18 @@ export default function ListsSection({ onCopy }) {
   return (
     <section className="py-24 px-6 lg:px-12 bg-surface-container-low border-t border-slate-800/80 scroll-mt-20" id="lists">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <Reveal className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-label-md font-label-md text-emerald-400 uppercase tracking-widest mb-2 block">{t("От путешественников")}</span>
           <h2 className="text-3xl md:text-headline-lg font-headline-lg text-white mb-4">{t("Популярные маршруты")}</h2>
           <p className="text-body-md text-slate-400">
             {t("Открытые списки путешествий других пользователей. Скопируйте понравившийся маршрут к себе.")}
           </p>
-        </div>
+        </Reveal>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
           {lists?.map((list, i) => (
-            <TravelListCard key={list.id} highlighted={lists.length === 3 && i === 1} list={list} onCopy={onCopy} />
+            <Reveal key={list.id} delay={i * 110}>
+              <TravelListCard highlighted={lists.length === 3 && i === 1} list={list} onCopy={onCopy} />
+            </Reveal>
           ))}
         </div>
         {lists?.length === 0 && (
