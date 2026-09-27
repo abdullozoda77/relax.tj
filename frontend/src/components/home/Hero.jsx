@@ -204,7 +204,7 @@ export default function Hero({ onNearby }) {
               className="font-label-md font-extrabold text-[2.3rem] leading-[1.1] sm:text-[3.4rem] lg:text-[3.9rem] xl:text-[4.4rem] mb-6"
               lineClasses={["", "text-[#6ee7b7]"]}
               start={250}
-              text={t("Откройте Таджикистан\nвыше облаков.")}
+              text={t("Найдите своё\nместо в горах.")}
             />
             <FadeIn delay={900}>
               <p className="max-w-xl border-l-2 border-[#34d399] pl-4 mb-8 text-base md:text-lg leading-relaxed text-[rgba(255,255,255,0.88)]">
