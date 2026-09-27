@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import Icon from "./Icon.jsx";
+import { Link, useLocation } from "react-router-dom";
 import LanguageSwitcher from "./LanguageSwitcher.jsx";
 import Logo from "./Logo.jsx";
 import NotificationBell from "./NotificationBell.jsx";
+import SearchBox from "./SearchBox.jsx";
 import ThemeToggle from "./ThemeToggle.jsx";
 import UserMenu from "./UserMenu.jsx";
 import { t } from "../i18n.js";
@@ -35,27 +35,8 @@ function useOverHero(enabled) {
 }
 
 export default function Header() {
-  const navigate = useNavigate();
   const location = useLocation();
-  const [params] = useSearchParams();
-  const [query, setQuery] = useState(params.get("search") || "");
   const overHero = useOverHero(location.pathname === "/");
-
-  // Keep the input in sync when the search changes from somewhere else (footer links, reset button).
-  useEffect(() => {
-    setQuery(params.get("search") || "");
-  }, [params]);
-
-  // Search runs 400 ms after the user stops typing.
-  useEffect(() => {
-    const current = params.get("search") || "";
-    if (query.trim() === current) return;
-    const timer = setTimeout(() => {
-      const q = query.trim();
-      navigate({ pathname: "/", search: q ? `?search=${encodeURIComponent(q)}` : "" }, { replace: location.pathname === "/" });
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [query]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <header
@@ -79,17 +60,7 @@ export default function Header() {
           ))}
         </nav>
         <div className="flex items-center gap-2 sm:gap-4">
-          <div className="relative hidden sm:block">
-            <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]" />
-            <input
-              className="pl-9 pr-4 py-1.5 rounded-full bg-slate-900 border border-slate-700/80 text-body-sm text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400 w-48 focus:w-64 transition-all"
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && document.getElementById("places")?.scrollIntoView()}
-              placeholder={t("Поиск мест...")}
-              type="search"
-              value={query}
-            />
-          </div>
+          <SearchBox />
           <LanguageSwitcher />
           <ThemeToggle />
           <NotificationBell />

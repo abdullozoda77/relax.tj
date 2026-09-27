@@ -6,3 +6,4 @@ class PlacesConfig(AppConfig):
 
     def ready(self):
         from . import signals  # noqa: F401  connects the signal handlers
+        from . import sqlite_like  # noqa: F401  case-insensitive search in Russian and Tajik
