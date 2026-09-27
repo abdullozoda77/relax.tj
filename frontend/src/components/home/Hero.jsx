@@ -6,11 +6,25 @@ import { t } from "../../i18n.js";
 // so the credit is shown under the tag.
 const PHOTOS = [
   {
+    src: "/hero/iskanderkul.jpg",
+    place: t("Фанские горы · Озеро Искандеркуль"),
+    author: "Marat Nadjibaev",
+    license: "CC BY-SA 4.0",
+    page: "https://commons.wikimedia.org/wiki/File:Iskanderkul_9.jpg",
+  },
+  {
     src: "/hero/rudaki.jpg",
     place: t("Душанбе · Памятник Рудаки"),
     author: t("Шухрат Саъдиев"),
     license: "CC BY-SA 4.0",
     page: "https://commons.wikimedia.org/wiki/File:-Rudaki_in_Park_Dushanbe_city.jpg",
+  },
+  {
+    src: "/hero/alaudin.jpg",
+    place: t("Фанские горы · Алаудинские озёра"),
+    author: "Marat Nadjibaev",
+    license: "CC BY-SA 4.0",
+    page: "https://commons.wikimedia.org/wiki/File:Alaudin_14.jpg",
   },
   {
     src: "/hero/flagpole.jpg",
@@ -20,6 +34,13 @@ const PHOTOS = [
     page: "https://commons.wikimedia.org/wiki/File:Panorama_with_Dousti_Square_and_Dushanbe_Flagpole.jpg",
   },
   {
+    src: "/hero/kulikalon.jpg",
+    place: t("Фанские горы · Озеро Куликалон"),
+    author: "Adam Harangozó",
+    license: "CC BY-SA 4.0",
+    page: "https://commons.wikimedia.org/wiki/File:Kulikalon_Lake_and_Fann_Mountains,_Tajikistan.jpg",
+  },
+  {
     src: "/hero/palace.jpg",
     place: t("Душанбе · Парк Рудаки и Дворец нации"),
     author: "Maris Teteris",
@@ -27,11 +48,25 @@ const PHOTOS = [
     page: "https://commons.wikimedia.org/wiki/File:Ustod_Rudaki_Park_and_Palace_of_the_Nation_in_Dushanbe_-_panoramio.jpg",
   },
   {
+    src: "/hero/karakul.jpg",
+    place: t("Памир · Озеро Каракуль"),
+    author: "Benoît Vicart",
+    license: "CC0",
+    page: "https://commons.wikimedia.org/wiki/File:Lake_Karakul.jpg",
+  },
+  {
     src: "/hero/city.jpg",
     place: t("Душанбе · Современный центр"),
     author: "Adam Harangozó",
     license: "CC BY-SA 4.0",
     page: "https://commons.wikimedia.org/wiki/File:Panorama_with_buildings,_Dushanbe.jpg",
+  },
+  {
+    src: "/hero/sarez.jpg",
+    place: t("Памир · Сарезское озеро"),
+    author: "Marat Nadjibaev",
+    license: "CC BY-SA 4.0",
+    page: "https://commons.wikimedia.org/wiki/File:Sarez_lake_35.jpg",
   },
   {
     src: "/hero/yashikul.jpg",
