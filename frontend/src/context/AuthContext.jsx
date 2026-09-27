@@ -32,9 +32,15 @@ export function AuthProvider({ children }) {
     return loadProfile();
   }
 
-  async function register(data) {
-    const result = await api("/auth/register/", { method: "POST", body: data });
-    tokens.save(result.tokens);
+  // Creates the account; it can be used after the email is confirmed (the letter has the link).
+  // Returns { detail, email }.
+  function register(data) {
+    return api("/auth/register/", { method: "POST", body: data });
+  }
+
+  // Logs in with tokens from the email confirmation page.
+  function loginWithTokens(newTokens) {
+    tokens.save(newTokens);
     return loadProfile();
   }
 
@@ -49,7 +55,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, ready, login, register, logout, reloadUser: loadProfile, setUser }}>
+    <AuthContext.Provider value={{ user, ready, login, register, loginWithTokens, logout, reloadUser: loadProfile, setUser }}>
       {children}
     </AuthContext.Provider>
   );

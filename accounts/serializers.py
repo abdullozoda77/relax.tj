@@ -2,9 +2,21 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.exceptions import APIException
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+from .emails import email_confirmation_token
 from .models import User
+
+EMAIL_NOT_CONFIRMED = "Confirm your email first: open the link from the letter we sent you."
+
+
+class EmailNotConfirmed(APIException):
+    """Login refused until the email is confirmed; `code` and `email` let the site offer to resend the letter."""
+
+    status_code = status.HTTP_403_FORBIDDEN
+    default_code = "email_not_confirmed"
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
@@ -13,6 +25,13 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "username", "email", "first_name", "last_name", "phone_number", "password", "password2"]
+        extra_kwargs = {"email": {"required": True, "allow_blank": False}}
+
+    def validate_email(self, value):
+        # The confirmation link goes to this address, so one email can belong to only one account.
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("This email is already registered.")
+        return value
 
     def validate(self, attrs):
         if attrs["password"] != attrs["password2"]:
@@ -21,7 +40,38 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop("password2")
-        return User.objects.create_user(**validated_data)
+        return User.objects.create_user(**validated_data, email_verified=False)
+
+
+class LoginSerializer(TokenObtainPairSerializer):
+    """Normal JWT login, but only after the email is confirmed."""
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        if not self.user.email_verified:
+            raise EmailNotConfirmed({"detail": EMAIL_NOT_CONFIRMED, "code": "email_not_confirmed", "email": self.user.email})
+        return data
+
+
+class ConfirmEmailSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()
+
+    def validate(self, attrs):
+        try:
+            user = User.objects.get(pk=force_str(urlsafe_base64_decode(attrs["uid"])), is_active=True)
+        except (User.DoesNotExist, ValueError, TypeError, OverflowError):
+            user = None
+        if user is None:
+            raise serializers.ValidationError({"token": "This link is invalid or expired. Ask for a new one."})
+        if not user.email_verified and not email_confirmation_token.check_token(user, attrs["token"]):
+            raise serializers.ValidationError({"token": "This link is invalid or expired. Ask for a new one."})
+        attrs["user"] = user
+        return attrs
+
+
+class ResendConfirmationSerializer(serializers.Serializer):
+    email = serializers.EmailField()
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

@@ -43,6 +43,9 @@ const SERVER_MESSAGES = {
   "This point is outside Tajikistan. Only places in Tajikistan can be added.": t(
     "Это место за пределами Таджикистана. Добавлять можно только места в Таджикистане."
   ),
+  "Confirm your email first: open the link from the letter we sent you.": t("Сначала подтвердите email: откройте ссылку из письма."),
+  "This email is already registered.": t("Этот email уже зарегистрирован."),
+  "This link is invalid or expired. Ask for a new one.": t("Ссылка недействительна или устарела. Запросите новую."),
 };
 
 export function errorText(data) {

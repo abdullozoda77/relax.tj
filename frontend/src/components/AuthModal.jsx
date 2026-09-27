@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api } from "../api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
+import Icon from "./Icon.jsx";
 import Modal from "./Modal.jsx";
 import { t } from "../i18n.js";
 
@@ -64,6 +65,48 @@ function ForgotPassword({ onBack }) {
   );
 }
 
+// After registration (or a login before the email is confirmed): asks to open the letter, can send it again.
+export function CheckEmail({ email, notConfirmed = false, onBack }) {
+  const toast = useToast();
+  const [busy, setBusy] = useState(false);
+
+  async function resend() {
+    setBusy(true);
+    try {
+      await api("/auth/resend-confirmation/", { method: "POST", body: { email } });
+      toast(t("Письмо отправлено ещё раз."));
+    } catch (err) {
+      toast(err.message, "error");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="p-8 text-center">
+      <span className="mx-auto w-14 h-14 rounded-full bg-emerald-500/15 text-emerald-300 flex items-center justify-center">
+        <Icon name="mark_email_unread" className="text-[30px]" />
+      </span>
+      <h2 className="text-headline-md font-headline-md text-white mt-4 mb-2">{t("Проверьте почту")}</h2>
+      {notConfirmed && <p className="text-body-sm text-amber-300 mb-2">{t("Сначала подтвердите email.")}</p>}
+      <p className="text-body-sm text-slate-400 mb-6">
+        {t("Мы отправили ссылку для подтверждения на {0}. Откройте её, чтобы завершить регистрацию.", email)}
+      </p>
+      <button
+        className="w-full bg-slate-800 hover:bg-slate-700 text-emerald-300 font-semibold py-3 rounded-xl text-label-md font-label-md disabled:opacity-60"
+        disabled={busy}
+        onClick={resend}
+        type="button"
+      >
+        {busy ? t("Отправляем...") : t("Отправить письмо ещё раз")}
+      </button>
+      <button className="mt-4 w-full text-body-sm text-slate-400 hover:text-emerald-300" onClick={onBack} type="button">
+        {t("← Назад ко входу")}
+      </button>
+    </div>
+  );
+}
+
 export default function AuthModal({ tab: initialTab = "login", onClose }) {
   const { login, register } = useAuth();
   const toast = useToast();
@@ -71,6 +114,8 @@ export default function AuthModal({ tab: initialTab = "login", onClose }) {
   const [form, setForm] = useState({ username: "", email: "", password: "", password2: "" });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  // { email, notConfirmed }: shown after registration or when logging in before confirming the email.
+  const [pending, setPending] = useState(null);
   const isLogin = tab === "login";
 
   const change = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -80,17 +125,39 @@ export default function AuthModal({ tab: initialTab = "login", onClose }) {
     setBusy(true);
     setError("");
     try {
-      const user = isLogin ? await login(form.username, form.password) : await register(form);
-      toast(isLogin ? t("Добро пожаловать, {0}!", user.username) : t("Аккаунт создан. Добро пожаловать!"));
-      onClose();
+      if (isLogin) {
+        const user = await login(form.username, form.password);
+        toast(t("Добро пожаловать, {0}!", user.username));
+        onClose();
+      } else {
+        const result = await register(form);
+        setPending({ email: result.email, notConfirmed: false });
+        setBusy(false);
+      }
     } catch (err) {
-      setError(err.status === 401 ? t("Неверное имя пользователя или пароль.") : err.message);
+      if (err.data?.code === "email_not_confirmed") setPending({ email: err.data.email, notConfirmed: true });
+      else setError(err.status === 401 ? t("Неверное имя пользователя или пароль.") : err.message);
       setBusy(false);
     }
   }
 
   const tabClass = (active) =>
     active ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" : "text-slate-400 hover:text-white border border-transparent";
+
+  if (pending) {
+    return (
+      <Modal onClose={onClose}>
+        <CheckEmail
+          email={pending.email}
+          notConfirmed={pending.notConfirmed}
+          onBack={() => {
+            setPending(null);
+            setTab("login");
+          }}
+        />
+      </Modal>
+    );
+  }
 
   if (tab === "forgot") {
     return (
@@ -127,7 +194,7 @@ export default function AuthModal({ tab: initialTab = "login", onClose }) {
         </div>
         <form className="space-y-4" onSubmit={submit}>
           <Field autoComplete="username" autoFocus label={t("Имя пользователя")} name="username" onChange={change} required value={form.username} />
-          {!isLogin && <Field autoComplete="email" label="Email" name="email" onChange={change} type="email" value={form.email} />}
+          {!isLogin && <Field autoComplete="email" label="Email" name="email" onChange={change} required type="email" value={form.email} />}
           <Field
             autoComplete={isLogin ? "current-password" : "new-password"}
             label={t("Пароль")}

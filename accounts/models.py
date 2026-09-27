@@ -12,6 +12,9 @@ class User(AbstractUser):
     avatar = models.ImageField(upload_to="avatars/", validators=image_validators, blank=True, null=True)
     phone_number = models.CharField(max_length=20, unique=True, blank=True, null=True)
     bio = models.TextField(blank=True)
+    # Set to False for people who sign up on the site until they open the link in the confirmation email.
+    # Accounts made in other ways (createsuperuser, the admin, the seed command) count as confirmed.
+    email_verified = models.BooleanField(default=True)
 
     def __str__(self):
         return self.username

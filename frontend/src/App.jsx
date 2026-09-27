@@ -9,6 +9,7 @@ import AdminPanel from "./pages/AdminPanel.jsx";
 import Home from "./pages/Home.jsx";
 import PlaceDetail from "./pages/PlaceDetail.jsx";
 import Profile from "./pages/Profile.jsx";
+import ConfirmEmail from "./pages/ConfirmEmail.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 import TravelListPage from "./pages/TravelListPage.jsx";
 
@@ -53,6 +54,7 @@ export default function App() {
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/admin-panel" element={<AdminPanel />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/confirm-email" element={<ConfirmEmail />} />
                 </Routes>
               </PageTransition>
             </main>

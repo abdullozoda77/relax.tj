@@ -14,10 +14,12 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from drf_yasg.utils import swagger_auto_schema
 from places.permissions import IsAdmin
 from .models import User
+from .emails import send_confirmation_email
 from .serializers import (
     PasswordResetSerializer, PasswordResetConfirmSerializer,
     RegisterSerializer, UserSerializer, ChangePasswordSerializer,
     LogoutSerializer, AdminUserSerializer,
+    LoginSerializer, ConfirmEmailSerializer, ResendConfirmationSerializer,
 )
 
 def tokens_for(user):
@@ -34,14 +36,51 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        # No tokens yet: the account can be used after the email is confirmed (see ConfirmEmailView).
+        send_confirmation_email(user)
         return Response(
-            {"user": UserSerializer(user, context={"request": request}).data, "tokens": tokens_for(user)},
+            {"detail": "We sent a confirmation link to your email.", "email": user.email},
             status=status.HTTP_201_CREATED,
         )
 
 class LoginView(TokenObtainPairView):
+    serializer_class = LoginSerializer
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "auth"
+
+
+class ConfirmEmailView(APIView):
+    """Confirms the email from the link in the letter and logs the user in."""
+
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
+
+    @swagger_auto_schema(request_body=ConfirmEmailSerializer)
+    def post(self, request):
+        serializer = ConfirmEmailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
+        if not user.email_verified:
+            user.email_verified = True
+            user.save(update_fields=["email_verified"])
+        return Response({"user": UserSerializer(user, context={"request": request}).data, "tokens": tokens_for(user)})
+
+
+class ResendConfirmationView(APIView):
+    """Sends the confirmation letter again. The answer is the same whether the email exists or not."""
+
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
+
+    @swagger_auto_schema(request_body=ResendConfirmationSerializer)
+    def post(self, request):
+        serializer = ResendConfirmationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        for user in User.objects.filter(email__iexact=serializer.validated_data["email"], is_active=True, email_verified=False):
+            send_confirmation_email(user)
+        return Response({"detail": "If this email is waiting for confirmation, we sent the link again."})
 
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
