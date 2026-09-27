@@ -1,6 +1,9 @@
+import smtplib
+
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.db import transaction
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from rest_framework import generics, permissions, status, viewsets, mixins
@@ -13,8 +16,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from drf_yasg.utils import swagger_auto_schema
 from places.permissions import IsAdmin
+from .emails import can_resend, check_code, send_confirmation_code
 from .models import User
-from .emails import send_confirmation_email
 from .serializers import (
     PasswordResetSerializer, PasswordResetConfirmSerializer,
     RegisterSerializer, UserSerializer, ChangePasswordSerializer,
@@ -35,11 +38,16 @@ class RegisterView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        # No tokens yet: the account can be used after the email is confirmed (see ConfirmEmailView).
-        send_confirmation_email(user)
+        # No tokens yet: the account can be used after the code from the email is entered (ConfirmEmailView).
+        # If the letter cannot be sent, the new account is not kept, so the person can simply try again.
+        try:
+            with transaction.atomic():
+                user = serializer.save()
+                send_confirmation_code(user)
+        except (smtplib.SMTPException, OSError):
+            return Response({"detail": EMAIL_NOT_SENT}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         return Response(
-            {"detail": "We sent a confirmation link to your email.", "email": user.email},
+            {"detail": "We sent a confirmation code to your email.", "email": user.email},
             status=status.HTTP_201_CREATED,
         )
 
@@ -49,8 +57,17 @@ class LoginView(TokenObtainPairView):
     throttle_scope = "auth"
 
 
+EMAIL_NOT_SENT = "Could not send the email. Please try again later."
+CODE_ERRORS = {
+    "wrong": "The code is wrong.",
+    "expired": "The code has expired. Ask for a new one.",
+    "too_many": "Too many wrong tries. Ask for a new code.",
+    "missing": "The code is wrong.",
+}
+
+
 class ConfirmEmailView(APIView):
-    """Confirms the email from the link in the letter and logs the user in."""
+    """Checks the 6-digit code from the letter, confirms the email and logs the user in."""
 
     permission_classes = [permissions.AllowAny]
     throttle_classes = [ScopedRateThrottle]
@@ -60,11 +77,18 @@ class ConfirmEmailView(APIView):
     def post(self, request):
         serializer = ConfirmEmailSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data["user"]
-        if not user.email_verified:
-            user.email_verified = True
-            user.save(update_fields=["email_verified"])
+        user = User.objects.filter(
+            email__iexact=serializer.validated_data["email"], is_active=True, email_verified=False
+        ).select_related("email_code").first()
+        result = check_code(user, serializer.validated_data["code"]) if user else "missing"
+        if result != "ok":
+            raise ValidationError({"code": CODE_ERRORS[result]})
+        user.email_verified = True
+        user.save(update_fields=["email_verified"])
         return Response({"user": UserSerializer(user, context={"request": request}).data, "tokens": tokens_for(user)})
+
+
+WAIT_BEFORE_RESEND = "Please wait a minute before asking for a new code."
 
 
 class ResendConfirmationView(APIView):
@@ -78,9 +102,17 @@ class ResendConfirmationView(APIView):
     def post(self, request):
         serializer = ResendConfirmationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        for user in User.objects.filter(email__iexact=serializer.validated_data["email"], is_active=True, email_verified=False):
-            send_confirmation_email(user)
-        return Response({"detail": "If this email is waiting for confirmation, we sent the link again."})
+        user = User.objects.filter(
+            email__iexact=serializer.validated_data["email"], is_active=True, email_verified=False
+        ).select_related("email_code").first()
+        if user:
+            if not can_resend(user):
+                return Response({"detail": WAIT_BEFORE_RESEND}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+            try:
+                send_confirmation_code(user)
+            except (smtplib.SMTPException, OSError):
+                return Response({"detail": EMAIL_NOT_SENT}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        return Response({"detail": "If this email is waiting for confirmation, we sent a new code."})
 
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]

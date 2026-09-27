@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
@@ -65,20 +65,46 @@ function ForgotPassword({ onBack }) {
   );
 }
 
-// After registration (or a login before the email is confirmed): asks to open the letter, can send it again.
-export function CheckEmail({ email, notConfirmed = false, onBack }) {
+// After registration (or a login before the email is confirmed): asks for the 6-digit code from the letter.
+// The right code confirms the email and logs the user in; a new code can be sent once a minute.
+export function CheckEmail({ email, notConfirmed = false, onBack, onConfirmed }) {
+  const { loginWithTokens } = useAuth();
   const toast = useToast();
+  const [code, setCode] = useState("");
+  const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [wait, setWait] = useState(60); // seconds until "send again" is allowed
+
+  useEffect(() => {
+    if (wait <= 0) return;
+    const timer = setTimeout(() => setWait((s) => s - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [wait]);
+
+  async function confirm(e) {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      const data = await api("/auth/confirm-email/", { method: "POST", body: { email, code } });
+      const user = await loginWithTokens(data.tokens);
+      toast(t("Email подтверждён. Добро пожаловать, {0}!", user.username));
+      onConfirmed();
+    } catch (err) {
+      setError(err.message);
+      setBusy(false);
+    }
+  }
 
   async function resend() {
-    setBusy(true);
     try {
       await api("/auth/resend-confirmation/", { method: "POST", body: { email } });
-      toast(t("Письмо отправлено ещё раз."));
+      toast(t("Новый код отправлен."));
+      setCode("");
+      setError("");
+      setWait(60);
     } catch (err) {
       toast(err.message, "error");
-    } finally {
-      setBusy(false);
     }
   }
 
@@ -89,18 +115,34 @@ export function CheckEmail({ email, notConfirmed = false, onBack }) {
       </span>
       <h2 className="text-headline-md font-headline-md text-white mt-4 mb-2">{t("Проверьте почту")}</h2>
       {notConfirmed && <p className="text-body-sm text-amber-300 mb-2">{t("Сначала подтвердите email.")}</p>}
-      <p className="text-body-sm text-slate-400 mb-6">
-        {t("Мы отправили ссылку для подтверждения на {0}. Откройте её, чтобы завершить регистрацию.", email)}
-      </p>
-      <button
-        className="w-full bg-slate-800 hover:bg-slate-700 text-emerald-300 font-semibold py-3 rounded-xl text-label-md font-label-md disabled:opacity-60"
-        disabled={busy}
-        onClick={resend}
-        type="button"
-      >
-        {busy ? t("Отправляем...") : t("Отправить письмо ещё раз")}
+      <p className="text-body-sm text-slate-400 mb-6">{t("Мы отправили 6-значный код на {0}. Введите его здесь.", email)}</p>
+      <form className="space-y-4" onSubmit={confirm}>
+        <input
+          aria-label={t("Код из письма")}
+          autoComplete="one-time-code"
+          autoFocus
+          className="w-full text-center tracking-[0.6em] pl-[0.6em] text-3xl font-bold py-3 rounded-xl bg-slate-950 border border-slate-700/80 text-white placeholder-slate-700 focus:outline-none focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400"
+          inputMode="numeric"
+          maxLength={6}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+          pattern="\d{6}"
+          placeholder="••••••"
+          required
+          value={code}
+        />
+        {error && <p className="text-body-sm text-red-300 bg-red-950/60 border border-red-900 rounded-lg px-4 py-2.5">{error}</p>}
+        <button
+          className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl text-label-md font-label-md transition-all disabled:opacity-60"
+          disabled={busy || code.length !== 6}
+          type="submit"
+        >
+          {busy ? t("Проверяем...") : t("Подтвердить")}
+        </button>
+      </form>
+      <button className="mt-4 w-full text-body-sm text-emerald-300 hover:text-emerald-200 disabled:text-slate-500" disabled={wait > 0} onClick={resend} type="button">
+        {wait > 0 ? t("Отправить код ещё раз через {0} с", wait) : t("Отправить код ещё раз")}
       </button>
-      <button className="mt-4 w-full text-body-sm text-slate-400 hover:text-emerald-300" onClick={onBack} type="button">
+      <button className="mt-2 w-full text-body-sm text-slate-400 hover:text-emerald-300" onClick={onBack} type="button">
         {t("← Назад ко входу")}
       </button>
     </div>
@@ -150,6 +192,7 @@ export default function AuthModal({ tab: initialTab = "login", onClose }) {
         <CheckEmail
           email={pending.email}
           notConfirmed={pending.notConfirmed}
+          onConfirmed={onClose}
           onBack={() => {
             setPending(null);
             setTab("login");

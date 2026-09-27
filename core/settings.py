@@ -187,12 +187,36 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
+# With EMAIL_HOST in .env, letters (confirmation codes, password reset) are sent through that SMTP server,
+# for example Gmail: EMAIL_HOST=smtp.gmail.com, EMAIL_PORT=587, EMAIL_USE_TLS=True and an app password.
+# Without it they are only printed in the Django console (development).
+# (Lower-case name: Django 6.1 refuses the old EMAIL_* settings next to MAILERS.)
+smtp_host = os.getenv('EMAIL_HOST', '')
+if smtp_host:
+    MAILERS = {
+        'default': {
+            'BACKEND': 'django.core.mail.backends.smtp.EmailBackend',
+            'OPTIONS': {
+                'host': smtp_host,
+                'port': int(os.getenv('EMAIL_PORT', '587')),
+                'username': os.getenv('EMAIL_HOST_USER', ''),
+                'password': os.getenv('EMAIL_HOST_PASSWORD', ''),
+                'use_tls': os.getenv('EMAIL_USE_TLS', 'True') == 'True',
+                'use_ssl': os.getenv('EMAIL_USE_SSL', 'False') == 'True',
+                'timeout': 15,
+            },
+        },
+    }
+else:
+    MAILERS = {
+        'default': {
+            'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+        },
+    }
 
 # Password reset emails link to the React page /reset-password on this address
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Relax.tj <noreply@relax.tj>')
+# Gmail and most SMTP servers only send "from" the account itself, so it is used by default.
+DEFAULT_FROM_EMAIL = os.getenv(
+    'DEFAULT_FROM_EMAIL', f"Relax.tj <{os.getenv('EMAIL_HOST_USER')}>" if os.getenv('EMAIL_HOST_USER') else 'Relax.tj <noreply@relax.tj>'
+)

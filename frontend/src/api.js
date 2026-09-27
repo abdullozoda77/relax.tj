@@ -43,9 +43,14 @@ const SERVER_MESSAGES = {
   "This point is outside Tajikistan. Only places in Tajikistan can be added.": t(
     "Это место за пределами Таджикистана. Добавлять можно только места в Таджикистане."
   ),
-  "Confirm your email first: open the link from the letter we sent you.": t("Сначала подтвердите email: откройте ссылку из письма."),
+  "Confirm your email first: enter the code from the letter we sent you.": t("Сначала подтвердите email: введите код из письма."),
   "This email is already registered.": t("Этот email уже зарегистрирован."),
-  "This link is invalid or expired. Ask for a new one.": t("Ссылка недействительна или устарела. Запросите новую."),
+  "The code is wrong.": t("Неверный код."),
+  "The code has 6 digits.": t("Код состоит из 6 цифр."),
+  "The code has expired. Ask for a new one.": t("Срок действия кода истёк. Запросите новый."),
+  "Too many wrong tries. Ask for a new code.": t("Слишком много неверных попыток. Запросите новый код."),
+  "Please wait a minute before asking for a new code.": t("Подождите минуту, прежде чем запрашивать новый код."),
+  "Could not send the email. Please try again later.": t("Не удалось отправить письмо. Попробуйте позже."),
 };
 
 export function errorText(data) {

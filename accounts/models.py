@@ -18,3 +18,13 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class EmailConfirmationCode(models.Model):
+    """The 6-digit code from the confirmation letter. Only a hash is stored, like a password;
+    sending a new code replaces the old one."""
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="email_code")
+    code_hash = models.CharField(max_length=128)
+    sent_at = models.DateTimeField()
+    attempts = models.PositiveSmallIntegerField(default=0)  # wrong tries with this code

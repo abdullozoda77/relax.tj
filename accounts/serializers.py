@@ -6,10 +6,9 @@ from rest_framework import serializers, status
 from rest_framework.exceptions import APIException
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .emails import email_confirmation_token
 from .models import User
 
-EMAIL_NOT_CONFIRMED = "Confirm your email first: open the link from the letter we sent you."
+EMAIL_NOT_CONFIRMED = "Confirm your email first: enter the code from the letter we sent you."
 
 
 class EmailNotConfirmed(APIException):
@@ -54,20 +53,8 @@ class LoginSerializer(TokenObtainPairSerializer):
 
 
 class ConfirmEmailSerializer(serializers.Serializer):
-    uid = serializers.CharField()
-    token = serializers.CharField()
-
-    def validate(self, attrs):
-        try:
-            user = User.objects.get(pk=force_str(urlsafe_base64_decode(attrs["uid"])), is_active=True)
-        except (User.DoesNotExist, ValueError, TypeError, OverflowError):
-            user = None
-        if user is None:
-            raise serializers.ValidationError({"token": "This link is invalid or expired. Ask for a new one."})
-        if not user.email_verified and not email_confirmation_token.check_token(user, attrs["token"]):
-            raise serializers.ValidationError({"token": "This link is invalid or expired. Ask for a new one."})
-        attrs["user"] = user
-        return attrs
+    email = serializers.EmailField()
+    code = serializers.RegexField(r"^\d{6}$", error_messages={"invalid": "The code has 6 digits."})
 
 
 class ResendConfirmationSerializer(serializers.Serializer):
