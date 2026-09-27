@@ -18,7 +18,10 @@ from .models import (
     Activity, Category, Favorite, Notification, Place, PlaceImage, PlaceSuggestion,
     Region, Review, TravelList, TravelListPlace,
 )
-from .permissions import IsAdmin, IsAdminOrReadOnly, IsOwner, IsOwnerOrAdminOrReadOnly, is_admin
+from .permissions import (
+    IsAdmin, IsAdminOrReadOnly, IsModerator, IsOwner, IsOwnerOrModeratorDeleteOrReadOnly,
+    is_admin, is_moderator,
+)
 from .serializers import (
     ActivitySerializer, CategorySerializer, FavoriteSerializer, NotificationSerializer, PlaceDetailSerializer,
     PlaceImageSerializer, PlaceListSerializer, PlaceSuggestionSerializer, PlaceWriteSerializer,
@@ -258,14 +261,14 @@ class PlaceImageViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrAdminOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrModeratorDeleteOrReadOnly]
     filterset_class = ReviewFilter
     search_fields = ["comment", "place__name"]
     ordering_fields = ["created_at", "rating"]
 
     def get_queryset(self):
         qs = Review.objects.select_related("user", "place").prefetch_related("images")
-        if not is_admin(self.request.user):
+        if not is_moderator(self.request.user):
             qs = qs.filter(place__is_active=True)
         return qs
 
@@ -438,7 +441,7 @@ class PlaceSuggestionViewSet(viewsets.ModelViewSet):
         if getattr(self, "swagger_fake_view", False):
             return PlaceSuggestion.objects.none()
         qs = PlaceSuggestion.objects.select_related("user", "region", "category")
-        if is_admin(self.request.user):
+        if is_moderator(self.request.user):
             return qs
         return qs.filter(user=self.request.user)
 
@@ -446,7 +449,7 @@ class PlaceSuggestionViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def check_can_change(self, suggestion):
-        if is_admin(self.request.user):
+        if is_moderator(self.request.user):
             return
         if suggestion.user != self.request.user:
             raise PermissionDenied("This is not your suggestion.")
@@ -462,7 +465,7 @@ class PlaceSuggestionViewSet(viewsets.ModelViewSet):
         instance.delete()
 
     @swagger_auto_schema(request_body=SuggestionApproveSerializer)
-    @action(detail=True, methods=["post"], permission_classes=[IsAdmin])
+    @action(detail=True, methods=["post"], permission_classes=[IsModerator])
     def approve(self, request, pk=None):
         suggestion = self.get_object()
         if suggestion.status != "pending":
@@ -510,7 +513,7 @@ class PlaceSuggestionViewSet(viewsets.ModelViewSet):
         )
 
     @swagger_auto_schema(request_body=RejectSerializer)
-    @action(detail=True, methods=["post"], permission_classes=[IsAdmin])
+    @action(detail=True, methods=["post"], permission_classes=[IsModerator])
     def reject(self, request, pk=None):
         suggestion = self.get_object()
         if suggestion.status != "pending":

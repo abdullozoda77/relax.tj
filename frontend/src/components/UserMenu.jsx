@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import { useUi } from "../context/UiContext.jsx";
-import { isAdmin } from "../pages/AdminPanel.jsx";
+import { isAdmin, isModerator, roleName } from "../roles.js";
 import Icon from "./Icon.jsx";
 import { t } from "../i18n.js";
 
@@ -59,7 +59,7 @@ export default function UserMenu() {
           <div className="px-4 py-2 border-b border-slate-800 mb-1">
             <p className="text-body-sm text-white font-semibold truncate">{user.username}</p>
             <p className="text-label-sm font-label-sm text-slate-400 truncate">
-              {user.email || (user.role === "admin" ? t("Администратор") : t("Путешественник"))}
+              {user.email || roleName(user)}
             </p>
           </div>
           <Link className={itemClass} onClick={() => setOpen(false)} to="/profile">
@@ -75,9 +75,9 @@ export default function UserMenu() {
           >
             <Icon name="add_location_alt" className="text-[18px]" /> {t("Предложить место")}
           </button>
-          {isAdmin(user) && (
+          {isModerator(user) && (
             <Link className={itemClass} onClick={() => setOpen(false)} to="/admin-panel">
-              <Icon name="admin_panel_settings" className="text-[18px]" /> {t("Панель управления")}
+              <Icon name="admin_panel_settings" className="text-[18px]" /> {isAdmin(user) ? t("Панель управления") : t("Панель модератора")}
             </Link>
           )}
           <button className={`${itemClass} !text-rose-300 border-t border-slate-800 mt-1`} onClick={handleLogout} type="button">

@@ -1,6 +1,7 @@
 import { formatDate, plural } from "../../utils.js";
 import Icon from "../Icon.jsx";
 import { t } from "../../i18n.js";
+import { roleName } from "../../roles.js";
 
 function InfoTile({ label, icon, value, note, live, accent = "primary" }) {
   const color = accent === "primary" ? "text-primary" : "text-secondary";
@@ -36,7 +37,6 @@ export function Avatar({ user, size = "w-24 h-24", text = "text-4xl" }) {
 export default function ProfileHeader({ user }) {
   const stats = user.stats || {};
   const fullName = [user.first_name, user.last_name].filter(Boolean).join(" ");
-  const isAdmin = user.role === "admin";
 
   return (
     <div className="bg-surface-container rounded-xl p-6 lg:p-8 shadow-xl relative overflow-hidden">
@@ -48,7 +48,7 @@ export default function ProfileHeader({ user }) {
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="font-headline-lg text-3xl md:text-headline-lg text-on-surface">{fullName || user.username}</h1>
               <span className="bg-primary/15 text-primary font-label-sm text-label-sm px-3 py-1 rounded-full uppercase tracking-wider">
-                {isAdmin ? t("Администратор") : t("Путешественник")}
+                {roleName(user)}
               </span>
             </div>
             <p className="font-body-md text-body-md text-on-surface-variant flex flex-wrap items-center gap-2">

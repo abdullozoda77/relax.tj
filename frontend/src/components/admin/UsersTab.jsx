@@ -5,6 +5,7 @@ import { useToast } from "../../context/ToastContext.jsx";
 import Icon from "../Icon.jsx";
 import { Empty, input } from "./ui.jsx";
 import { locale, t } from "../../i18n.js";
+import { ROLES } from "../../roles.js";
 
 export default function UsersTab() {
   const { user: me } = useAuth();
@@ -64,8 +65,11 @@ export default function UsersTab() {
               onChange={(e) => update(u, { role: e.target.value }, t("Роль {0} изменена", u.username))}
               value={u.role}
             >
-              <option value="user">{t("Пользователь")}</option>
-              <option value="admin">{t("Администратор")}</option>
+              {Object.entries(ROLES).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
             </select>
             <button
               className={`text-body-sm px-3 py-2 rounded-lg flex items-center gap-1.5 disabled:opacity-40 ${

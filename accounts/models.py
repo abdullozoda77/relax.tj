@@ -4,7 +4,10 @@ from places.validators import image_validators
 
 
 class User(AbstractUser):
-    ROLES = (("user", "User"), ("admin", "Admin"))
+    # user: reviews, favourites, routes, suggestions.
+    # moderator: also checks suggestions (approve / reject) and removes bad reviews.
+    # admin: everything, including places, users, roles and statistics.
+    ROLES = (("user", "User"), ("moderator", "Moderator"), ("admin", "Admin"))
     role = models.CharField(max_length=20, choices=ROLES, default="user")
     avatar = models.ImageField(upload_to="avatars/", validators=image_validators, blank=True, null=True)
     phone_number = models.CharField(max_length=20, unique=True, blank=True, null=True)
