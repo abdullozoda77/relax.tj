@@ -1,0 +1,16 @@
+# Rohat backend: Django behind gunicorn, reachable only from nginx (127.0.0.1:8031).
+[Unit]
+Description=Rohat — gunicorn (Django API)
+After=network.target
+
+[Service]
+User=romin
+Group=romin
+WorkingDirectory=/home/romin/rohat
+# gthread workers: an AI assistant answer can take up to a minute, and other requests keep being served meanwhile.
+ExecStart=/home/romin/rohat/.venv/bin/gunicorn core.wsgi:application --bind 127.0.0.1:8031 --workers 3 --threads 4 --timeout 120 --access-logfile -
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+# Rohat background tasks (sending emails) — Celery worker with Redis as the broker (CELERY_BROKER_URL in .env).
+[Unit]
+Description=Rohat — Celery worker
+After=network.target redis-server.service
+
+[Service]
+User=romin
+Group=romin
+WorkingDirectory=/home/romin/rohat
+ExecStart=/home/romin/rohat/.venv/bin/celery -A core worker --loglevel=INFO --concurrency=2 --hostname=rohat@%%h
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

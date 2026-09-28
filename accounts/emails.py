@@ -5,6 +5,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.mail import send_mail
+from django.db import transaction
 from django.utils import timezone
 
 from .models import EmailConfirmationCode
@@ -14,14 +15,32 @@ MAX_ATTEMPTS = 5
 RESEND_AFTER = timedelta(seconds=60)
 
 
+def deliver(subject, message, recipient, html_message=None):
+    """Sends an email. With Celery (CELERY_BROKER_URL set) it is queued once the database changes are saved,
+    and the worker retries if the mail server fails. Without Celery it is sent right away and SMTP errors
+    are raised to the caller."""
+    if settings.CELERY_BROKER_URL:
+        from .tasks import send_email
+
+        transaction.on_commit(lambda: send_email.delay(subject, message, recipient, html_message))
+    else:
+        send_mail(
+            subject=subject,
+            message=message,
+            html_message=html_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[recipient],
+        )
+
+
 def send_confirmation_code(user):
-    """Makes a new code, saves its hash and emails the code. SMTP errors are raised to the caller."""
+    """Makes a new code, saves its hash and emails the code (see deliver)."""
     code = f"{secrets.randbelow(10**6):06d}"
     EmailConfirmationCode.objects.update_or_create(
         user=user, defaults={"code_hash": make_password(code), "sent_at": timezone.now(), "attempts": 0}
     )
     minutes = int(CODE_LIFETIME.total_seconds() // 60)
-    send_mail(
+    deliver(
         subject="Rohat — код подтверждения",
         message=(
             f"Здравствуйте, {user.username}!\n\n"
@@ -40,8 +59,7 @@ def send_confirmation_code(user):
             f'<p style="color:#64748b;font-size:13px">Если вы не регистрировались, просто проигнорируйте это письмо.</p>'
             f"</div>"
         ),
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email],
+        recipient=user.email,
     )
     if settings.MAILERS["default"]["BACKEND"].endswith("console.EmailBackend"):
         # Without SMTP the letter only goes to the console, so show the code plainly for development.

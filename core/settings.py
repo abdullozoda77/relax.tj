@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 import os
 from pathlib import Path
 
+from celery.schedules import crontab
+
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -113,6 +115,9 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [o.strip() for o in os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:5173').split(',') if o.strip()]
+# Addresses the site is opened at on the server (with the port), e.g. http://31.25.238.204:8030 — needed for
+# forms like the Django admin login behind nginx.
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()]
 
 ROOT_URLCONF = 'core.urls'
 
@@ -226,6 +231,18 @@ ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY', '')
 ASSISTANT_MODEL = os.getenv('ASSISTANT_MODEL', 'claude-opus-5')
 # low answers fastest; medium or high think longer before answering.
 ASSISTANT_EFFORT = os.getenv('ASSISTANT_EFFORT', 'low')
+
+# Celery (background tasks) with Redis, e.g. CELERY_BROKER_URL=redis://127.0.0.1:6379/7 (its own database number,
+# so it does not mix with other projects on the same Redis). Without it tasks run at once, inside the request.
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', '')
+CELERY_TASK_ALWAYS_EAGER = not CELERY_BROKER_URL
+CELERY_TASK_EAGER_PROPAGATES = True
+CELERY_TASK_IGNORE_RESULT = True
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_TIMEZONE = 'Asia/Dushanbe'
+CELERY_BEAT_SCHEDULE = {
+    'nightly-cleanup': {'task': 'accounts.tasks.cleanup', 'schedule': crontab(hour=3, minute=30)},
+}
 
 # Password reset emails link to the React page /reset-password on this address
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')

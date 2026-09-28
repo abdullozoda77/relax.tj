@@ -2,7 +2,6 @@ import smtplib
 
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
 from django.db import transaction
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -16,7 +15,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from drf_yasg.utils import swagger_auto_schema
 from places.permissions import IsAdmin
-from .emails import can_resend, check_code, send_confirmation_code
+from .emails import can_resend, check_code, deliver, send_confirmation_code
 from .models import User
 from .serializers import (
     PasswordResetSerializer, PasswordResetConfirmSerializer,
@@ -192,15 +191,14 @@ class PasswordResetView(APIView):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
             link = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
-            send_mail(
+            deliver(
                 subject="Rohat — восстановление пароля",
                 message=(
                     f"Здравствуйте, {user.username}!\n\n"
                     f"Чтобы задать новый пароль, откройте ссылку:\n{link}\n\n"
                     "Если вы не запрашивали восстановление, просто проигнорируйте это письмо."
                 ),
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
+                recipient=user.email,
             )
             if settings.DEBUG:
                 # The console email body is base64 encoded, so print the link separately for development.

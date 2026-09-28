@@ -1,0 +1,15 @@
+# Rohat scheduled tasks (nightly cleanup at 03:30) — Celery beat puts them in the queue on time.
+[Unit]
+Description=Rohat — Celery beat (schedule)
+After=network.target redis-server.service
+
+[Service]
+User=romin
+Group=romin
+WorkingDirectory=/home/romin/rohat
+ExecStart=/home/romin/rohat/.venv/bin/celery -A core beat --loglevel=INFO --schedule=/home/romin/rohat/.celerybeat-schedule
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
