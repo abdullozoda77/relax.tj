@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useUi } from "../context/UiContext.jsx";
-import { LogoMark } from "./Logo.jsx";
 import { t } from "../i18n.js";
 
 const link = "text-body-sm text-slate-400 hover:text-emerald-400 transition-colors";
@@ -13,10 +12,9 @@ export default function Footer() {
     <footer className="w-full bg-surface-container-lowest border-t border-slate-800/80 py-16">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2.5">
-            <LogoMark small />
-            <span className="text-headline-sm font-headline-sm text-white">Rohat</span>
-          </div>
+          <Link aria-label="Rohat" className="w-fit" to="/">
+            <img alt="Rohat" className="h-28 w-auto drop-shadow-lg" height="534" src="/brand/logo.webp" width="800" />
+          </Link>
           <p className="text-body-sm text-slate-400 leading-relaxed">
             {t("Места для отдыха в Таджикистане: горы Памира, озёра Фанских гор, санатории и древние крепости.")}
           </p>
