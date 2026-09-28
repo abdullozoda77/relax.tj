@@ -129,7 +129,8 @@ function AnimatedHeading({ text, start = 200, charDelay = 30, className = "", li
     <h1 aria-label={text.replace("\n", " ")} className={className} style={{ letterSpacing: "-0.04em" }}>
       {text.split("\n").map((line, li) => (
         <span key={li} aria-hidden className={`block ${lineClasses[li] || ""}`}>
-          {line.split(" ").map((word, wi) => (
+          {/* A dash stays on the line of the word before it. */}
+          {line.split(/ (?=[^—])/).map((word, wi) => (
             <span key={wi}>
               {wi > 0 && " "}
               <span className="inline-block whitespace-nowrap">
@@ -145,7 +146,7 @@ function AnimatedHeading({ text, start = 200, charDelay = 30, className = "", li
                         transitionDelay: `${delay}ms`,
                       }}
                     >
-                      {char}
+                      {char === " " ? "\u00a0" : char}
                     </span>
                   );
                 })}
@@ -191,7 +192,7 @@ export default function Hero({ onNearby }) {
       <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-[rgba(0,0,0,0.55)] via-[rgba(0,0,0,0.2)] to-transparent" />
       <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.6)] via-transparent to-transparent" />
       <div className="relative h-full flex flex-col px-6 md:px-12 lg:px-16 pt-28">
-        <div className="flex-1 flex flex-col justify-end pb-12 lg:pb-16 lg:grid lg:grid-cols-2 lg:items-end gap-8">
+        <div className="flex-1 flex flex-col justify-end pb-12 lg:pb-16 lg:grid lg:grid-cols-[3fr_2fr] lg:items-end gap-8">
           {/* The hero always sits on a dark photo, so its colours are fixed and do not follow the light theme. */}
           <div className="hero-shadow max-w-3xl">
             <FadeIn delay={100}>
