@@ -220,6 +220,8 @@ else:
 # Without either key the chat says it is not set up yet.
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
 GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-3.8-flash')
+# Tried in turn when the main model is overloaded or out of free quota.
+GEMINI_FALLBACK_MODELS = [m.strip() for m in os.getenv('GEMINI_FALLBACK_MODELS', 'gemini-3.7-flash,gemini-3.6-flash').split(',') if m.strip()]
 ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY', '')
 ASSISTANT_MODEL = os.getenv('ASSISTANT_MODEL', 'claude-opus-5')
 # low answers fastest; medium or high think longer before answering.

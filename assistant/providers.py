@@ -13,6 +13,7 @@ from .tools import TOOLS, run_tool
 logger = logging.getLogger(__name__)
 
 MAX_TOOL_STEPS = 6  # model calls per answer (each tool round is one more call)
+GEMINI_TIMEOUT_MS = 25_000  # per call; a slow model is left for the next one
 
 
 class AssistantError(Exception):
@@ -52,7 +53,11 @@ def _ask_gemini(system_text, visitor_note, messages):
     from google import genai
     from google.genai import errors, types
 
-    client = genai.Client(api_key=settings.GEMINI_API_KEY)
+    # No retries inside the client (it would wait minutes on an overloaded model); the next model is tried instead.
+    client = genai.Client(
+        api_key=settings.GEMINI_API_KEY,
+        http_options=types.HttpOptions(timeout=GEMINI_TIMEOUT_MS, retry_options=types.HttpRetryOptions(attempts=1)),
+    )
     config = types.GenerateContentConfig(
         system_instruction=f"{system_text}\n{visitor_note}",
         tools=[types.Tool(function_declarations=[
@@ -66,25 +71,35 @@ def _ask_gemini(system_text, visitor_note, messages):
         automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
         max_output_tokens=8192,
     )
-    contents = [
+    question = [
         types.Content(role="user" if m["role"] == "user" else "model", parts=[types.Part.from_text(text=m["content"])])
         for m in messages
     ]
 
-    for _ in range(MAX_TOOL_STEPS):
+    # Free models are often overloaded (503) or out of quota (429) for a while. Then the answer starts again
+    # on the next model: a model's tool-call turns carry its own thought signatures, so they are not mixed.
+    models = list(dict.fromkeys([settings.GEMINI_MODEL, *settings.GEMINI_FALLBACK_MODELS]))
+    for i, model in enumerate(models):
         try:
-            response = client.models.generate_content(model=settings.GEMINI_MODEL, contents=contents, config=config)
+            return _gemini_answer(client, model, config, list(question), types)
         except errors.APIError as e:
-            logger.warning("AI assistant (Gemini): %s %s", e.code, e.message)
+            logger.warning("AI assistant (Gemini %s): %s %s", model, e.code, e.message)
             if e.code in (401, 403) or (e.code == 400 and "API key" in (e.message or "")):
                 raise AssistantError(*NOT_CONFIGURED)
-            if e.code == 429:
-                raise AssistantError(*BUSY)
-            raise AssistantError(*UNAVAILABLE)
+            if e.code in (404, 429, 500, 503, 504) and i + 1 < len(models):
+                continue
+            raise AssistantError(*(BUSY if e.code == 429 else UNAVAILABLE))
         except (httpx.HTTPError, OSError) as e:
-            logger.warning("AI assistant (Gemini): network error: %s", e)
+            logger.warning("AI assistant (Gemini %s): network error: %r", model, e)
+            if isinstance(e, httpx.TimeoutException) and i + 1 < len(models):
+                continue
             raise AssistantError(*UNAVAILABLE)
 
+
+def _gemini_answer(client, model, config, contents, types):
+    """One model answers, calling tools as it needs; API errors are left to the caller."""
+    for _ in range(MAX_TOOL_STEPS):
+        response = client.models.generate_content(model=model, contents=contents, config=config)
         candidate = response.candidates[0] if response.candidates else None
         if candidate is None or candidate.content is None:
             return {"reply": "", "refused": True, "truncated": False}  # the question itself was blocked
@@ -97,7 +112,7 @@ def _ask_gemini(system_text, visitor_note, messages):
                 text, _ = run_tool(call.name, dict(call.args or {}))
                 # The id ties the result to its call when the model asks for several at once.
                 parts.append(types.Part(function_response=types.FunctionResponse(id=call.id, name=call.name, response=json.loads(text))))
-            contents.append(types.Content(role="tool", parts=parts))
+            contents.append(types.Content(role="user", parts=parts))
             continue
         reply = (response.text or "").strip()
         finish = str(candidate.finish_reason or "")

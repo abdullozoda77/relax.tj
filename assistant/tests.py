@@ -71,6 +71,16 @@ class GeminiTests(AssistantTestCase):
         self.assertEqual((result.id, result.name), ("call_1", "get_place_details"))
         self.assertEqual(result.response["places"][0]["description"], "Горное озеро.")
 
+    @override_settings(GEMINI_MODEL="main-model", GEMINI_FALLBACK_MODELS=["spare-model"])
+    def test_overloaded_model_falls_back(self):
+        overloaded = genai_errors.APIError(503, {"error": {"message": "high demand", "status": "UNAVAILABLE"}})
+        with mock.patch("google.genai.Client") as client_class:
+            generate = client_class.return_value.models.generate_content
+            generate.side_effect = [overloaded, gemini_response(text="Салом!")]
+            response = self.ask("Салом")
+        self.assertEqual(response.json()["reply"], "Салом!")
+        self.assertEqual([c.kwargs["model"] for c in generate.call_args_list], ["main-model", "spare-model"])
+
     def test_free_quota_used_up(self):
         error = genai_errors.APIError(429, {"error": {"message": "Quota exceeded", "status": "RESOURCE_EXHAUSTED"}})
         with mock.patch("google.genai.Client") as client_class:
