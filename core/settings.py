@@ -217,6 +217,7 @@ else:
 # Password reset emails link to the React page /reset-password on this address
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 # Gmail and most SMTP servers only send "from" the account itself, so it is used by default.
+# The name is quoted ("Relax.tj"): a dot in an unquoted name is not a valid address.
 DEFAULT_FROM_EMAIL = os.getenv(
-    'DEFAULT_FROM_EMAIL', f"Relax.tj <{os.getenv('EMAIL_HOST_USER')}>" if os.getenv('EMAIL_HOST_USER') else 'Relax.tj <noreply@relax.tj>'
+    'DEFAULT_FROM_EMAIL', f'"Relax.tj" <{os.getenv("EMAIL_HOST_USER") or "noreply@relax.tj"}>'
 )
