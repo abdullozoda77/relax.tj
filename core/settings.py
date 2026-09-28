@@ -119,6 +119,13 @@ CORS_ALLOWED_ORIGINS = [o.strip() for o in os.getenv('CORS_ALLOWED_ORIGINS', 'ht
 # forms like the Django admin login behind nginx.
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()]
 
+# Behind nginx with HTTPS (HTTPS=True in .env): nginx tells Django the page came over https, so links to photos
+# and the admin stay on https, and login cookies are sent only over https.
+if os.getenv('HTTPS', 'False') == 'True':
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
 ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
