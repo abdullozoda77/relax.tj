@@ -67,14 +67,14 @@ export default function Home() {
   }
 
   function findNearby() {
-    const useDushanbe = () => {
+    const fallbackToDushanbe = () => {
       toast(t("Не удалось определить местоположение — показываем места рядом с Душанбе"), "error");
       showNearby(DUSHANBE, true);
     };
-    if (!navigator.geolocation) return useDushanbe();
+    if (!navigator.geolocation) return fallbackToDushanbe();
     navigator.geolocation.getCurrentPosition(
       (pos) => showNearby({ lat: pos.coords.latitude.toFixed(6), lng: pos.coords.longitude.toFixed(6) }, false),
-      useDushanbe,
+      fallbackToDushanbe,
       { timeout: 8000 }
     );
   }

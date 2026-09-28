@@ -147,7 +147,8 @@ export function DetailsAccordion({ place }) {
   const toggle = (i) =>
     setOpenSet((prev) => {
       const next = new Set(prev);
-      next.has(i) ? next.delete(i) : next.add(i);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
       return next;
     });
 
@@ -193,16 +194,6 @@ export function GoodToKnow({ place }) {
     place.best_season !== "all_year" && t("Лучшее время для поездки — {0}", SEASONS[place.best_season].toLowerCase()),
   ].filter(Boolean);
 
-  const List = ({ items, icon, color }) => (
-    <ul className="flex flex-col gap-3 text-body-md font-body-md text-on-surface-variant">
-      {items.map((text) => (
-        <li key={text} className="flex items-start gap-2.5">
-          <Icon name={icon} className={`${color} text-[18px] mt-0.5`} />
-          <span>{text}</span>
-        </li>
-      ))}
-    </ul>
-  );
 
   return (
     <section className={card}>
@@ -222,6 +213,19 @@ export function GoodToKnow({ place }) {
         </div>
       </div>
     </section>
+  );
+}
+
+function List({ items, icon, color }) {
+  return (
+    <ul className="flex flex-col gap-3 text-body-md font-body-md text-on-surface-variant">
+      {items.map((text) => (
+        <li key={text} className="flex items-start gap-2.5">
+          <Icon name={icon} className={`${color} text-[18px] mt-0.5`} />
+          <span>{text}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
 

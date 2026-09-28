@@ -26,16 +26,25 @@ export function setLogoutHandler(handler) {
   onLogout = handler;
 }
 
-async function refreshAccessToken() {
-  if (!tokens.refresh) return false;
-  const res = await fetch(`${API}/auth/token/refresh/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refresh: tokens.refresh }),
+// A refresh token works only once (the server gives a new one and blocks the old), so when several requests
+// find the access token expired at the same moment they all wait for one refresh instead of each sending theirs.
+let refreshing = null;
+
+function refreshAccessToken() {
+  refreshing ??= (async () => {
+    if (!tokens.refresh) return false;
+    const res = await fetch(`${API}/auth/token/refresh/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh: tokens.refresh }),
+    });
+    if (!res.ok) return false;
+    tokens.save(await res.json());
+    return true;
+  })().finally(() => {
+    refreshing = null;
   });
-  if (!res.ok) return false;
-  tokens.save(await res.json());
-  return true;
+  return refreshing;
 }
 
 // Server messages that are shown to visitors, in the site language.
@@ -69,18 +78,23 @@ export async function api(path, { method = "GET", body } = {}) {
   const isForm = body instanceof FormData;
   const payload = body && !isForm ? JSON.stringify(body) : body;
 
+  let sentWith = null;
   const send = () => {
     // The API returns place names in the site language (Russian when there is no translation).
     const headers = { "Accept-Language": lang };
     if (body && !isForm) headers["Content-Type"] = "application/json";
-    if (tokens.access) headers.Authorization = `Bearer ${tokens.access}`;
+    sentWith = tokens.access;
+    if (sentWith) headers.Authorization = `Bearer ${sentWith}`;
     return fetch(API + path, { method, headers, body: payload });
   };
 
   let res = await send();
   if (res.status === 401) {
     const hadToken = Boolean(tokens.access);
-    if (hadToken && (await refreshAccessToken())) {
+    if (hadToken && tokens.access !== sentWith) {
+      // Another request has already got a new token while this one was on its way: just repeat it.
+      res = await send();
+    } else if (hadToken && (await refreshAccessToken())) {
       res = await send();
     } else {
       // The saved login is gone or has expired: show the site as logged out (the page may still think
