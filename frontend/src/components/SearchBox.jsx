@@ -94,12 +94,13 @@ export default function SearchBox() {
   const showList = open && query.trim().length >= 2 && results !== null;
 
   return (
-    <div className="relative hidden sm:block">
+    // Its width can shrink (down to 6rem, before the user name) when the header is short of space, e.g. with a large system font.
+    <div className="relative hidden sm:block w-40 xl:w-52 min-w-[6rem] shrink-[6]">
       <Icon name="search" className="absolute z-10 left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px] pointer-events-none" />
       <input
         aria-autocomplete="list"
         aria-expanded={showList}
-        className="pl-9 pr-4 py-1.5 rounded-full bg-slate-900 border border-slate-700/80 text-body-sm text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400 w-40 xl:w-52 transition-colors"
+        className="pl-9 pr-4 py-1.5 rounded-full bg-slate-900 border border-slate-700/80 text-body-sm text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400 w-full transition-colors"
         onBlur={() => setOpen(false)}
         onChange={(e) => {
           setQuery(e.target.value);

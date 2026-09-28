@@ -42,8 +42,8 @@ export default function UserMenu() {
   }
 
   return (
-    <div className="relative" ref={box}>
-      <button className="flex items-center gap-2 text-slate-200 hover:text-white" onClick={() => setOpen(!open)} type="button">
+    <div className="relative min-w-0" ref={box}>
+      <button className="flex items-center gap-2 min-w-0 max-w-full text-slate-200 hover:text-white" onClick={() => setOpen(!open)} type="button">
         {user.avatar ? (
           <img alt="" className="w-8 h-8 rounded-full object-cover shadow-md shadow-emerald-950" src={user.avatar} />
         ) : (
@@ -51,7 +51,7 @@ export default function UserMenu() {
             {user.username[0]}
           </span>
         )}
-        <span className="hidden xl:inline max-w-[10rem] truncate text-body-sm">{user.username}</span>
+        <span className="hidden xl:inline min-w-0 max-w-[10rem] truncate text-body-sm">{user.username}</span>
         <Icon name="expand_more" className="text-[18px]" />
       </button>
       {open && (
