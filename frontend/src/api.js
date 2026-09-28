@@ -60,12 +60,15 @@ const SERVER_MESSAGES = {
   "Too many wrong tries. Ask for a new code.": t("Слишком много неверных попыток. Запросите новый код."),
   "Please wait a minute before asking for a new code.": t("Подождите минуту, прежде чем запрашивать новый код."),
   "Could not send the email. Please try again later.": t("Не удалось отправить письмо. Попробуйте позже."),
+  "No active account found with the given credentials": t("Неверное имя пользователя или пароль."),
+  "The routing service is not available right now.": t("Сервис маршрутов сейчас недоступен. Попробуйте позже."),
+  "No road route was found between these places.": t("Между этими местами не найдено дороги."),
 };
 
 export function errorText(data) {
   if (!data) return "";
   if (typeof data === "string") return SERVER_MESSAGES[data] || data;
-  if (data.detail) return data.detail;
+  if (data.detail) return SERVER_MESSAGES[data.detail] || data.detail;
   return Object.values(data)
     .flat()
     .map((m) => (typeof m === "string" ? SERVER_MESSAGES[m] || m : errorText(m)))
