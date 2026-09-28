@@ -172,3 +172,19 @@
 | Центр Душанбе и парк Айни | dushanbe_center/dushanbe_center_1.jpg | alzium | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Dushanbe%2C_Tajikistan_-_panoramio_-_alzium_%2817%29.jpg |
 | Чилучорчашма | chiluchorchashma/chiluchorchashma_1.jpg | Bertramz | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:ChiluChorChashma1.jpg |
 | Язгулемская долина | yazgulom/yazgulom_1.jpg | tajikam | CC BY 3.0 | https://commons.wikimedia.org/wiki/File:Janarch-i_bala%2Cbadakhshan_province%2C%D8%AC%D8%A7%D9%85%D8%B1%DA%86%DB%8C_%D8%A8%D8%A7%D9%84%D8%A7_%2C_%D8%A7%D8%B3%D8%AA%D8%A7%D9%86_%D8%A8%D8%AF%D8%AE%D8%B4%D8%A7%D9%86_-_panoramio_%281%29.jpg |
+
+## Места 90–100
+
+| Место | Файл | Автор | Лицензия | Источник |
+|---|---|---|---|---|
+| Театр оперы и балета имени Айни | opera_ballet/opera_ballet_1.jpg | Зинҳор Насрӣ | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:%D0%A2%D0%B5%D0%B0%D1%82%D1%80_%D0%BE%D0%BF%D0%B5%D1%80%D1%8B_%D0%B8_%D0%B1%D0%B0%D0%BB%D0%B5%D1%82%D0%B0,_%D0%94%D1%83%D1%88%D0%B0%D0%BD%D0%B1%D0%B5,_%D0%A2%D0%B0%D0%B4%D0%B6%D0%B8%D0%BA%D0%B8%D1%81%D1%82%D0%B0%D0%BD_-_2024.jpg |
+| Душанбинский зоопарк | dushanbe_zoo/dushanbe_zoo_1.jpg | SaidBahrom | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:%D0%9F%D1%8F%D1%82%D0%BD%D0%B8%D1%81%D1%82%D1%8B%D0%B9_%D0%BE%D0%BB%D0%B5%D0%BD%D1%8C_(%D0%94%D1%83%D1%88%D0%B0%D0%BD%D0%B1%D0%B5).jpg |
+| Парк Победы | victory_park/victory_park_1.jpg | Zack Knowles | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:World_war_2_memorial,_victory_park_(2)_-_panoramio.jpg |
+| Мавзолей Мухаммада Башоро | bashoro/bashoro_1.jpg | Шухрат Саъдиев | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Mosques_in_Panjakent_District.jpg |
+| Дворец Арбоб | arbob/arbob_1.jpg | Tuyuhun | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Arbob_Palace.jpg |
+| Ширкентский историко-природный парк | shirkent/shirkent_1.jpg | Adam Harangozó | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Dinosaur_footprints_in_Shirkent,_Tajikistan_2.jpg |
+| Озеро Тимурдара | timurdara/timurdara_1.jpg | Prospector | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Timurdara_lake_(2).jpg |
+| Медресе Ходжа Машхад | khoja_mashhad/khoja_mashhad_1.jpg | Bertramz | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:KhojaMahshad,S.jpg |
+| Пик Озоди (Корженевской) | peak_ozodi/peak_ozodi_1.jpg | Jaan Künnap | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Kor%C5%BEenevskaja_m%C3%A4etipp_90.jpg |
+| Ишкашим | ishkoshim/ishkoshim_1.jpg | Hans Birger Nilsen | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Ishkashim_populus_and_the_Hindu_Kush_(1)_(32233309096).jpg |
+| Калаи-Хумб (Дарваз) | kalaikhum/kalaikhum_1.jpg | Khwahan | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Bridge_Qalaikhum_%26_Nusay_of_Darwaz.jpg |

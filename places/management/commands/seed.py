@@ -141,18 +141,18 @@ class Command(BaseCommand):
         ))
 
     def add_routes(self):
-        """Creates the ready-made public routes that do not exist yet. Returns how many were created."""
+        """Creates the ready-made public routes that do not exist yet. Returns how many were created.
+        A route counts as existing when a public route has its title, whoever owns it (the owner may be renamed)."""
+        missing = [r for r in ROUTES if not TravelList.objects.filter(is_public=True, title=r[0]).exists()]
+        if not missing:
+            return 0
         owner, is_new = User.objects.get_or_create(username=ROUTES_OWNER, defaults={"first_name": "Relax.tj"})
         if is_new:
             owner.set_unusable_password()  # nobody logs in with this account
             owner.save()
         added = 0
-        for title, description, stops in reversed(ROUTES):
-            travel_list, is_new = TravelList.objects.get_or_create(
-                user=owner, title=title, defaults={"description": description, "is_public": True}
-            )
-            if not is_new:
-                continue
+        for title, description, stops in reversed(missing):
+            travel_list = TravelList.objects.create(user=owner, title=title, description=description, is_public=True)
             places = {p.name: p for p in Place.objects.filter(name__in=stops)}
             TravelListPlace.objects.bulk_create(
                 TravelListPlace(travel_list=travel_list, place=places[name], order=i)
