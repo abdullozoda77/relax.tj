@@ -75,7 +75,7 @@ function PhotosManager({ placeId }) {
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
         {images.map((img) => (
           <div key={img.id} className={`relative rounded-lg overflow-hidden border-2 ${img.is_main ? "border-secondary" : "border-transparent"}`}>
-            <img alt="" className="w-full h-24 object-cover" src={img.image} />
+            <img alt="" className="w-full h-24 object-cover" src={img.image_small || img.image} />
             {img.is_main && <span className="absolute top-1 left-1 bg-secondary text-on-secondary-container text-[10px] font-bold px-1.5 rounded">{t("ГЛАВНОЕ")}</span>}
             <div className="absolute bottom-1 right-1 flex gap-1">
               {!img.is_main && (

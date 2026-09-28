@@ -207,7 +207,7 @@ export default function Reviews({ placeId, onSummary }) {
               <div className="flex flex-wrap gap-2 mt-3">
                 {r.images.map((img) => (
                   <a key={img.id} href={img.image} rel="noreferrer" target="_blank">
-                    <img alt="" className="w-20 h-20 object-cover rounded-lg border border-slate-800 hover:opacity-80 transition-opacity" src={img.image} />
+                    <img alt="" className="w-20 h-20 object-cover rounded-lg border border-slate-800 hover:opacity-80 transition-opacity" src={img.image_small || img.image} />
                   </a>
                 ))}
               </div>

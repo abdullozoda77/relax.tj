@@ -4,8 +4,10 @@ import Icon from "./Icon.jsx";
 // Photo of the place, or a gradient with the category icon when there is no photo.
 export default function PlaceBackground({ place, className = "" }) {
   const base = `absolute inset-0 group-hover:scale-110 transition-transform duration-700 ease-out ${className}`;
-  if (place.main_image) {
-    return <div className={`${base} bg-cover bg-center`} style={{ backgroundImage: `url("${place.main_image}")` }} />;
+  // The 640 px copy is enough for cards; the original only when there is no copy.
+  const photo = place.main_image_small || place.main_image;
+  if (photo) {
+    return <div className={`${base} bg-cover bg-center`} style={{ backgroundImage: `url("${photo}")` }} />;
   }
   const style = categoryStyle(place.category?.name ?? place.category);
   return (

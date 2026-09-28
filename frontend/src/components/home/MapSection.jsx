@@ -32,7 +32,7 @@ export default function MapSection() {
               onClick={() => setOpen(true)}
               type="button"
             >
-              <div className="absolute inset-0 bg-cover bg-center scale-105 group-hover:scale-110 transition-transform duration-700" style={{ backgroundImage: 'url("/hero/yashikul.jpg")' }} />
+              <div className="absolute inset-0 bg-cover bg-center scale-105 group-hover:scale-110 transition-transform duration-700 bg-[url('/hero/small/yashikul.jpg')] md:bg-[url('/hero/yashikul.jpg')]" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/30" />
               <div className="relative h-full flex flex-col items-center justify-center gap-4 text-center px-6">
                 <span className="w-16 h-16 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center shadow-lg shadow-emerald-950 group-hover:scale-110 transition-transform">

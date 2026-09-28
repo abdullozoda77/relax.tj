@@ -63,7 +63,7 @@ export default function ReviewsTab() {
               <div className="flex gap-2 mt-2">
                 {r.images.map((img) => (
                   <a key={img.id} href={img.image} rel="noreferrer" target="_blank">
-                    <img alt="" className="w-14 h-14 rounded object-cover" src={img.image} />
+                    <img alt="" className="w-14 h-14 rounded object-cover" src={img.image_small || img.image} />
                   </a>
                 ))}
               </div>

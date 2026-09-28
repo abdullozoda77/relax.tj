@@ -84,6 +84,7 @@ step "Database, admin styles and the places"
 as_user ".venv/bin/python manage.py migrate --noinput"
 as_user ".venv/bin/python manage.py collectstatic --noinput -v 0"
 as_user ".venv/bin/python manage.py seed"
+as_user ".venv/bin/python manage.py make_thumbnails"  # small photo copies for cards and phones
 
 step "Node.js 22 for $APP_USER (the system Node.js stays as it is)"
 if [ ! -x "$NODE_DIR/bin/node" ]; then

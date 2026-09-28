@@ -2,6 +2,7 @@ from django.db.models import Avg
 from rest_framework import serializers
 from accounts.serializers import UserShortSerializer
 from .geo import in_tajikistan
+from .thumbnails import thumbnail_url
 from .validators import image_validators
 from .models import (
     Region, Category, Activity, Place, PlaceImage, Favorite,
@@ -52,9 +53,19 @@ class ActivitySerializer(serializers.ModelSerializer):
         fields = ["id", "name", "description", "icon"]
 
 class PlaceImageSerializer(serializers.ModelSerializer):
+    # Lighter copies for the page; "image" stays the original (full view, admin).
+    image_small = serializers.SerializerMethodField()
+    image_medium = serializers.SerializerMethodField()
+
     class Meta:
         model = PlaceImage
-        fields = ["id", "place", "image", "is_main", "created_at"]
+        fields = ["id", "place", "image", "image_small", "image_medium", "is_main", "created_at"]
+
+    def get_image_small(self, obj):
+        return thumbnail_url(obj.image, self.context.get("request"), "small")
+
+    def get_image_medium(self, obj):
+        return thumbnail_url(obj.image, self.context.get("request"), "medium")
 
     def validate(self, attrs):
         place = attrs.get("place", getattr(self.instance, "place", None))
@@ -96,11 +107,12 @@ class PlaceListSerializer(LocalizedNameMixin, PlaceRatingMixin, serializers.Mode
     region = serializers.CharField(source="region.name", read_only=True)
     category = serializers.CharField(source="category.name", read_only=True, default=None)
     main_image = serializers.SerializerMethodField()
+    main_image_small = serializers.SerializerMethodField()  # 640 px copy for cards
 
     class Meta:
         model = Place
         fields = [
-            "id", "name", "region", "category", "main_image", "best_season",
+            "id", "name", "region", "category", "main_image", "main_image_small", "best_season",
             "entrance_fee", "views_count", "average_rating", "reviews_count", "is_favorite", "is_active",
             "latitude", "longitude", "altitude",
         ]
@@ -112,6 +124,10 @@ class PlaceListSerializer(LocalizedNameMixin, PlaceRatingMixin, serializers.Mode
             return None
         request = self.context.get("request")
         return request.build_absolute_uri(image.image.url) if request else image.image.url
+
+    def get_main_image_small(self, obj):
+        images = list(obj.images.all())
+        return thumbnail_url(images[0].image, self.context.get("request"), "small") if images else None
 
 class PlaceDetailSerializer(LocalizedNameMixin, PlaceRatingMixin, serializers.ModelSerializer):
     # The original names for the admin edit form; `name` is already in the visitor's language.
@@ -167,9 +183,14 @@ class PlaceWriteSerializer(serializers.ModelSerializer):
         return value
 
 class ReviewImageSerializer(serializers.ModelSerializer):
+    image_small = serializers.SerializerMethodField()
+
     class Meta:
         model = ReviewImage
-        fields = ["id", "image"]
+        fields = ["id", "image", "image_small"]
+
+    def get_image_small(self, obj):
+        return thumbnail_url(obj.image, self.context.get("request"), "small")
 
 class ReviewSerializer(serializers.ModelSerializer):
     MAX_IMAGES = 5

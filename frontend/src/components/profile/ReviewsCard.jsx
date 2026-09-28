@@ -57,7 +57,7 @@ export default function ReviewsCard({ onChanged }) {
                 {r.images?.length > 0 && (
                   <span className="flex gap-1 mt-1.5">
                     {r.images.slice(0, 4).map((img) => (
-                      <img key={img.id} alt="" className="w-8 h-8 rounded object-cover" src={img.image} />
+                      <img key={img.id} alt="" className="w-8 h-8 rounded object-cover" src={img.image_small || img.image} />
                     ))}
                   </span>
                 )}

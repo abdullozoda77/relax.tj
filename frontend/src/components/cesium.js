@@ -17,7 +17,8 @@ const PHONE = window.matchMedia("(pointer: coarse)").matches || window.innerWidt
 // Creates a viewer with our quality settings and without Cesium's default buttons.
 export function createViewer(container) {
   const viewer = new Viewer(container, {
-    terrain: Terrain.fromWorldTerrain({ requestVertexNormals: true, requestWaterMask: !PHONE }),
+    // Phones skip the extra data for sun shading and water, so each terrain tile is smaller.
+    terrain: Terrain.fromWorldTerrain({ requestVertexNormals: !PHONE, requestWaterMask: !PHONE }),
     animation: false,
     timeline: false,
     baseLayerPicker: false,
@@ -36,8 +37,10 @@ export function createViewer(container) {
   viewer.useBrowserRecommendedResolution = false;
   const pixelRatio = window.devicePixelRatio || 1;
   viewer.resolutionScale = PHONE ? Math.min(pixelRatio, 1.5) / pixelRatio : 1;
-  scene.globe.maximumScreenSpaceError = PHONE ? 2.5 : 1.2;
-  scene.globe.enableLighting = true;
+  // On phones coarser tiles: fewer satellite images and terrain pieces to download, and even coarser far away.
+  scene.globe.maximumScreenSpaceError = PHONE ? 3.5 : 1.2;
+  if (PHONE) scene.fog.screenSpaceErrorFactor = 4;
+  scene.globe.enableLighting = !PHONE;
   scene.light.intensity = 3; // default 2 looks too dark on satellite photos
   scene.highDynamicRange = false; // HDR tone mapping makes the photos dull and dark
   scene.globe.depthTestAgainstTerrain = true;

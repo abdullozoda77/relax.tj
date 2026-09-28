@@ -166,3 +166,32 @@ class NotificationTests(PlacesTestCase):
         self.assertIn(self.client.post("/api/notifications/read-all/").status_code, (200, 204))
         self.assertEqual(self.client.get("/api/notifications/unread-count/").json()["count"], 0)
         self.assertEqual(Notification.objects.filter(user=self.bob, is_read=False).count(), 1)
+
+
+class ThumbnailTests(PlacesTestCase):
+    def test_cards_get_a_small_webp_copy_of_the_photo(self):
+        import io
+        import shutil
+        import tempfile
+
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from django.test import override_settings
+        from PIL import Image
+
+        from .models import PlaceImage
+
+        media = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, media, ignore_errors=True)
+        with override_settings(MEDIA_ROOT=media):
+            buffer = io.BytesIO()
+            Image.new("RGB", (1920, 1280), (30, 120, 90)).save(buffer, "JPEG")
+            PlaceImage.objects.create(place=self.place, is_main=True, image=SimpleUploadedFile("lake.jpg", buffer.getvalue()))
+
+            card = self.client.get("/api/places/", {"search": "искан"}).json()["results"][0]
+            self.assertTrue(card["main_image_small"].endswith(".webp"))
+            path = card["main_image_small"].split("/media/", 1)[1]
+            with Image.open(f"{media}/{path}") as small:
+                self.assertEqual(small.size, (640, 427))
+            detail = self.client.get(f"/api/places/{self.place.id}/").json()
+            self.assertIn("/thumbs/medium/", detail["images"][0]["image_medium"])
+            self.assertTrue(detail["images"][0]["image"].endswith(".jpg"))  # the original is still there

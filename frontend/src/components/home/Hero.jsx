@@ -86,9 +86,18 @@ const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)"
 
 // The new photo fades in on top, from a soft blur to sharp, and starts its slow zoom.
 // The previous one stays fully visible underneath and keeps zooming, so there is no dark dip or jump.
+// Phones get 960 px copies of the photos (about 6 times lighter), computers the 1920 px ones.
+const PHOTO_DIR = window.matchMedia("(max-width: 767px)").matches ? "/hero/small/" : "/hero/";
+const photoUrl = (photo) => PHOTO_DIR + photo.src.split("/").pop();
+
 function slideStyle(i, { slide, prev }, ready) {
   const still = reducedMotion();
-  const base = { backgroundImage: `url("${PHOTOS[i].src}")`, transformOrigin: ORIGINS[i % ORIGINS.length] };
+  // Only the photo on screen, the one fading out and the next one are downloaded; the others wait their turn.
+  const needed = i === slide || i === prev || i === (slide + 1) % PHOTOS.length;
+  const base = {
+    backgroundImage: needed ? `url("${photoUrl(PHOTOS[i])}")` : "none",
+    transformOrigin: ORIGINS[i % ORIGINS.length],
+  };
   const moving = `opacity ${FADE_MS}ms ease-in-out, filter ${FADE_MS}ms ease-out, transform ${ZOOM_MS}ms linear`;
   if (i === slide && !ready) return { ...base, zIndex: 2, opacity: 1 }; // first paint, before the zoom starts
   if (i === slide) {

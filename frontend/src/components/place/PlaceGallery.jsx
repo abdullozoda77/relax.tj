@@ -8,7 +8,12 @@ import { t } from "../../i18n.js";
 // Tiles show more photos of the place; if there are not enough, similar places fill them.
 export default function PlaceGallery({ place, similar }) {
   const { openPlace } = useUi();
-  const photos = place.images.map((img) => ({ ...place, main_image: img.image }));
+  // The big photo uses the 1200 px copy, the tiles the 640 px one (the original opens in full screen).
+  const photos = place.images.map((img, i) => ({
+    ...place,
+    main_image: (i === 0 ? img.image_medium : img.image_small) || img.image,
+    main_image_small: null,
+  }));
   const main = photos[0] || place;
   const tiles = [
     ...photos.slice(1, 4).map((p, i) => ({ key: `img-${i}`, place: p, title: place.name })),
