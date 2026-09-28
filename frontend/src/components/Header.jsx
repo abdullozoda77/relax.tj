@@ -47,19 +47,19 @@ export default function Header() {
       }`}
     >
       <div
-        className={`max-w-7xl mx-auto px-3 sm:px-6 lg:px-12 flex items-center justify-between gap-2 sm:gap-4 transition-[height,border-radius] duration-500 ${
+        className={`max-w-7xl mx-auto px-3 sm:px-6 xl:px-10 flex items-center justify-between gap-2 sm:gap-4 transition-[height,border-radius] duration-500 ${
           overHero ? "liquid-glass h-16 rounded-xl" : "h-20"
         }`}
       >
         <Logo />
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden lg:flex items-center gap-4 xl:gap-6 shrink-0">
           {NAV.map((item) => (
             <Link key={item.to} className="text-body-md text-slate-300 hover:text-emerald-400 transition-colors" to={item.to}>
               {item.label}
             </Link>
           ))}
         </nav>
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3 xl:gap-4 min-w-0">
           <SearchBox />
           <LanguageSwitcher />
           <ThemeToggle />

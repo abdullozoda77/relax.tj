@@ -11,10 +11,13 @@ window.CESIUM_BASE_URL = "/cesium/";
 // Sun position: a summer day in Tajikistan (12:00 local time), bright light with soft shadows on slopes.
 const SUNNY_DAY = JulianDate.fromIso8601("2026-06-21T07:00:00Z");
 
+// Phones and tablets: a touch screen or a narrow window. They get lighter settings, computers the full quality.
+const PHONE = window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768;
+
 // Creates a viewer with our quality settings and without Cesium's default buttons.
 export function createViewer(container) {
   const viewer = new Viewer(container, {
-    terrain: Terrain.fromWorldTerrain({ requestVertexNormals: true, requestWaterMask: true }),
+    terrain: Terrain.fromWorldTerrain({ requestVertexNormals: true, requestWaterMask: !PHONE }),
     animation: false,
     timeline: false,
     baseLayerPicker: false,
@@ -28,9 +31,12 @@ export function createViewer(container) {
   });
   const { scene } = viewer;
 
-  // Quality: full pixel density, more detailed terrain, sunlight, atmosphere and anti-aliasing.
+  // Quality: sharp pixels, detailed terrain, sunlight, atmosphere and anti-aliasing. Phone screens have up to 3
+  // pixels per point (9 times the work), so they draw at most 1.5 and load coarser terrain tiles.
   viewer.useBrowserRecommendedResolution = false;
-  scene.globe.maximumScreenSpaceError = 1.2;
+  const pixelRatio = window.devicePixelRatio || 1;
+  viewer.resolutionScale = PHONE ? Math.min(pixelRatio, 1.5) / pixelRatio : 1;
+  scene.globe.maximumScreenSpaceError = PHONE ? 2.5 : 1.2;
   scene.globe.enableLighting = true;
   scene.light.intensity = 3; // default 2 looks too dark on satellite photos
   scene.highDynamicRange = false; // HDR tone mapping makes the photos dull and dark

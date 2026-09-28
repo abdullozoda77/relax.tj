@@ -99,7 +99,7 @@ export default function SearchBox() {
       <input
         aria-autocomplete="list"
         aria-expanded={showList}
-        className="pl-9 pr-4 py-1.5 rounded-full bg-slate-900 border border-slate-700/80 text-body-sm text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400 w-48 focus:w-64 transition-all"
+        className="pl-9 pr-4 py-1.5 rounded-full bg-slate-900 border border-slate-700/80 text-body-sm text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400 w-40 xl:w-52 transition-colors"
         onBlur={() => setOpen(false)}
         onChange={(e) => {
           setQuery(e.target.value);

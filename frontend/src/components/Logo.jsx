@@ -7,7 +7,7 @@ export function LogoMark({ className = "h-10 w-10" }) {
 
 export default function Logo() {
   return (
-    <Link className="flex items-center gap-3" to="/">
+    <Link className="flex items-center gap-3 shrink-0" to="/">
       <LogoMark />
       <span className="text-headline-sm font-headline-sm text-white tracking-tight flex items-center gap-1.5">
         Rohat <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />

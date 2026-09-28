@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { api } from "../api.js";
 import Icon from "../components/Icon.jsx";
 import PlaceBackground from "../components/PlaceBackground.jsx";
+import WhenVisible from "../components/WhenVisible.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import { useUi } from "../context/UiContext.jsx";
@@ -222,9 +223,11 @@ export default function TravelListPage() {
               )}
             </div>
             {route?.error && <p className="text-body-sm text-on-surface-variant">{t("Маршрут по дорогам сейчас недоступен — показаны расстояния по прямой.")}</p>}
-            <Suspense fallback={<div className="h-[420px] rounded-xl bg-surface-container-lowest animate-pulse" />}>
-              <RouteMap3D color={mode.color} onSelect={openPlace} path={road?.geometry} points={points} />
-            </Suspense>
+            <WhenVisible placeholder={<div className="h-[420px] rounded-xl bg-surface-container-lowest animate-pulse" />}>
+              <Suspense fallback={<div className="h-[420px] rounded-xl bg-surface-container-lowest animate-pulse" />}>
+                <RouteMap3D color={mode.color} onSelect={openPlace} path={road?.geometry} points={points} />
+              </Suspense>
+            </WhenVisible>
           </section>
         )}
 

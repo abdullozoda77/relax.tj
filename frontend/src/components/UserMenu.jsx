@@ -51,7 +51,7 @@ export default function UserMenu() {
             {user.username[0]}
           </span>
         )}
-        <span className="hidden lg:inline text-body-sm">{user.username}</span>
+        <span className="hidden xl:inline max-w-[10rem] truncate text-body-sm">{user.username}</span>
         <Icon name="expand_more" className="text-[18px]" />
       </button>
       {open && (

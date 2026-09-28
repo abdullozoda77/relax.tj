@@ -9,6 +9,7 @@ import PlaceSidebar from "../components/place/PlaceSidebar.jsx";
 import Reviews from "../components/place/Reviews.jsx";
 import WeatherCard from "../components/place/WeatherCard.jsx";
 import Stars from "../components/Stars.jsx";
+import WhenVisible from "../components/WhenVisible.jsx";
 import { SEASONS, formatRating, plural } from "../utils.js";
 import { t } from "../i18n.js";
 
@@ -27,9 +28,11 @@ function Terrain3DSection({ place }) {
           <Icon name="3d_rotation" className="text-[16px]" /> {t("Тяните мышью, чтобы вращать · правой кнопкой — наклон")}
         </span>
       </div>
-      <Suspense fallback={<div className="h-[420px] rounded-xl bg-surface-container-lowest animate-pulse" />}>
-        <Terrain3D place={place} />
-      </Suspense>
+      <WhenVisible placeholder={<div className="h-[420px] rounded-xl bg-surface-container-lowest animate-pulse" />}>
+        <Suspense fallback={<div className="h-[420px] rounded-xl bg-surface-container-lowest animate-pulse" />}>
+          <Terrain3D place={place} />
+        </Suspense>
+      </WhenVisible>
     </section>
   );
 }
