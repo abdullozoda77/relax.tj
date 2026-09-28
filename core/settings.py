@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'accounts',
     'places',
+    'assistant',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -75,6 +76,7 @@ REST_FRAMEWORK = {
         'anon': '1000/hour',
         'user': '5000/hour',
         'auth': '10/minute',
+        'assistant': '15/minute',
     },
 }
 
@@ -213,6 +215,12 @@ else:
             'BACKEND': 'django.core.mail.backends.console.EmailBackend',
         },
     }
+
+# AI assistant (Claude). Without ANTHROPIC_API_KEY in .env the chat says it is not set up yet.
+ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY', '')
+ASSISTANT_MODEL = os.getenv('ASSISTANT_MODEL', 'claude-opus-5')
+# low answers fastest; medium or high think longer before answering.
+ASSISTANT_EFFORT = os.getenv('ASSISTANT_EFFORT', 'low')
 
 # Password reset emails link to the React page /reset-password on this address
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')

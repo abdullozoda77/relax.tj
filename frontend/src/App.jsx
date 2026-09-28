@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
+import AssistantChat from "./components/AssistantChat.jsx";
 import Footer from "./components/Footer.jsx";
 import Header from "./components/Header.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
@@ -57,6 +58,7 @@ export default function App() {
               </PageTransition>
             </main>
             <Footer />
+            <AssistantChat />
           </div>
         </UiProvider>
       </AuthProvider>

@@ -563,6 +563,41 @@ def simplify_line(points, tolerance=0.00015):
     return [p for p, k in zip(points, keep) if k]
 
 
+class RoutingError(Exception):
+    def __init__(self, status_code, detail):
+        super().__init__(detail)
+        self.status_code = status_code
+        self.detail = detail
+
+
+def road_route(mode, points):
+    """Road route through points [(lng, lat), …]: distance, time, legs and the line. Cached for a day.
+    Raises RoutingError when the routing service is down or there is no road."""
+    coords = ";".join(f"{lng:.5f},{lat:.5f}" for lng, lat in points)
+    key = f"route:{mode}:{coords}"
+    data = cache.get(key)
+    if data is None:
+        url = ROUTING_URL.format(mode=mode, profile=ROUTING_PROFILES[mode], coords=coords)
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Relax.tj travel site"})
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                osrm = json.load(resp)
+        except (OSError, ValueError):
+            raise RoutingError(status.HTTP_503_SERVICE_UNAVAILABLE, "The routing service is not available right now.")
+        if osrm.get("code") != "Ok" or not osrm.get("routes"):
+            raise RoutingError(status.HTTP_404_NOT_FOUND, "No road route was found between these places.")
+        route = osrm["routes"][0]
+        data = {
+            "mode": mode,
+            "distance_km": round(route["distance"] / 1000, 1),
+            "duration_min": round(route["duration"] / 60),
+            "legs": [{"distance_km": round(leg["distance"] / 1000, 1), "duration_min": round(leg["duration"] / 60)} for leg in route["legs"]],
+            "geometry": simplify_line(route["geometry"]["coordinates"]),  # [[lng, lat], …] along the roads
+        }
+        cache.set(key, data, ROUTING_CACHE_SECONDS)
+    return data
+
+
 class RouteView(APIView):
     """Road route through the given points: total and per-leg distance and time, and the line to draw on a map."""
 
@@ -589,29 +624,10 @@ class RouteView(APIView):
         if not valid or not 2 <= len(points) <= ROUTING_MAX_POINTS:
             raise ValidationError({"points": f"Give 2 to {ROUTING_MAX_POINTS} points as lng,lat;lng,lat."})
 
-        coords = ";".join(f"{lng:.5f},{lat:.5f}" for lng, lat in points)
-        key = f"route:{mode}:{coords}"
-        data = cache.get(key)
-        if data is None:
-            url = ROUTING_URL.format(mode=mode, profile=ROUTING_PROFILES[mode], coords=coords)
-            try:
-                req = urllib.request.Request(url, headers={"User-Agent": "Relax.tj travel site"})
-                with urllib.request.urlopen(req, timeout=15) as resp:
-                    osrm = json.load(resp)
-            except (OSError, ValueError):
-                return Response({"detail": "The routing service is not available right now."}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
-            if osrm.get("code") != "Ok" or not osrm.get("routes"):
-                return Response({"detail": "No road route was found between these places."}, status=status.HTTP_404_NOT_FOUND)
-            route = osrm["routes"][0]
-            data = {
-                "mode": mode,
-                "distance_km": round(route["distance"] / 1000, 1),
-                "duration_min": round(route["duration"] / 60),
-                "legs": [{"distance_km": round(leg["distance"] / 1000, 1), "duration_min": round(leg["duration"] / 60)} for leg in route["legs"]],
-                "geometry": simplify_line(route["geometry"]["coordinates"]),  # [[lng, lat], …] along the roads
-            }
-            cache.set(key, data, ROUTING_CACHE_SECONDS)
-        return Response(data)
+        try:
+            return Response(road_route(mode, points))
+        except RoutingError as error:
+            return Response({"detail": error.detail}, status=error.status_code)
 
 
 class StatsView(APIView):
