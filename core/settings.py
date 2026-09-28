@@ -187,12 +187,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-# With EMAIL_HOST in .env, letters (confirmation codes, password reset) are sent through that SMTP server,
+# With EMAIL_HOST, EMAIL_HOST_USER and EMAIL_HOST_PASSWORD in .env, letters (confirmation codes, password reset) are sent through that SMTP server,
 # for example Gmail: EMAIL_HOST=smtp.gmail.com, EMAIL_PORT=587, EMAIL_USE_TLS=True and an app password.
-# Without it they are only printed in the Django console (development).
+# Until all three are filled in they are only printed in the Django console (development).
 # (Lower-case name: Django 6.1 refuses the old EMAIL_* settings next to MAILERS.)
 smtp_host = os.getenv('EMAIL_HOST', '')
-if smtp_host:
+if smtp_host and os.getenv('EMAIL_HOST_USER') and os.getenv('EMAIL_HOST_PASSWORD'):
     MAILERS = {
         'default': {
             'BACKEND': 'django.core.mail.backends.smtp.EmailBackend',
