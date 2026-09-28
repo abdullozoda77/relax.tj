@@ -46,7 +46,7 @@ fly-to; "Категории"; "Маршруты" - public routes made by the tea
 travellers (when to go, transport, useful to know).
 - Place page: photo gallery, description, how to get there, address, altitude, best season, entrance fee in \
 somoni (0 = free), current weather, a 3D terrain map, reviews with ratings and photos, buttons to add to \
-favorites, add to a route and share.
+favorites and share.
 - Account: "Войти" -> "Регистрация" with a username, email and password. A 6-digit code is sent to the \
 email; it is valid for 15 minutes, allows 5 tries, and a new code can be requested after 60 seconds. \
 "Забыли пароль?" in the login window (and in profile settings) sends a link to reset the password.

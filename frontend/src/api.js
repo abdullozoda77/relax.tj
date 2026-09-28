@@ -78,17 +78,24 @@ export async function api(path, { method = "GET", body } = {}) {
   };
 
   let res = await send();
-  if (res.status === 401 && tokens.access) {
-    if (!(await refreshAccessToken())) {
+  if (res.status === 401) {
+    const hadToken = Boolean(tokens.access);
+    if (hadToken && (await refreshAccessToken())) {
+      res = await send();
+    } else {
+      // The saved login is gone or has expired: show the site as logged out (the page may still think
+      // otherwise), and repeat the request as a guest so public data still loads.
       tokens.clear();
       onLogout();
+      if (hadToken) res = await send();
     }
-    res = await send();
   }
 
   const data = res.status === 204 ? null : await res.json().catch(() => null);
   if (!res.ok) {
-    const error = new Error(errorText(data) || t("Ошибка {0}", res.status));
+    // Not logged in (any more): a clear message instead of the server's. Wrong passwords on /auth/ keep theirs.
+    const message = res.status === 401 && !path.startsWith("/auth/") ? t("Сессия истекла. Войдите снова.") : errorText(data);
+    const error = new Error(message || t("Ошибка {0}", res.status));
     error.status = res.status;
     error.data = data;
     throw error;

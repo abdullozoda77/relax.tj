@@ -1,55 +1,13 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { api } from "../../api.js";
-import { useAuth } from "../../context/AuthContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
-import { useUi } from "../../context/UiContext.jsx";
 import { SEASONS, formatFee } from "../../utils.js";
 import FavoriteButton from "../FavoriteButton.jsx";
 import Icon from "../Icon.jsx";
 import { locale, t } from "../../i18n.js";
 
-// Right column: price, favorite, "add to my route", map and share.
+// Right column: price, favorite, map and share.
 export default function PlaceSidebar({ place }) {
-  const { user } = useAuth();
-  const { requireLogin, refreshMyData } = useUi();
   const toast = useToast();
-  const [lists, setLists] = useState([]);
-  const [listId, setListId] = useState("");
-
-  useEffect(() => {
-    if (!user) {
-      setLists([]);
-      return;
-    }
-    api("/travel-lists/?page_size=50")
-      .then((d) => {
-        setLists(d.results);
-        setListId(d.results[0]?.id || "");
-      })
-      .catch(() => {});
-  }, [user]);
-
-  const inList = (list) => list.items.some((i) => i.place === place.id);
-
-  async function addToList() {
-    if (!requireLogin(t("Войдите, чтобы добавлять места в маршрут"))) return;
-    try {
-      let target = lists.find((l) => l.id === Number(listId));
-      if (!target) {
-        // No routes yet: create the first one, named after this place.
-        target = await api("/travel-lists/", { method: "POST", body: { title: place.name, is_public: false } });
-      }
-      await api(`/travel-lists/${target.id}/add-place/`, { method: "POST", body: { place: place.id } });
-      toast(t("Добавлено в маршрут «{0}»", t(target.title)));
-      refreshMyData();
-      const d = await api("/travel-lists/?page_size=50");
-      setLists(d.results);
-      setListId(target.id);
-    } catch (err) {
-      toast(err.message, "error");
-    }
-  }
 
   async function share() {
     try {
@@ -61,7 +19,6 @@ export default function PlaceSidebar({ place }) {
   }
 
   const fee = Number(place.entrance_fee);
-  const selected = lists.find((l) => l.id === Number(listId));
 
   return (
     <aside className="bg-surface-container-low/95 backdrop-blur-xl rounded-2xl p-6 sm:p-7 shadow-2xl flex flex-col gap-6">
@@ -80,36 +37,6 @@ export default function PlaceSidebar({ place }) {
       </div>
 
       <FavoriteButton large place={place} />
-
-      <div className="flex flex-col gap-3 bg-surface-container-lowest/50 p-4 rounded-xl">
-        <label className="text-label-md font-label-md text-on-surface font-medium flex items-center justify-between">
-          <span>{t("Добавить в мой маршрут")}</span>
-          {selected && inList(selected) && <span className="text-label-sm font-label-sm text-primary">{t("уже в маршруте")}</span>}
-        </label>
-        {user && lists.length > 0 && (
-          <select
-            className="w-full bg-surface-container-lowest text-on-surface font-body-md text-body-md rounded-xl px-4 py-3 border-0 focus:ring-1 focus:ring-primary"
-            onChange={(e) => setListId(e.target.value)}
-            value={listId}
-          >
-            {lists.map((l) => (
-              <option key={l.id} value={l.id}>
-                {t(l.title)} ({l.items.length})
-              </option>
-            ))}
-          </select>
-        )}
-        {user && lists.length === 0 && <p className="text-label-sm font-label-sm text-outline">{t("У вас нет маршрутов — создадим новый с этим местом.")}</p>}
-        <button
-          className="w-full py-3 rounded-xl bg-primary hover:bg-tertiary-container text-on-primary font-title-md text-title-md transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
-          disabled={Boolean(selected && inList(selected))}
-          onClick={addToList}
-          type="button"
-        >
-          <Icon name="add_location_alt" className="text-[20px]" />
-          <span>{t("В маршрут")}</span>
-        </button>
-      </div>
 
       <div className="grid grid-cols-2 gap-3">
         {place.latitude && place.longitude ? (
