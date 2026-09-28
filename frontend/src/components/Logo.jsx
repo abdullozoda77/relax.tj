@@ -19,7 +19,7 @@ export default function Logo() {
     <Link className="flex items-center gap-3" to="/">
       <LogoMark />
       <span className="text-headline-sm font-headline-sm text-white tracking-tight flex items-center gap-1.5">
-        Relax.tj <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+        Rohat <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
       </span>
     </Link>
   );

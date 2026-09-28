@@ -15,7 +15,7 @@ export default function Footer() {
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2.5">
             <LogoMark small />
-            <span className="text-headline-sm font-headline-sm text-white">Relax.tj</span>
+            <span className="text-headline-sm font-headline-sm text-white">Rohat</span>
           </div>
           <p className="text-body-sm text-slate-400 leading-relaxed">
             {t("Места для отдыха в Таджикистане: горы Памира, озёра Фанских гор, санатории и древние крепости.")}
@@ -56,7 +56,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="max-w-7xl mx-auto px-6 lg:px-12 mt-12 pt-6 border-t border-slate-800/80 text-center text-slate-400 text-label-sm">
-        {t("© 2026 Relax.tj. Все права защищены.")}
+        {t("© 2026 Rohat. Все права защищены.")}
       </div>
     </footer>
   );

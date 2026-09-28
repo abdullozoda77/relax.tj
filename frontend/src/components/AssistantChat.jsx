@@ -213,7 +213,7 @@ export default function AssistantChat() {
               <Icon name="auto_awesome" filled className="text-[20px]" />
             </span>
             <div className="min-w-0 flex-1">
-              <h2 className="text-body-md font-semibold text-white truncate">{t("AI-помощник Relax.tj")}</h2>
+              <h2 className="text-body-md font-semibold text-white truncate">{t("AI-помощник Rohat")}</h2>
               <p className="text-label-sm text-slate-400 truncate">{t("Знает все места, маршруты и как работает сайт")}</p>
             </div>
             {messages.length > 0 && (
@@ -244,7 +244,7 @@ export default function AssistantChat() {
             {messages.length === 0 && (
               <div className="space-y-4">
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-sm px-4 py-3 text-slate-200">
-                  {t("Салом! Я AI-помощник Relax.tj. Спросите меня о местах, маршрутах, поездках по Таджикистану или о том, как пользоваться сайтом.")}
+                  {t("Салом! Я AI-помощник Rohat. Спросите меня о местах, маршрутах, поездках по Таджикистану или о том, как пользоваться сайтом.")}
                 </div>
                 {enabled ? (
                   <div className="flex flex-wrap gap-2">

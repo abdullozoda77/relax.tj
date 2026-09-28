@@ -9,8 +9,8 @@ class CustomUserAdmin(UserAdmin):
     list_filter = ["role", "is_active", "is_staff"]
     search_fields = ["username", "email", "first_name", "last_name", "phone_number"]
     fieldsets = UserAdmin.fieldsets + (
-        ("Relax.tj", {"fields": ("role", "phone_number", "avatar", "bio")}),
+        ("Rohat", {"fields": ("role", "phone_number", "avatar", "bio")}),
     )
     add_fieldsets = UserAdmin.add_fieldsets + (
-        ("Relax.tj", {"fields": ("email", "role", "phone_number")}),
+        ("Rohat", {"fields": ("email", "role", "phone_number")}),
     )

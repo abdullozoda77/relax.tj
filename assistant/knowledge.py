@@ -10,7 +10,7 @@ from places.models import Place, Region, Review, TravelList, TravelListPlace
 SEASONS = {"spring": "весна", "summer": "лето", "autumn": "осень", "winter": "зима", "all_year": "круглый год"}
 
 INSTRUCTIONS = """\
-You are the AI assistant of Relax.tj, a website about travel and rest in Tajikistan. Visitors ask you about \
+You are the AI assistant of Rohat, a website about travel and rest in Tajikistan. Visitors ask you about \
 places on the site, trips around Tajikistan, how to use the site, and anything else they are curious about.
 
 How to answer:
@@ -35,7 +35,7 @@ Explain how to do it in a few steps instead.
 """
 
 SITE_GUIDE = """\
-How Relax.tj works (menu names are shown in Russian; the site is also in Tajik and English):
+How Rohat works (menu names are shown in Russian; the site is also in Tajik and English):
 
 - Languages and theme: RU / TJ / EN switcher and a light/dark theme button in the header.
 - Search: the search box in the header suggests places while you type (in any of the three languages); \

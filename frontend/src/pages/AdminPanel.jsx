@@ -53,7 +53,7 @@ export default function AdminPanel() {
     <div className="max-w-7xl mx-auto px-6 lg:px-12 py-10 flex flex-col gap-8">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Relax.tj</span>
+          <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Rohat</span>
           <h1 className="font-headline-lg text-3xl md:text-headline-lg text-on-surface">{isAdmin(user) ? t("Панель управления") : t("Панель модератора")}</h1>
         </div>
         {isAdmin(user) && (

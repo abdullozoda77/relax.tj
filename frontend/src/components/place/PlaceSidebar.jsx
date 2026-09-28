@@ -136,7 +136,7 @@ export default function PlaceSidebar({ place }) {
       <div className="flex flex-col gap-3 pt-3 border-t border-outline-variant/30 text-label-sm font-label-sm text-on-surface-variant">
         <div className="flex items-center gap-2.5">
           <Icon name="verified_user" className="text-primary text-[19px]" />
-          <span>{t("Место проверено администратором Relax.tj")}</span>
+          <span>{t("Место проверено администратором Rohat")}</span>
         </div>
         <div className="flex items-center gap-2.5">
           <Icon name="payments" className="text-secondary text-[19px]" />

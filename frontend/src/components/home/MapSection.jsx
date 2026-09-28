@@ -39,7 +39,7 @@ export default function MapSection() {
                   <Icon name="3d_rotation" className="text-[32px]" />
                 </span>
                 <span className="text-headline-md font-headline-md text-white">{t("Открыть 3D-карту Таджикистана")}</span>
-                <span className="text-body-sm text-slate-300">{t("Горы, озёра и все места Relax.tj на одной карте")}</span>
+                <span className="text-body-sm text-slate-300">{t("Горы, озёра и все места Rohat на одной карте")}</span>
               </div>
             </button>
           </Reveal>

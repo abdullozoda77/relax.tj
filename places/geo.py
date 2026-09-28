@@ -22,7 +22,7 @@ def country_code(lat, lng):
     if code is None:
         query = urllib.parse.urlencode({"lat": f"{lat:.6f}", "lon": f"{lng:.6f}", "format": "json", "zoom": 3})
         try:
-            req = urllib.request.Request(f"{NOMINATIM_URL}?{query}", headers={"User-Agent": "Relax.tj travel site"})
+            req = urllib.request.Request(f"{NOMINATIM_URL}?{query}", headers={"User-Agent": "Rohat travel site"})
             with urllib.request.urlopen(req, timeout=10) as resp:
                 code = (json.load(resp).get("address") or {}).get("country_code", "")
         except (OSError, ValueError):

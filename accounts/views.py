@@ -193,7 +193,7 @@ class PasswordResetView(APIView):
             token = default_token_generator.make_token(user)
             link = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
             send_mail(
-                subject="Relax.tj — восстановление пароля",
+                subject="Rohat — восстановление пароля",
                 message=(
                     f"Здравствуйте, {user.username}!\n\n"
                     f"Чтобы задать новый пароль, откройте ссылку:\n{link}\n\n"

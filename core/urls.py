@@ -8,7 +8,7 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Relax.tj API",
+        title="Rohat API",
         default_version='v1',
         description="API для поиска мест отдыха в Таджикистане: регионы, места, отзывы, избранное и списки путешествий",
     ),
@@ -25,6 +25,6 @@ urlpatterns = [
     re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-admin.site.site_header = "Relax.tj"
-admin.site.site_title = "Relax.tj"
+admin.site.site_header = "Rohat"
+admin.site.site_title = "Rohat"
 admin.site.index_title = "Панель управления"

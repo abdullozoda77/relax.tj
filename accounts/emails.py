@@ -22,16 +22,16 @@ def send_confirmation_code(user):
     )
     minutes = int(CODE_LIFETIME.total_seconds() // 60)
     send_mail(
-        subject="Relax.tj — код подтверждения",
+        subject="Rohat — код подтверждения",
         message=(
             f"Здравствуйте, {user.username}!\n\n"
             f"Ваш код подтверждения: {code}\n\n"
-            f"Введите его на сайте Relax.tj, чтобы завершить регистрацию. Код действует {minutes} минут.\n"
+            f"Введите его на сайте Rohat, чтобы завершить регистрацию. Код действует {minutes} минут.\n"
             "Если вы не регистрировались, просто проигнорируйте это письмо."
         ),
         html_message=(
             f'<div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:24px;color:#0f172a">'
-            f'<h2 style="color:#059669;margin:0 0 12px">Relax.tj</h2>'
+            f'<h2 style="color:#059669;margin:0 0 12px">Rohat</h2>'
             f"<p>Здравствуйте, {user.username}!</p>"
             f"<p>Ваш код подтверждения:</p>"
             f'<p style="font-size:32px;font-weight:bold;letter-spacing:8px;background:#ecfdf5;border-radius:12px;'

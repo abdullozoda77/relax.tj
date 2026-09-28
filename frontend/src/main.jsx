@@ -5,7 +5,7 @@ import App from "./App.jsx";
 import { t } from "./i18n.js";
 import "./index.css";
 
-document.title = t("Relax.tj — отдых в Таджикистане");
+document.title = t("Rohat — отдых в Таджикистане");
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
