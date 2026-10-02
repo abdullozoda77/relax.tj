@@ -2,7 +2,7 @@
 
 ```
 Browser ──► nginx https://rohat.khayrkhoh.tj ──► frontend/dist (React), /media, /static
-            (http:// and :8030 redirect here) └► /api /admin /swagger ──► gunicorn 127.0.0.1:8031 (Django)
+            (also http://IP:8030)            └► /api /admin /swagger ──► gunicorn 127.0.0.1:8031 (Django)
 Django ──► Redis (db 12) ──► Celery worker (emails)   ◄── Celery beat (nightly cleanup 03:30)
 certbot (Let's Encrypt) renews the HTTPS certificate by itself.
 ```
