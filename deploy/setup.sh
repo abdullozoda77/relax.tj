@@ -209,11 +209,15 @@ systemctl restart rohat-gunicorn rohat-celery rohat-celerybeat
 step "Check"
 sleep 3
 systemctl is-active rohat-gunicorn rohat-celery rohat-celerybeat
-curl -sS -o /dev/null -w "site: HTTP %{http_code}\n" "$SITE_URL/"
-curl -sS -o /dev/null -w "API:  HTTP %{http_code}\n" "$SITE_URL/api/places/?page_size=1"
+# Checked on this server itself (--resolve), so the check works even if the domain's DNS is broken.
+RESOLVE="$DOMAIN:443:127.0.0.1"
+curl -sS -o /dev/null -w "site ($SITE_URL): HTTP %{http_code}\n" --resolve "$RESOLVE" --resolve "$DOMAIN:80:127.0.0.1" "$SITE_URL/" || true
+curl -sS -o /dev/null -w "API:  HTTP %{http_code}\n" --resolve "$RESOLVE" --resolve "$DOMAIN:80:127.0.0.1" "$SITE_URL/api/places/?page_size=1" || true
+curl -sS -o /dev/null -w "site (http://$SERVER_IP:$PUBLIC_PORT): HTTP %{http_code}\n" "http://127.0.0.1:$PUBLIC_PORT/" || true
+getent hosts "$DOMAIN" >/dev/null || echo "Warning: $DOMAIN does not resolve in DNS; the site is reachable at http://$SERVER_IP:$PUBLIC_PORT/"
 
 echo
-echo "Rohat: $SITE_URL/"
+echo "Rohat: $SITE_URL/  (also http://$SERVER_IP:$PUBLIC_PORT/)"
 echo "Admin account:   cd $APP && sudo -u $APP_USER .venv/bin/python manage.py createsuperuser"
 echo "Email / AI keys: nano $APP/.env   then   systemctl restart rohat-gunicorn rohat-celery"
 echo "Logs:            journalctl -u rohat-gunicorn -u rohat-celery -f"
