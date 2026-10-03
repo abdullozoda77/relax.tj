@@ -3,7 +3,7 @@
 # Run as root after cloning the project to /home/romin/rohat:
 #   bash /home/romin/rohat/deploy/setup.sh
 #
-# What runs where:  nginx https://rohat.khayrkhoh.tj and http://IP:8030  →  React site (frontend/dist), /media, /static
+# What runs where:  nginx https://rohat.king.tj and http://IP:8030  →  React site (frontend/dist), /media, /static
 #                                →  /api /admin /swagger  →  gunicorn 127.0.0.1:8031 (Django)
 #                   certbot (Let's Encrypt) keeps the HTTPS certificate renewed
 #                   Celery worker + beat  ←→  Redis (database 12)
@@ -13,7 +13,7 @@ set -euo pipefail
 APP_USER=romin
 APP=/home/$APP_USER/rohat
 PUBLIC_PORT=8030
-DOMAIN=rohat.khayrkhoh.tj  # must point to this server in DNS
+DOMAIN=rohat.king.tj  # must point to this server in DNS
 REDIS_DB=12
 NODE_DIR=/home/$APP_USER/.local/node22
 SERVER_IP=$(hostname -I | awk '{print $1}')
