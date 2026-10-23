@@ -6,6 +6,9 @@
 - **Бэкенд:** Django 6.1, Django REST Framework, SimpleJWT, django-filter, drf-yasg (Swagger).
 - **Фронтенд:** React, Vite, Tailwind CSS, React Router — в папке `frontend/`.
 
+Полная документация по всему коду (архитектура, технологии, каждая папка и файл бэкенда и фронтенда,
+API, база данных, деплой) — в папке [`docs/`](docs/README.md).
+
 ## Запуск бэкенда
 
 ```bash
