@@ -75,13 +75,18 @@ Update to the latest `main`:
 bash /home/romin/rohat/deploy/update.sh
 ```
 
-Add keys (Gmail app password, Gemini key), then restart:
+Add keys (Gmail app password, Gemini key, `GOOGLE_CLIENT_ID`), then restart:
 ```bash
 nano /home/romin/rohat/.env
 ```
 ```bash
 systemctl restart rohat-gunicorn rohat-celery
 ```
+
+Continue with Google: in https://console.cloud.google.com/apis/credentials create an **OAuth client ID** of type
+**Web application**, add `https://rohat.king.tj` (and `http://localhost:5173` for development) to
+**Authorized JavaScript origins**, and put the client ID in `.env` as `GOOGLE_CLIENT_ID=…`. No secret is needed.
+`update.sh` installs `google-auth` from `requirements.txt`.
 
 Logs:
 ```bash

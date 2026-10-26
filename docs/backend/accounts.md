@@ -82,6 +82,7 @@ Constants: `CODE_LIFETIME = 15 min`, `MAX_ATTEMPTS = 5`, `RESEND_AFTER = 60 s`.
 | `LoginView(TokenObtainPairView)` | `POST login/` | `auth` | Uses `LoginSerializer` |
 | `ConfirmEmailView` | `POST confirm-email/` | AllowAny, `auth` | Finds the active unverified user by email, `check_code`; errors mapped by `CODE_ERRORS`; on success sets `email_verified=True` and returns `{user, tokens}` |
 | `ResendConfirmationView` | `POST resend-confirmation/` | AllowAny, `auth` | 429 if `can_resend` is false; same answer whether the email exists or not |
+| `GoogleLoginView` (`google.py`) | `GET/POST google/` | AllowAny, `auth` | GET → `{client_id}`. POST `{credential}`: `verify_google_token` (signature, audience, issuer, `email_verified`), then `user_for_google` — existing user by email (sets `email_verified=True`) or a new one with `set_unusable_password()` and `free_username()`. 200/201 `{user, tokens, created}`; 400 bad token; 403 blocked; 503 if `GOOGLE_CLIENT_ID` is empty |
 | `TokenRefreshView` (SimpleJWT) | `POST token/refresh/` | — | New access (+ rotated refresh) |
 | `LogoutView` | `POST logout/` | IsAuthenticated | Blacklists the refresh token; 205 |
 | `ProfileView(RetrieveUpdateDestroyAPIView)` | `GET/PUT/PATCH/DELETE profile/` | IsAuthenticated | `get_object()` = current user. GET adds `stats` (favorites, reviews, travel_lists, suggestions counts). DELETE = soft delete (`is_active=False`) |

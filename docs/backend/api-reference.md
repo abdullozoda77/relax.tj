@@ -21,6 +21,8 @@ Legend for "Who": 🌐 anyone · 👤 logged in · 🛡 moderator or admin · �
 | POST | `confirm-email/` | 🌐 | `email, code` (6 digits) | 200 `{user, tokens:{refresh, access}}`; 400 `{code: "..."}` |
 | POST | `resend-confirmation/` | 🌐 | `email` | 200 `{detail}`; 429 if < 60 s |
 | POST | `login/` | 🌐 | `username, password` | 200 `{refresh, access}`; 401 wrong; 403 `{detail, code:"email_not_confirmed", email}` |
+| GET | `google/` | 🌐 | — | 200 `{client_id}` (empty = Google login off) |
+| POST | `google/` | 🌐 | `credential` (Google ID token) | 200 / 201 (new account) `{user, tokens:{refresh, access}, created}`; 400 bad token; 403 blocked; 503 not set up |
 | POST | `token/refresh/` | 🌐 | `refresh` | 200 `{access, refresh}` (rotated) |
 | POST | `logout/` | 👤 | `refresh` | 205 (token blacklisted) |
 | GET | `profile/` | 👤 | — | user + `stats{favorites, reviews, travel_lists, suggestions}` |

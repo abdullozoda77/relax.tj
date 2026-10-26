@@ -44,6 +44,14 @@ export function AuthProvider({ children }) {
     return loadProfile();
   }
 
+  // Continue with Google: the server checks Google's ID token and logs in (or creates) the account.
+  async function loginWithGoogle(credential) {
+    const data = await api("/auth/google/", { method: "POST", body: { credential } });
+    tokens.save(data.tokens);
+    await loadProfile();
+    return data;
+  }
+
   async function logout() {
     try {
       if (tokens.refresh) await api("/auth/logout/", { method: "POST", body: { refresh: tokens.refresh } });
@@ -55,7 +63,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, ready, login, register, loginWithTokens, logout, reloadUser: loadProfile, setUser }}>
+    <AuthContext.Provider value={{ user, ready, login, register, loginWithTokens, loginWithGoogle, logout, reloadUser: loadProfile, setUser }}>
       {children}
     </AuthContext.Provider>
   );

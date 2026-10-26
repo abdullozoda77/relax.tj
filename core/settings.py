@@ -251,6 +251,10 @@ CELERY_BEAT_SCHEDULE = {
     'nightly-cleanup': {'task': 'accounts.tasks.cleanup', 'schedule': crontab(hour=3, minute=30)},
 }
 
+# Continue with Google: the OAuth client ID (Web application) from https://console.cloud.google.com/apis/credentials.
+# While it is empty, the Google button is not shown.
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '')
+
 # Password reset emails link to the React page /reset-password on this address
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 # Gmail and most SMTP servers only send "from" the account itself, so it is used by default.

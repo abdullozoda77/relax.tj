@@ -56,3 +56,63 @@ class EmailDeliveryTests(APITestCase):
         EmailConfirmationCode.objects.create(user=new, code_hash="-", sent_at=timezone.now())
         cleanup()
         self.assertEqual(list(EmailConfirmationCode.objects.values_list("user__username", flat=True)), ["new"])
+
+
+GOOGLE = "/api/auth/google/"
+
+
+@override_settings(GOOGLE_CLIENT_ID="test-client.apps.googleusercontent.com")
+class GoogleLoginTests(APITestCase):
+    def setUp(self):
+        cache.clear()
+
+    def login(self, **claims):
+        claims = {"iss": "https://accounts.google.com", "email": "Ali.Valiev@gmail.com", "email_verified": True,
+                  "given_name": "Ali", "family_name": "Valiev", **claims}
+        with mock.patch("accounts.google.id_token.verify_oauth2_token", return_value=claims) as verify:
+            response = self.client.post(GOOGLE, {"credential": "token"}, format="json")
+        verify.assert_called_once()
+        self.assertEqual(verify.call_args.args[2], "test-client.apps.googleusercontent.com")
+        return response
+
+    def test_client_id_is_public(self):
+        self.assertEqual(self.client.get(GOOGLE).json(), {"client_id": "test-client.apps.googleusercontent.com"})
+
+    def test_new_user_is_created_without_password(self):
+        response = self.login()
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(response.json()["created"])
+        self.assertIn("access", response.json()["tokens"])
+        user = User.objects.get(email="ali.valiev@gmail.com")
+        self.assertEqual((user.username, user.first_name, user.last_name), ("ali.valiev", "Ali", "Valiev"))
+        self.assertTrue(user.email_verified)
+        self.assertFalse(user.has_usable_password())
+
+    def test_existing_email_logs_in_and_confirms_it(self):
+        user = User.objects.create_user("ali", "ali.valiev@gmail.com", "Qz7-rohat-test-4821", email_verified=False)
+        response = self.login()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["user"]["id"], user.id)
+        user.refresh_from_db()
+        self.assertTrue(user.email_verified)
+        self.assertEqual(User.objects.count(), 1)
+
+    def test_taken_username_gets_a_number(self):
+        User.objects.create_user("ali.valiev", "other@example.com", "Qz7-rohat-test-4821")
+        self.assertEqual(self.login().json()["user"]["username"], "ali.valiev2")
+
+    def test_unverified_google_email_is_refused(self):
+        self.assertEqual(self.login(email_verified=False).status_code, 400)
+        self.assertFalse(User.objects.filter(email__iexact="ali.valiev@gmail.com").exists())
+
+    def test_blocked_user_is_refused(self):
+        User.objects.create_user("ali", "ali.valiev@gmail.com", "Qz7-rohat-test-4821", is_active=False)
+        self.assertEqual(self.login().status_code, 403)
+
+    def test_invalid_token(self):
+        with mock.patch("accounts.google.id_token.verify_oauth2_token", side_effect=ValueError("bad")):
+            self.assertEqual(self.client.post(GOOGLE, {"credential": "x"}, format="json").status_code, 400)
+
+    @override_settings(GOOGLE_CLIENT_ID="")
+    def test_not_configured(self):
+        self.assertEqual(self.client.post(GOOGLE, {"credential": "x"}, format="json").status_code, 503)

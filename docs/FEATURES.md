@@ -61,6 +61,11 @@ Other list endpoints: `places/top-rated/`, `places/popular/`, `places/most-viewe
    `{code: "email_not_confirmed", email}` and the UI switches to the code screen.
 4. **Token refresh**: `api.js` automatically calls `POST /api/auth/token/refresh/` on a 401.
 5. **Logout**: `POST /api/auth/logout/ {refresh}` blacklists the refresh token.
+6. **Continue with Google** (`GoogleButton` under the login/register form): Google's button gives an ID token →
+   `POST /api/auth/google/ {credential}`. The server verifies it with `google-auth` (audience = `GOOGLE_CLIENT_ID`,
+   email must be verified by Google), then logs in the account with that email (marking it confirmed) or creates a
+   new one without a password (username from the email, `ali.valiev`, `ali.valiev2`…). Returns `{user, tokens, created}`.
+   The button is hidden while `GOOGLE_CLIENT_ID` is empty (`GET /api/auth/google/` returns the client ID).
 - Backend: `accounts/views.py`, `accounts/serializers.py`, `accounts/emails.py`, `accounts/models.py`.
 - Emails are queued to Celery when Redis is configured (with retries), otherwise sent immediately.
 

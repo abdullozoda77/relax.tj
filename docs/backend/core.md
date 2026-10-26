@@ -133,4 +133,5 @@ Run: `celery -A core worker` and `celery -A core beat` (see [../deploy.md](../de
 | `DEFAULT_FROM_EMAIL` | `"Rohat" <user>` | Sender |
 | `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_FALLBACK_MODELS` | see above | AI (Gemini) |
 | `ANTHROPIC_API_KEY`, `ASSISTANT_MODEL`, `ASSISTANT_EFFORT` | see above | AI (Claude) |
+| `GOOGLE_CLIENT_ID` | empty | Continue with Google (OAuth client ID, Web application); empty hides the button |
 | `CELERY_BROKER_URL` | empty | Redis broker; empty = run tasks inline |

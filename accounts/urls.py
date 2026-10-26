@@ -2,6 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
+from .google import GoogleLoginView
 from .views import (
     RegisterView, LoginView, PasswordResetView, PasswordResetConfirmView, LogoutView, ProfileView, ChangePasswordView,
     UserAdminViewSet, ConfirmEmailView, ResendConfirmationView,
@@ -13,6 +14,7 @@ router.register("users", UserAdminViewSet, basename="users")
 urlpatterns = [
     path("register/", RegisterView.as_view(), name="register"),
     path("login/", LoginView.as_view(), name="login"),
+    path("google/", GoogleLoginView.as_view(), name="google-login"),
     path("confirm-email/", ConfirmEmailView.as_view(), name="confirm-email"),
     path("resend-confirmation/", ResendConfirmationView.as_view(), name="resend-confirmation"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token-refresh"),

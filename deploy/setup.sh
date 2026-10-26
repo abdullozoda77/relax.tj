@@ -70,6 +70,9 @@ EMAIL_HOST_PASSWORD=
 # AI assistant: a free key from https://aistudio.google.com/apikey (or a paid ANTHROPIC_API_KEY).
 GEMINI_API_KEY=
 ANTHROPIC_API_KEY=
+
+# Continue with Google: OAuth client ID (Web application) from https://console.cloud.google.com/apis/credentials.
+GOOGLE_CLIENT_ID=
 ENV
   echo "Created $APP/.env — add the email and AI keys to it later (see the end of this script)."
 fi

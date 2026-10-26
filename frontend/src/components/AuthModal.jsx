@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
+import GoogleButton from "./GoogleButton.jsx";
 import Icon from "./Icon.jsx";
 import Modal from "./Modal.jsx";
 import { t } from "../i18n.js";
@@ -150,7 +151,7 @@ export function CheckEmail({ email, notConfirmed = false, onBack, onConfirmed })
 }
 
 export default function AuthModal({ tab: initialTab = "login", onClose }) {
-  const { login, register } = useAuth();
+  const { login, register, loginWithGoogle } = useAuth();
   const toast = useToast();
   const [tab, setTab] = useState(initialTab);
   const [form, setForm] = useState({ username: "", email: "", password: "", password2: "" });
@@ -180,6 +181,17 @@ export default function AuthModal({ tab: initialTab = "login", onClose }) {
       if (err.data?.code === "email_not_confirmed") setPending({ email: err.data.email, notConfirmed: true });
       else setError(err.status === 401 ? t("Неверное имя пользователя или пароль.") : err.message);
       setBusy(false);
+    }
+  }
+
+  async function google(credential) {
+    setError("");
+    try {
+      const { user, created } = await loginWithGoogle(credential);
+      toast(created ? t("Аккаунт создан. Добро пожаловать, {0}!", user.username) : t("Добро пожаловать, {0}!", user.username));
+      onClose();
+    } catch (err) {
+      setError(err.status === 403 ? t("Этот аккаунт заблокирован.") : t("Не удалось войти через Google. Попробуйте ещё раз."));
     }
   }
 
@@ -264,6 +276,7 @@ export default function AuthModal({ tab: initialTab = "login", onClose }) {
             </button>
           )}
         </form>
+        <GoogleButton label={isLogin ? "continue_with" : "signup_with"} onCredential={google} />
       </div>
     </Modal>
   );

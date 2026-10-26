@@ -31,6 +31,7 @@
 ### Modals (opened through `UiContext`)
 | File | Exports | What it does |
 |---|---|---|
+| `GoogleButton.jsx` | default `GoogleButton({onCredential, label})` | Loads Google Identity Services once, gets the client ID from `GET /auth/google/` and renders Google's button (dark, pill, site language) with an "или" divider; hidden if the client ID is empty or the script fails. Used in `AuthModal` → `useAuth().loginWithGoogle` |
 | `AuthModal.jsx` | default `AuthModal({tab, onClose})`, `Field`, `inputClass`, `CheckEmail` | Tabs **Вход** / **Регистрация**. Login via `useAuth().login`; if the server answers `email_not_confirmed` it switches to `CheckEmail`. Register via `useAuth().register` → `CheckEmail`. `CheckEmail` — 6-digit code input → `POST /auth/confirm-email/` → `loginWithTokens`; "send again" (`POST /auth/resend-confirmation/`) with a 60 s countdown. `ForgotPassword` → `POST /auth/password-reset/` |
 | `SuggestModal.jsx` | default `SuggestModal({name, onClose})`, `SUGGESTION_STATUSES`, `StatusBadge` | Form: name*, location* (`LocationPicker`), region, category, address, description, photo. Checks the point with `inTajikistanBox` before sending; `POST /suggestions/` as `FormData`; calls `suggestionSent()`. Shows "Мои предложения" (last 5) with status badges |
 
