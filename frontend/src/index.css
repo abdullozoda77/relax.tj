@@ -254,6 +254,15 @@ a.press {
     background-position: -150% 0;
   }
 }
+/* Spinner.jsx: an even turn with a slight ease, so it feels calm rather than mechanical. */
+.spinner {
+  animation: spinner 0.9s cubic-bezier(0.5, 0.15, 0.5, 0.85) infinite;
+}
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
 /* The hero's scroll hint: a dot moving down inside a mouse outline. */
 @keyframes scroll-hint {
   0% {

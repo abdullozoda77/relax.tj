@@ -8,6 +8,7 @@ import { DetailsAccordion, GearChecklist, GoodToKnow, LocationCard, MetricsBar }
 import PlaceSidebar from "../components/place/PlaceSidebar.jsx";
 import Reviews from "../components/place/Reviews.jsx";
 import WeatherCard from "../components/place/WeatherCard.jsx";
+import Spinner from "../components/Spinner.jsx";
 import Stars from "../components/Stars.jsx";
 import WhenVisible from "../components/WhenVisible.jsx";
 import { SEASONS, formatRating, plural } from "../utils.js";
@@ -28,8 +29,8 @@ function Terrain3DSection({ place }) {
           <Icon name="3d_rotation" className="text-[16px]" /> {t("Тяните мышью, чтобы вращать · правой кнопкой — наклон")}
         </span>
       </div>
-      <WhenVisible placeholder={<div className="h-[420px] rounded-xl bg-surface-container-lowest animate-pulse" />}>
-        <Suspense fallback={<div className="h-[420px] rounded-xl bg-surface-container-lowest animate-pulse" />}>
+      <WhenVisible placeholder={<div className="h-[420px] rounded-xl bg-surface-container-lowest flex items-center justify-center"><Spinner className="h-8 w-8" /></div>}>
+        <Suspense fallback={<div className="h-[420px] rounded-xl bg-surface-container-lowest flex items-center justify-center"><Spinner className="h-8 w-8" /></div>}>
           <Terrain3D place={place} />
         </Suspense>
       </WhenVisible>

@@ -6,6 +6,7 @@ import { SEASONS, formatFee, formatRating } from "../../utils.js";
 import Icon from "../Icon.jsx";
 import Modal from "../Modal.jsx";
 import PlaceBackground from "../PlaceBackground.jsx";
+import Spinner from "../Spinner.jsx";
 import { btnPrimary, btnSecondary, Empty, input, Label } from "./ui.jsx";
 import { t } from "../../i18n.js";
 
@@ -100,7 +101,7 @@ function PhotosManager({ placeId }) {
           </div>
         ))}
         <label className="h-24 rounded-lg border-2 border-dashed border-outline-variant hover:border-primary text-on-surface-variant hover:text-primary flex flex-col items-center justify-center cursor-pointer text-label-sm font-label-sm gap-1">
-          <Icon name={busy ? "progress_activity" : "add_a_photo"} className={`text-[22px] ${busy ? "animate-spin" : ""}`} />
+          {busy ? <Spinner className="h-[22px] w-[22px]" /> : <Icon name="add_a_photo" className="text-[22px]" />}
           {busy ? t("Загрузка...") : t("Добавить")}
           <input accept=".jpg,.jpeg,.png,.webp" className="hidden" disabled={busy} multiple onChange={upload} type="file" />
         </label>

@@ -11,6 +11,7 @@ import {
 import { CATEGORY_COLORS, createViewer, iconFontReady, placeMarker } from "../cesium.js";
 import { categoryStyle } from "../../utils.js";
 import Icon from "../Icon.jsx";
+import Spinner from "../Spinner.jsx";
 import { t } from "../../i18n.js";
 
 const DEGREES_PER_SECOND = 5;
@@ -136,7 +137,7 @@ export default function Terrain3D({ place }) {
       <div className="w-full h-full" ref={container} />
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center gap-2 text-on-surface-variant text-body-sm pointer-events-none bg-surface-container-lowest/40">
-          <Icon name="progress_activity" className="animate-spin text-primary" /> {t("Загружаем рельеф и спутниковые снимки...")}
+          <Spinner /> {t("Загружаем рельеф и спутниковые снимки...")}
         </div>
       )}
       <div className="absolute left-3 top-3 flex gap-2">
